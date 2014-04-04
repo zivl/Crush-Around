@@ -8,3 +8,5 @@
 # Visual Studio SDF files #
 *.sdf
 *.opensdf
+OpenCVFinal/Debug/
+OpenCVFinal/OpenCVFinal/Debug/
