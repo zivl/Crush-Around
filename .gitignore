@@ -4,3 +4,7 @@
 *.jar
 *.war
 *.ear
+
+# Visual Studio SDF files #
+*.sdf
+*.opensdf
