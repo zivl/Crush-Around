@@ -10,62 +10,113 @@
 #include <opencv2/objdetect/objdetect.hpp>
 #include <opencv2/features2d/features2d.hpp>
 
+#include "Definitions.h"
+
 using namespace cv;
 using namespace std;
 
-#define MAX_FOLDER_PATH_CHARS 200
-#define INPUT_FOLDER "C:\\vs2012_projects\\Inputs\\"
-#define IMG_ON_WALL_SPEAKERS "on-wall-speakers.jpg"
-#define IMG_PLANE "plane.jpg"
-#define IMG_CARD "card.jpg"
 
-#define BLOB_DISTANCE_BETWEEEN_BLOBS 10.0f
-#define BLOB_MIN_AREA 20.0f
-#define BLOB_MAX_AREA 500.0f
 
-void showBlobs(Mat image){
-	const char *wndNameOut = "Out";
-
+Mat showBlobs(Mat image, bool drawLinesBetweenBlobs){
         Mat out;
-        vector<KeyPoint> keyPoints;
+        vector<KeyPoint> keyPoints(1024);
         SimpleBlobDetector::Params params;
 		params.filterByColor = false;
         params.filterByCircularity = false;
 
 		params.minDistBetweenBlobs = BLOB_DISTANCE_BETWEEEN_BLOBS;
-        params.minThreshold = 40;
-        params.maxThreshold = 100;
-        params.thresholdStep = 10;
+        params.minThreshold = BLOB_MIN_THRESHOLD;
+        params.maxThreshold = BLOB_MAX_THRESHOLD;
+        params.thresholdStep = BLOB_THRESHOLD_STEP;
 
-        params.minArea = 300; 
-        params.maxArea = 8000;
+        params.minArea = BLOB_MIN_AREA; 
+        params.maxArea = BLOB_MAX_AREA;
                 
-		params.minConvexity = 0.3;
-        params.maxConvexity = 10;
+		params.minConvexity = BLOB_MIN_CONVEXITY;
+        params.maxConvexity = BLOB_MAX_CONVEXITY;
 
-		params.minInertiaRatio = 0.01;
+		params.minInertiaRatio = BLOB_MIN_INERTIA_RATIO;
 
-
-        SimpleBlobDetector blobDetector( params );
-        blobDetector.create("SimpleBlob");
+        SimpleBlobDetector blobDetector(params);
+		blobDetector.create("SimpleBlob");
 
         blobDetector.detect(image, keyPoints);
         drawKeypoints(image, keyPoints, out, CV_RGB(255, 0, 0), DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
 
-		for(int i = 0; i < keyPoints.size(); i++) {
-			if(i + 1 < keyPoints.size()){
-				line(out, keyPoints[i].pt, keyPoints[i + 1].pt, CV_RGB(0, 255, 0), 2);
-			}
-			else {
-				line(out, keyPoints[i].pt, keyPoints[0].pt, CV_RGB(0, 255, 0), 2);
+		if(drawLinesBetweenBlobs){
+			for(int i = 0; i < keyPoints.size(); i++) {
+				if(i + 1 < keyPoints.size()){
+					line(out, keyPoints[i].pt, keyPoints[i + 1].pt, CV_RGB(0, 255, 0), 2);
+				}
+				else {
+					line(out, keyPoints[i].pt, keyPoints[0].pt, CV_RGB(0, 255, 0), 2);
+				}
 			}
 		}
 
-
         cout << "Keypoints " << keyPoints.size() << endl;
         
-        imshow("Blobs", out);
-        waitKey(0);
+        return out;
+}
+
+class WatershedSegmenter{
+private:
+    Mat markers;
+public:
+    void setMarkers(Mat& markerImage)
+    {
+        markerImage.convertTo(markers, CV_32S);
+    }
+
+    Mat process(Mat &image)
+    {
+        watershed(image, markers);
+        markers.convertTo(markers,CV_8U);
+        return markers;
+    }
+};
+
+#define SEG_OUTER_BG 10
+
+
+Mat showSegmentation(Mat image)
+{
+    Mat blank(image.size(),CV_8U,Scalar(0xFF));
+    Mat dest;
+    imshow("originalimage", image);
+
+    // Create markers image
+    Mat markers(image.size(),CV_8U,Scalar(-1));
+
+    //top rectangle
+    markers(Rect(0,0,image.cols, SEG_OUTER_BG)) = Scalar::all(1);
+    //bottom rectangle
+    markers(Rect(0,image.rows-SEG_OUTER_BG,image.cols, SEG_OUTER_BG)) = Scalar::all(1);
+    //left rectangle
+    markers(Rect(0,0,SEG_OUTER_BG,image.rows)) = Scalar::all(1);
+    //right rectangle
+    markers(Rect(image.cols-SEG_OUTER_BG,0,SEG_OUTER_BG,image.rows)) = Scalar::all(1);
+    //centre rectangle
+    int centreW = image.cols/4;
+    int centreH = image.rows/4;
+    markers(Rect((image.cols/2)-(centreW/2),(image.rows/2)-(centreH/2), centreW, centreH)) = Scalar::all(2);
+    markers.convertTo(markers,CV_BGR2GRAY);
+    imshow("markers", markers);
+
+    //Create watershed segmentation object
+    WatershedSegmenter segmenter;
+    segmenter.setMarkers(markers);
+    Mat wshedMask = segmenter.process(image);
+    Mat mask;
+    convertScaleAbs(wshedMask, mask, 1, 0);
+    double thresh = threshold(mask, mask, 1, 255, THRESH_BINARY);
+    bitwise_and(image, image, dest, mask);
+    dest.convertTo(dest,CV_8U);
+
+    imshow("final_result", dest);
+    waitKey(0);
+
+    return dest;
 }
 
 int main()
@@ -73,19 +124,17 @@ int main()
 	char filename[MAX_FOLDER_PATH_CHARS] = "";
 	
 	strcat_s(filename, MAX_FOLDER_PATH_CHARS, INPUT_FOLDER);
-	strcat_s(filename, MAX_FOLDER_PATH_CHARS, IMG_CARD);
-	Mat im = imread(filename);
-    if (im.empty()) 
+	strcat_s(filename, MAX_FOLDER_PATH_CHARS, IMG_ON_WALL_SPEAKERS);
+	Mat inputImage = imread(filename);
+    if (inputImage.empty()) 
     {
         cout << "Cannot load image!" << endl;
         return -1;	
     }
 
-	showBlobs(im);
+	Mat outputImage = showSegmentation(inputImage);
 	
-    //imshow("Image", im);
-    //waitKey(0);
-	
-	
+    imshow("Image", outputImage);
+    waitKey(0);
 		
 }
