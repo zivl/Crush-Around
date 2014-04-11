@@ -11,6 +11,8 @@
 #include <opencv2/features2d/features2d.hpp>
 
 #include "Definitions.h"
+#include "WatershedSegmenter.h"
+
 
 using namespace cv;
 using namespace std;
@@ -59,22 +61,7 @@ Mat showBlobs(Mat image, bool drawLinesBetweenBlobs){
         return out;
 }
 
-class WatershedSegmenter{
-private:
-    Mat markers;
-public:
-    void setMarkers(Mat& markerImage)
-    {
-        markerImage.convertTo(markers, CV_32S);
-    }
 
-    Mat process(Mat &image)
-    {
-        watershed(image, markers);
-        markers.convertTo(markers,CV_8U);
-        return markers;
-    }
-};
 
 #define SEG_OUTER_BG 10
 
@@ -106,7 +93,7 @@ Mat showSegmentation(Mat image)
     //Create watershed segmentation object
     WatershedSegmenter segmenter;
     segmenter.setMarkers(markers);
-    Mat wshedMask = segmenter.process(image);
+	Mat wshedMask = segmenter.findSegments(image);
     Mat mask;
     convertScaleAbs(wshedMask, mask, 1, 0);
     double thresh = threshold(mask, mask, 1, 255, THRESH_BINARY);

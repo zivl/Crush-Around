@@ -2,7 +2,7 @@
 // files
 
 #define MAX_FOLDER_PATH_CHARS 200
-#define INPUT_FOLDER "C:\\vs2012_projects\\Inputs\\"
+#define INPUT_FOLDER "..\\..\\Inputs\\"
 #define IMG_ON_WALL_SPEAKERS "on-wall-speakers.jpg"
 #define IMG_PLANE "plane.jpg"
 #define IMG_CARD "card.jpg"
