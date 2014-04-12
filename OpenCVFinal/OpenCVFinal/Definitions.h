@@ -1,3 +1,4 @@
+#pragma once
 
 // files
 
@@ -21,3 +22,9 @@
 #define BLOB_MIN_CONVEXITY 0.3f
 #define BLOB_MAX_CONVEXITY 10.0f
 #define BLOB_MIN_INERTIA_RATIO 0.01f
+
+
+// Grab Cut Segmenter Settings
+
+#define GRAB_CUT_RADIUS 2
+#define GRAB_CUT_THICKNESS -1

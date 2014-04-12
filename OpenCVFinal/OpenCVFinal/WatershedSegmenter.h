@@ -1,3 +1,4 @@
+#pragma once
 #include "Segmenter.h"
 
 class WatershedSegmenter : public Segmenter

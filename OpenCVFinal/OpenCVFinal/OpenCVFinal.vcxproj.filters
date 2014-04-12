@@ -21,6 +21,12 @@
     <ClCompile Include="WatershedSegmenter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GrabCutSegmenter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OpenCVUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Definitions.h">
@@ -30,6 +36,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Segmenter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GrabCutSegmenter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenCVUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

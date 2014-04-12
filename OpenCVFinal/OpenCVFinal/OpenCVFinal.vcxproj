@@ -68,11 +68,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="GrabCutSegmenter.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="OpenCVUtils.cpp" />
     <ClCompile Include="WatershedSegmenter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Definitions.h" />
+    <ClInclude Include="GrabCutSegmenter.h" />
+    <ClInclude Include="OpenCVUtils.h" />
     <ClInclude Include="Segmenter.h" />
     <ClInclude Include="WatershedSegmenter.h" />
   </ItemGroup>

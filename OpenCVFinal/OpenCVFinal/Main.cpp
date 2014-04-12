@@ -12,12 +12,11 @@
 
 #include "Definitions.h"
 #include "WatershedSegmenter.h"
+#include "GrabCutSegmenter.h"
 
 
 using namespace cv;
 using namespace std;
-
-
 
 Mat showBlobs(Mat image, bool drawLinesBetweenBlobs){
         Mat out;
@@ -61,12 +60,9 @@ Mat showBlobs(Mat image, bool drawLinesBetweenBlobs){
         return out;
 }
 
-
-
 #define SEG_OUTER_BG 10
 
-
-Mat showSegmentation(Mat image)
+Mat showWatershedSegmentation(Mat image)
 {
     Mat blank(image.size(),CV_8U,Scalar(0xFF));
     Mat dest;
@@ -106,22 +102,97 @@ Mat showSegmentation(Mat image)
     return dest;
 }
 
-int main()
+void grabCutSegmentationInteractiveHelp()
+{
+    cout << "\nThis program demonstrates GrabCut segmentation -- select an object in a region\n"
+            "and then grabcut will attempt to segment it out.\n"
+            "Call:\n"
+            "./grabcut <image_name>\n"
+        "\nSelect a rectangular area around the object you want to segment\n" <<
+        "\nHot keys: \n"
+        "\tESC - quit the program\n"
+        "\tr - restore the original image\n"
+        "\tn - next iteration\n"
+        "\n"
+        "\tleft mouse button - set rectangle\n"
+        "\n"
+        "\tCTRL+left mouse button - set GrabCut Background pixels\n"
+        "\tSHIFT+left mouse button - set GrabCut Foreground pixels\n"
+        "\n"
+        "\tCTRL+right mouse button - set GrabCut Probably Background pixels\n"
+        "\tSHIFT+right mouse button - set GrabCut Probably Foreground pixels\n" << endl;
+}
+
+GrabCutSegmenter gcapp;
+
+static void on_mouse( int event, int x, int y, int flags, void* param )
+{
+    gcapp.mouseClick( event, x, y, flags, param );
+}
+
+void showGrabCutSegmentation(Mat image){
+	const string winName = "image";
+
+	grabCutSegmentationInteractiveHelp();
+    namedWindow( winName, WINDOW_AUTOSIZE );
+    setMouseCallback( winName, on_mouse, 0 );
+
+    gcapp.setImageAndWinName( image, winName );
+    gcapp.showImage();
+
+	bool exitFlagIsOff = true;
+
+    while(exitFlagIsOff)
+    {
+        int c = waitKey(0);
+        switch( (char) c )
+        {
+        case '\x1b':
+            cout << "Exiting ..." << endl;
+            exitFlagIsOff = false;
+			break;
+        case 'r':
+            cout << endl;
+            gcapp.reset();
+            gcapp.showImage();
+            break;
+        case 'n':
+            int iterCount = gcapp.getIterCount();
+            cout << "<" << iterCount << "... ";
+			gcapp.nextIter();
+			int newIterCount = gcapp.getIterCount();
+			if(newIterCount > iterCount) {
+                gcapp.showImage();
+                cout << iterCount << ">" << endl;
+            }
+            else{
+                cout << "rect must be determined>" << endl;
+			}
+            break;
+        }
+    }
+
+    destroyWindow(winName);
+}
+int main( int argc, char** argv )
 {
 	char filename[MAX_FOLDER_PATH_CHARS] = "";
 	
 	strcat_s(filename, MAX_FOLDER_PATH_CHARS, INPUT_FOLDER);
 	strcat_s(filename, MAX_FOLDER_PATH_CHARS, IMG_ON_WALL_SPEAKERS);
-	Mat inputImage = imread(filename);
+
+    Mat inputImage = imread(filename);
     if (inputImage.empty()) 
     {
         cout << "Cannot load image!" << endl;
         return -1;	
     }
 
-	Mat outputImage = showSegmentation(inputImage);
-	
+	showGrabCutSegmentation(inputImage);
+	/*Mat outputImage = showWatershedSegmentation(inputImage);
+
     imshow("Image", outputImage);
-    waitKey(0);
-		
+    waitKey(0);*/
+    
+    return 0;
 }
