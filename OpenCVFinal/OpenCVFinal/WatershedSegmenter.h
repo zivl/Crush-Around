@@ -1,6 +1,6 @@
 #include "Segmenter.h"
 
-class WatershedSegmenter //: public Segmenter
+class WatershedSegmenter : public Segmenter
 {
 private:
     Mat markers;

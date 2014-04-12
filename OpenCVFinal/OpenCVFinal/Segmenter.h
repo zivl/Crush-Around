@@ -8,6 +8,6 @@ class Segmenter
 public:
 	virtual ~Segmenter(void) {}
 
-	virtual Mat findSegments(Mat &image);
+	virtual Mat findSegments(Mat &image) = 0;
 };
 
