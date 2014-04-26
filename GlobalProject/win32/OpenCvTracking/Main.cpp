@@ -17,6 +17,7 @@
 
 #include "Core/ObjectTrackingSample.h"
 #include "Core/VideoTracking.hpp"
+#include "Core/WatershedSegmenter.h"
 
 #include <ctime>
 
@@ -65,7 +66,10 @@ int track2()
 
     track = new VideoTracking();
 
+    WatershedSegmenter segmenter;    
+
     setMouseCallback("track", VideoTracking::mouseCallback, track );
+
 
     time_t start = time(0);
     long frames = 0;

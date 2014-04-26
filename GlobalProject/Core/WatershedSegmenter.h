@@ -1,5 +1,8 @@
 #pragma once
 
+#include <opencv2/core/core.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+
 #define SEG_OUTER_BG 10
 
 class WatershedSegmenter

@@ -52,7 +52,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>opencv_calib3d248d.lib;opencv_contrib248d.lib;opencv_core248d.lib;opencv_features2d248d.lib;opencv_flann248d.lib;opencv_gpu248d.lib;opencv_highgui248d.lib;opencv_imgproc248d.lib;opencv_legacy248d.lib;opencv_ml248d.lib;opencv_nonfree248d.lib;opencv_objdetect248d.lib;opencv_photo248d.lib;opencv_stitching248d.lib;opencv_ts248d.lib;opencv_video248d.lib;opencv_videostab248d.lib;D:\box2d\Box2D_v2.3.0\Box2D\Build\vs2012\bin\Debug\Box2D.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opencv_calib3d248d.lib;opencv_contrib248d.lib;opencv_core248d.lib;opencv_features2d248d.lib;opencv_flann248d.lib;opencv_gpu248d.lib;opencv_highgui248d.lib;opencv_imgproc248d.lib;opencv_legacy248d.lib;opencv_ml248d.lib;opencv_nonfree248d.lib;opencv_objdetect248d.lib;opencv_photo248d.lib;opencv_stitching248d.lib;opencv_ts248d.lib;opencv_video248d.lib;opencv_videostab248d.lib;D:\Documents\Destroy-Around-Me\GlobalProject\win32\Box2d\bin\Debug\Box2D.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -76,6 +76,7 @@
     <ClCompile Include="..\..\Core\SampleBase.cpp" />
     <ClCompile Include="..\..\Core\SampleOptions.cpp" />
     <ClCompile Include="..\..\Core\VideoTracking.cpp" />
+    <ClCompile Include="..\..\Core\WatershedSegmenter.cpp" />
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -85,6 +86,7 @@
     <ClInclude Include="..\..\Core\SampleBase.h" />
     <ClInclude Include="..\..\Core\SampleOptions.h" />
     <ClInclude Include="..\..\Core\VideoTracking.hpp" />
+    <ClInclude Include="..\..\Core\WatershedSegmenter.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

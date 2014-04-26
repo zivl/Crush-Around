@@ -1,6 +1,5 @@
 #include "WatershedSegmenter.h"
 
-
 WatershedSegmenter::WatershedSegmenter(void)
 {
 }
@@ -13,7 +12,7 @@ WatershedSegmenter::~WatershedSegmenter(void)
 void WatershedSegmenter::createMarkersFromImage(cv::Mat& image)
 {
     // Create markers image
-	cv::Mat markerImage(image.size(),CV_8U,cv::Scalar(-1));
+    cv::Mat markerImage(image.size(),CV_8U,cv::Scalar(-1));
 
     //top rectangle
     markerImage(cv::Rect(0,0,image.cols, SEG_OUTER_BG)) = cv::Scalar::all(1);
@@ -46,7 +45,7 @@ void WatershedSegmenter::getSegmentedMask(const cv::Mat &segmentedImage, cv::Mat
 }
 
 void WatershedSegmenter::mergeSegmentedMaskAndOriginalImage(cv::Mat &originalImage, cv::Mat &dest, cv::Mat &segmentedImage, cv::Mat &mask) {
-	bitwise_and(originalImage, originalImage, dest, mask);
+    bitwise_and(originalImage, originalImage, dest, mask);
     dest.convertTo(dest,CV_8U);
 }
 
