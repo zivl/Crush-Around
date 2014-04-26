@@ -7,8 +7,10 @@
 //
 
 #import "ViewController.h"
-#import "Core/VideoTracking.hpp"
+#import "VideoTracking.hpp"
 #include "WatershedSegmenter.h"
+#include "LcObjectDetector.h"
+
 
 @interface ViewController ()
 
@@ -18,6 +20,8 @@
 @synthesize videoCamera;
 
 BOOL isFirst = YES;
+BOOL imageForSegmentationHasBeenTaken = NO;
+
 Mat firstImage;
 VideoTracking *track;
 
@@ -42,31 +46,63 @@ VideoTracking *track;
 
 #pragma mark - Protocol CvVideoCameraDelegate
 
+std::vector<std::vector<cv::Point>> getLCDetection(const cv::Mat &image, cv::Mat &output){
+	std::vector<std::vector<cv::Point>> contours;
+
+    LcObjectDetector objDetector;
+
+	contours = objDetector.getObjectContours(image);
+
+	std::vector<cv::Point> approx;
+	// test each contour
+	for( size_t i = 0; i < contours.size(); i++ )
+	{
+		cv::Point* pnts = (cv::Point*)malloc(sizeof(cv::Point) * contours[i].size());
+		for (int j = 0; j < contours[i].size(); j++)
+		{
+			pnts[j] = contours[i][j];
+		}
+
+		const cv::Point* ppt[1] = { pnts };
+		int npt[] = { (int)contours[i].size() };
+		fillPoly(output, ppt, npt, 1, cv::Scalar(120, 250, 50));
+		delete pnts;
+	}
+
+	return contours;
+}
+
 #ifdef __cplusplus
 - (void)processImage:(Mat&)image;
 {
 	Mat image_copy;
     cvtColor(image, image_copy, CV_BGRA2BGR);
 
-	/*if(isFirst){
-		firstImage = image_copy;
-		track->setReferenceFrame(firstImage);
-		isFirst = !isFirst;
+	if(imageForSegmentationHasBeenTaken){
+		if(isFirst){
+			isFirst = !isFirst;
+			firstImage = image_copy;
+			track->setReferenceFrame(firstImage);
+			cv::Mat temp;
+			track->setObjectsToBeModeled(getLCDetection(firstImage, temp));
+			
+		}
+		else {
+			track->processFrame(image_copy, image_copy);
+
+		}
+		cvtColor(image_copy, image, CV_BGR2BGRA);
 	}
-	else {
-		track->processFrame(image_copy, image_copy);
+	else{
 
-	}*/
-	//cv::Canny(image, image, 100, 500);
-	image = showWatershedSegmentation(image_copy);
-
-
-//    cvtColor(image_copy, image, CV_BGR2BGRA);
-
-
+		//image = showWatershedSegmentation(image_copy);
+		getLCDetection(image, image);
+	}
+	
+	
 }
 
-Mat showWatershedSegmentation(Mat image)
+Mat getWatershedSegmentation(Mat image)
 {
     //Mat blank(image.size(),CV_8U,Scalar(0xFF));
 
@@ -86,6 +122,10 @@ Mat showWatershedSegmentation(Mat image)
 	[self.videoCamera stop];
 	isFirst = YES;
 	[self.videoCamera start];
+}
+
+-(IBAction)markObjectButton:(id)sender {
+	imageForSegmentationHasBeenTaken = YES;
 }
 
 -(void)onTap:(UITapGestureRecognizer *)recognizer {

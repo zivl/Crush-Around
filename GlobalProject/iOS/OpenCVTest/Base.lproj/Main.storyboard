@@ -29,6 +29,17 @@
                                     <action selector="resetCameraFirstPositionButton:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="V2W-2L-A8A"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="wordWrap" translatesAutoresizingMaskIntoConstraints="NO" id="agZ-GW-kXb">
+                                <rect key="frame" x="20" y="132" width="46" height="56"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal">
+                                    <string key="title">Mark
+Object</string>
+                                </state>
+                                <connections>
+                                    <action selector="markObjectButton:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="Iic-oz-e3G"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>

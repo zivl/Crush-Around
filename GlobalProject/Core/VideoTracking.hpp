@@ -39,6 +39,8 @@ public:
     virtual void onMouse(int event, int x, int y, int, void*);
 
     static void mouseCallback(int event, int x, int y, int flags, void *param);
+
+	void setObjectsToBeModeled(const std::vector<std::vector<cv::Point>> contours);
     
 private:
     int m_maxNumberOfPoints;

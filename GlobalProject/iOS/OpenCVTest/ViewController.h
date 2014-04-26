@@ -42,9 +42,13 @@ using namespace cv;
 
 @property (nonatomic, retain) CvVideoCamera* videoCamera;
 
+-(void)onTap:(UITapGestureRecognizer *)recognizer;
+
 -(IBAction)resetCameraFirstPositionButton:(id)sender;
 
--(void)onTap:(UITapGestureRecognizer *)recognizer;
+-(IBAction)markObjectButton:(id)sender;
+
+
 
 
 @end

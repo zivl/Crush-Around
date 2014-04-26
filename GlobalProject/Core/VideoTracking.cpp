@@ -224,7 +224,7 @@ void VideoTracking::setReferenceFrame(const cv::Mat& reference)
     m_scene = cv::Scalar(0,0,0);
 
     // draw a square in the center
-    rectangle(m_scene, cvPoint(reference.cols/2 - 10, reference.rows/2 + 10), cvPoint(reference.cols/2 + 10, reference.rows /2 - 10), cv::Scalar(0,255,255), -1);
+    rectangle(m_scene, cvPoint(reference.cols/2 - 20, reference.rows/2 + 10), cvPoint(reference.cols/2 + 20, reference.rows /2 - 10), cv::Scalar(0,255,255), -1);
 
     // draw a border 20 pixels into the image
     line(m_scene, cvPoint(20, 20), cvPoint(20, reference.rows - 20), cv::Scalar(0, 255, 0), 2);
@@ -241,7 +241,7 @@ void VideoTracking::setReferenceFrame(const cv::Mat& reference)
     b2BodyDef groundBodyDef;
     groundBodyDef.position.Set(0,0);
 
-    cv::Size visibleSize(reference.cols - 40, reference.rows - 40);
+    cv::Size visibleSize(reference.cols, reference.rows);
 
     b2Body *groundBody = m_world->CreateBody(&groundBodyDef);
     b2EdgeShape groundEdge;
@@ -353,7 +353,7 @@ void VideoTracking::calcHomographyAndTransformScene(cv::Mat& outputFrame)
             }
 
             cv::circle(transformedScene,
-                       cv::Point2f(m_ballBody->GetPosition().x * PTM_RATIO + 20, m_ballBody->GetPosition().y * PTM_RATIO + 20),
+                       cv::Point2f(m_ballBody->GetPosition().x * PTM_RATIO, m_ballBody->GetPosition().y * PTM_RATIO),
                        26, cv::Scalar(255, 0, 0), -1);
 
             warpPerspective(transformedScene, transformedScene, this->m_refFrame2CurrentHomography, outputFrame.size(), CV_INTER_LINEAR);
@@ -380,7 +380,8 @@ void VideoTracking::onMouse( int event, int x, int y, int, void* )
     // add to the world model
     b2BodyDef bodyDef;
     bodyDef.type = b2_staticBody;
-    bodyDef.position.Set((targetPoints[0].x - 20)/PTM_RATIO, (targetPoints[0].y - 20)/PTM_RATIO);
+    bodyDef.position.Set(targetPoints[0].x /PTM_RATIO, targetPoints[0].y/PTM_RATIO);
+	std::cout << "[" << targetPoints[0].x /PTM_RATIO << "," <<targetPoints[0].y/PTM_RATIO << "]" << std::endl;
 	b2Body *body = m_world->CreateBody(&bodyDef);
 
     b2CircleShape circle;
@@ -401,3 +402,51 @@ void VideoTracking::mouseCallback(int event, int x, int y, int flags, void *para
     VideoTracking *self = static_cast<VideoTracking*>(param);
     self->onMouse(event, x, y, flags, param);
 }
+
+void VideoTracking::setObjectsToBeModeled(const std::vector<std::vector<cv::Point>> contours) {
+
+	int contourSize = (int)contours.size();
+	for(int i = 0; i < /*contourSize*/1; i++ )
+	{
+		std::vector<cv::Point> currentShape = contours[i];
+		int numOfPoints = (int)currentShape.size();
+		if(numOfPoints <= 8){
+//			std::cout << "Shape: " << i << " Points: " << numOfPoints << std::endl;
+			b2Vec2 vertices[8];
+			for (int j = 0; j < numOfPoints; j++)
+			{
+				vertices[j].x = currentShape[j].x / PTM_RATIO;
+				vertices[j].y = currentShape[j].y / PTM_RATIO;
+				cv::line(m_scene, currentShape[j], currentShape[(j + 1) % numOfPoints], cv::Scalar(0,0,255));
+				std::cout << "[" << vertices[j].x << "," <<vertices[j].y << "]" << std::endl;
+			}
+
+
+			b2PolygonShape polygon;
+			polygon.Set(vertices, numOfPoints);
+
+			b2BodyDef objectBodyDef;
+			objectBodyDef.type = b2_staticBody;
+			objectBodyDef.position.Set(polygon.m_centroid.x, polygon.m_centroid.y);
+			std::cout << "center=[" << polygon.m_centroid.x << "," << polygon.m_centroid.y << "]" << std::endl;
+			b2Body *objectBody = m_world->CreateBody(&objectBodyDef);
+
+			b2FixtureDef objectShapeDef;
+			objectShapeDef.shape = &polygon;
+			objectShapeDef.density = 10.0f;
+			objectShapeDef.friction = 0.0f;
+			objectBody->CreateFixture(&objectShapeDef);
+
+		}
+	}
+}
+
+
+
+
+
+
+
+
+
+
