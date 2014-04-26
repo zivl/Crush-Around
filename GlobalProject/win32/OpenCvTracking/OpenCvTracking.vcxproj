@@ -71,6 +71,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Core\Globals.cpp" />
+    <ClCompile Include="..\..\Core\LcObjectDetector.cpp" />
     <ClCompile Include="..\..\Core\ObjectTrackingClass.cpp" />
     <ClCompile Include="..\..\Core\ObjectTrackingSample.cpp" />
     <ClCompile Include="..\..\Core\SampleBase.cpp" />
@@ -81,6 +82,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Core\Globals.h" />
+    <ClInclude Include="..\..\Core\LcObjectDetector.h" />
     <ClInclude Include="..\..\Core\ObjectTrackingClass.h" />
     <ClInclude Include="..\..\Core\ObjectTrackingSample.h" />
     <ClInclude Include="..\..\Core\SampleBase.h" />

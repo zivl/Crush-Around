@@ -18,6 +18,7 @@
 #include "Core/ObjectTrackingSample.h"
 #include "Core/VideoTracking.hpp"
 #include "Core/WatershedSegmenter.h"
+#include "Core/LcObjectDetector.h";
 
 #include <ctime>
 
@@ -46,6 +47,20 @@ int main( int argc, char** argv )
     track2();
 }
 
+Mat showWatershedSegmentation(Mat image)
+{
+    //Mat blank(image.size(),CV_8U,Scalar(0xFF));
+
+    //Create watershed segmentation object
+    WatershedSegmenter segmenter;
+    segmenter.createMarkersFromImage(image);
+    Mat wshedMask = segmenter.findSegments(image);
+    Mat mask;
+    segmenter.getSegmentedMask(wshedMask, mask);
+
+    return mask;
+}
+
 
 int track2()
 {
@@ -62,23 +77,53 @@ int track2()
         cap >> testFrame;
     }
 
-    namedWindow("track", 1);
+    namedWindow("output", 1);
+    namedWindow("input", 2);
 
     track = new VideoTracking();
 
-    WatershedSegmenter segmenter;    
+    setMouseCallback("output", VideoTracking::mouseCallback, track );
 
-    setMouseCallback("track", VideoTracking::mouseCallback, track );
-
+    vector<vector<Point> > contours;
 
     time_t start = time(0);
     long frames = 0;
+    LcObjectDetector objDetector;
+    
     for(;;)
     {        
-        Mat frame;    // define a matrix for frame
+        Mat frame, frame2, frame3;
+
+        
         cap >> frame; // get a new frame from camera
-        processImage(frame);
-        imshow("track", frame);
+
+        frame.copyTo(frame2);
+        frame.copyTo(frame3);
+
+        
+        contours = objDetector.getObjectContours(frame2);
+
+        vector<Point> approx;
+        // test each contour
+        for( size_t i = 0; i < contours.size(); i++ )
+        {          
+            Point* pnts = (Point*)malloc(sizeof(Point) * contours[i].size());
+            for (int j = 0; j < contours[i].size(); j++)
+            {
+                pnts[j] = contours[i][j];
+            }
+
+            const Point* ppt[1] = { pnts };
+            int npt[] = { contours[i].size() };
+            fillPoly(frame3, ppt, npt, 1, Scalar(120, 250, 50));
+
+            delete pnts;
+        }
+
+        //drawContours(frame2, contours, -1, Scalar(120, 250, 120), 2);
+
+        imshow("input", frame);
+        imshow("output", frame3);
 
         if(waitKey(30) >= 0) break;
         
