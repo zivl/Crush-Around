@@ -4,6 +4,10 @@
 #define OpenCV_Tutorial_ObjectTrackingSample_h
 
 #include "SampleBase.h"
+#include <iostream>
+#include <float.h>
+#include <ctype.h>
+#include <opencv2\core\core.hpp>
 
 class ObjectTrackingSample : public SampleBase
 {

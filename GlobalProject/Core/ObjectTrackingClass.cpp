@@ -1,8 +1,4 @@
 
-
-#include <iostream>
-#include <float.h>
-#include <ctype.h>
 #include "ObjectTrackingClass.h"
 
 inline float Min(float a, float b) { return a < b ? a : b; }

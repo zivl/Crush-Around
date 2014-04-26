@@ -4,6 +4,7 @@
 #define OpenCV_Tutorial_SampleOptions_h
 
 #include <string>
+#include <vector>
 
 typedef enum { OptionKindBoolean, OptionKindInt32, OptionKindFloat, OptionKindDouble, OptionKindStringEnum } OptionKind;
 

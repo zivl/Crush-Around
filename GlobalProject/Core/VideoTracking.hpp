@@ -3,6 +3,13 @@
 #define OpenCV_Tutorial_VideoTracking_hpp
 
 #include "SampleBase.h"
+#include <opencv2\core\core.hpp>
+#include <opencv2\imgproc\imgproc.hpp>
+#include <opencv2\video\tracking.hpp>
+#include <opencv2\calib3d\calib3d.hpp> //for homography
+#include <opencv2\features2d\features2d.hpp>    //features (orb, brief and corresponding matcher/extractors)
+#include <opencv2\highgui\highgui.hpp>
+#include <vector>
 #include <Box2D/Box2D.h>
 
 #define PTM_RATIO 32.0
@@ -29,10 +36,10 @@ public:
 
     virtual std::string getSampleIcon() const;
 
-	virtual void onMouse(int event, int x, int y, int, void*);
+    virtual void onMouse(int event, int x, int y, int, void*);
 
     static void mouseCallback(int event, int x, int y, int flags, void *param);
-	
+    
 private:
     int m_maxNumberOfPoints;
 
@@ -83,13 +90,13 @@ private:
     // transform scene and add to output frame
     void calcHomographyAndTransformScene(cv::Mat& outputFrame);
 
-	// box2d "world" objects
+    // box2d "world" objects
     b2World * m_world;
     b2Body * m_ballBody;
     b2Fixture * m_ballFixture;
     float dt;
 
-	cv::Mat m_refFrame2CurrentHomography;
+    cv::Mat m_refFrame2CurrentHomography;
 
     cv::vector<cv::Point2f> m_destroyedPoints;
 };

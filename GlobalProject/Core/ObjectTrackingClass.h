@@ -3,6 +3,11 @@
 #ifndef OpenCV_Tutorial_ObjectTrackingClass_h
 #define OpenCV_Tutorial_ObjectTrackingClass_h
 
+#include <opencv2\core\core.hpp>
+#include <opencv2\imgproc\imgproc.hpp>
+#include <opencv2\video\tracking.hpp>
+
+
 class ObjectTrackingClass
 {
 private:
