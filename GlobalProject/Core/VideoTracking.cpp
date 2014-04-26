@@ -431,6 +431,7 @@ void VideoTracking::setObjectsToBeModeled(const std::vector<std::vector<cv::Poin
 			std::cout << "center=[" << polygon.m_centroid.x << "," << polygon.m_centroid.y << "]" << std::endl;
 			b2Body *objectBody = m_world->CreateBody(&objectBodyDef);
 
+
 			b2FixtureDef objectShapeDef;
 			objectShapeDef.shape = &polygon;
 			objectShapeDef.density = 10.0f;
