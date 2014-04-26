@@ -13,3 +13,7 @@ OpenCVFinal/Debug/
 OpenCVFinal/OpenCVFinal/Debug/
 GlobalProject/win32/Box2d/bin/
 GlobalProject/win32/Box2d/obj/
+GlobalProject/win32/OpenCvTracking/Debug/
+GlobalProject/win32/Debug/
+*.vcxproj.user
+*.suo
