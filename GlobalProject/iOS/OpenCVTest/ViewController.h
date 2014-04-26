@@ -18,6 +18,8 @@
 
 #ifdef __cplusplus
 #import <opencv2/opencv.hpp>
+#import <opencv2/core/core.hpp>
+#import <opencv2/objdetect/objdetect.hpp>
 #import <opencv2/features2d/features2d.hpp>
 #import <opencv2/imgproc/imgproc.hpp>
 #import <opencv2/video/tracking.hpp>

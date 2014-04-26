@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C95BF521190BDBF7008D9497 /* WatershedSegmenter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C95BF51E190BDBF7008D9497 /* WatershedSegmenter.cpp */; };
 		C99B1FEF190BB0EC003F19C1 /* b2BroadPhase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C99B1F80190BB0EC003F19C1 /* b2BroadPhase.cpp */; };
 		C99B1FF0190BB0EC003F19C1 /* b2CollideCircle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C99B1F82190BB0EC003F19C1 /* b2CollideCircle.cpp */; };
 		C99B1FF1190BB0EC003F19C1 /* b2CollideEdge.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C99B1F83190BB0EC003F19C1 /* b2CollideEdge.cpp */; };
@@ -95,6 +96,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		C95BF51E190BDBF7008D9497 /* WatershedSegmenter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WatershedSegmenter.cpp; sourceTree = "<group>"; };
+		C95BF51F190BDBF7008D9497 /* WatershedSegmenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WatershedSegmenter.h; sourceTree = "<group>"; };
 		C99B1F7E190BB0EC003F19C1 /* Box2D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Box2D.h; sourceTree = "<group>"; };
 		C99B1F80190BB0EC003F19C1 /* b2BroadPhase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = b2BroadPhase.cpp; sourceTree = "<group>"; };
 		C99B1F81190BB0EC003F19C1 /* b2BroadPhase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = b2BroadPhase.h; sourceTree = "<group>"; };
@@ -423,6 +426,8 @@
 		C99B1FE2190BB0EC003F19C1 /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				C95BF51E190BDBF7008D9497 /* WatershedSegmenter.cpp */,
+				C95BF51F190BDBF7008D9497 /* WatershedSegmenter.h */,
 				C99B1FE3190BB0EC003F19C1 /* Globals.cpp */,
 				C99B1FE4190BB0EC003F19C1 /* Globals.h */,
 				C99B1FE5190BB0EC003F19C1 /* ObjectTrackingClass.cpp */,
@@ -675,6 +680,7 @@
 				C99B201E190BB0EC003F19C1 /* ObjectTrackingClass.cpp in Sources */,
 				C99B1FF9190BB0EC003F19C1 /* b2EdgeShape.cpp in Sources */,
 				C99B1FF1190BB0EC003F19C1 /* b2CollideEdge.cpp in Sources */,
+				C95BF521190BDBF7008D9497 /* WatershedSegmenter.cpp in Sources */,
 				C99B200B190BB0EC003F19C1 /* b2ContactSolver.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

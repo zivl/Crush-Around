@@ -23,3 +23,5 @@ GlobalProject/win32/OpenCvTracking/Debug/
 *.xcscheme
 
 *.xcuserstate
+
+*.xcbkptlist
