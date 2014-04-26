@@ -157,62 +157,16 @@ bool VideoTracking::processFrame(const cv::Mat& inputFrame, cv::Mat& outputFrame
     else if (m_activeTrackingAlgorithm == TrackingAlgorithmORB)
     {
         m_orbFeatureEngine(m_nextImg, cv::Mat(), m_nextKeypoints, m_nextDescriptors);
-
-        /*if (m_prevKeypoints.size() > 0)
-		 {
-		 std::vector< std::vector<cv::DMatch> > matches;
-		 m_orbMatcher.radiusMatch(m_nextDescriptors, m_prevDescriptors, matches, 10);
-
-		 for (size_t i=0; i<matches.size(); i++)
-		 {
-		 if (matches[i].size()> 0)
-		 {
-		 cv::Point prevPt = m_prevKeypoints[matches[i][0].trainIdx].pt;
-		 cv::Point nextPt = m_nextKeypoints[matches[i][0].queryIdx].pt;
-
-		 cv::circle(outputFrame, prevPt, 5, cv::Scalar(250,0,250), CV_FILLED);
-		 cv::line(outputFrame, prevPt, nextPt, CV_RGB(0,250,0));
-		 cv::circle(outputFrame, nextPt, 3, CV_RGB(0,250,0), CV_FILLED);
-		 }
-		 }
-		 }*/
-
-        // TC: following code is added by Tomer 2014-04-22
         calcHomographyAndTransformScene(outputFrame);
 
-		//        m_prevKeypoints.swap(m_nextKeypoints);
-		//        m_nextDescriptors.copyTo(m_prevDescriptors);
     }
     else if(m_activeTrackingAlgorithm == TrackingAlgorithmBRIEF)
     {
         m_fastDetector.detect(m_nextImg, m_nextKeypoints);
         m_briefExtractor.compute(m_nextImg, m_nextKeypoints, m_nextDescriptors);
 
-        /*
-		 if (m_prevKeypoints.size() > 0)
-		 {
-		 std::vector< std::vector<cv::DMatch> > matches;
-		 m_orbMatcher.radiusMatch(m_nextDescriptors, m_prevDescriptors, matches, 10);
-
-		 for (size_t i=0; i<matches.size(); i++)
-		 {
-		 if (matches[i].size()> 0)
-		 {
-		 cv::Point prevPt = m_prevKeypoints[matches[i][0].trainIdx].pt;
-		 cv::Point nextPt = m_nextKeypoints[matches[i][0].queryIdx].pt;
-
-		 cv::circle(outputFrame, prevPt, 5, cv::Scalar(250,0,250), CV_FILLED);
-		 cv::line(outputFrame, prevPt, nextPt, CV_RGB(0,250,0));
-		 cv::circle(outputFrame, nextPt, 3, CV_RGB(0,250,0), CV_FILLED);
-		 }
-		 }
-		 }*/
-
         // TC: following code is added by Tomer 2014-04-22
         calcHomographyAndTransformScene(outputFrame);
-
-		//        m_prevKeypoints.swap(m_nextKeypoints);
-		//        m_nextDescriptors.copyTo(m_prevDescriptors);
     }
 
     //outputFrame += m_scene;
@@ -426,7 +380,7 @@ void VideoTracking::onMouse( int event, int x, int y, int, void* )
     // add to the world model
     b2BodyDef bodyDef;
     bodyDef.type = b2_staticBody;
-    bodyDef.position.Set(targetPoints[0].x/PTM_RATIO, targetPoints[0].y/PTM_RATIO);
+    bodyDef.position.Set((targetPoints[0].x - 20)/PTM_RATIO, (targetPoints[0].y - 20)/PTM_RATIO);
 	b2Body *body = m_world->CreateBody(&bodyDef);
 
     b2CircleShape circle;

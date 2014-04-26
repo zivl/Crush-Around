@@ -3,9 +3,9 @@
 #ifndef OpenCV_Tutorial_SampleBase_h
 #define OpenCV_Tutorial_SampleBase_h
 
-#include <opencv2\core\core.hpp>
+#include <opencv2/core/core.hpp>
 #include <iostream>
-#include <opencv2\imgproc\imgproc.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
 #include "SampleOptions.h"
 
 //! Base class for all samples

@@ -7,7 +7,7 @@
 #include <iostream>
 #include <float.h>
 #include <ctype.h>
-#include <opencv2\core\core.hpp>
+#include <opencv2/core/core.hpp>
 
 class ObjectTrackingSample : public SampleBase
 {
