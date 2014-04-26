@@ -46,7 +46,7 @@ VideoTracking *track;
 - (void)processImage:(Mat&)image;
 {
 	Mat image_copy;
-    //cvtColor(image, image_copy, CV_BGRA2BGR);
+    cvtColor(image, image_copy, CV_BGRA2BGR);
 
 	/*if(isFirst){
 		firstImage = image_copy;
@@ -58,7 +58,7 @@ VideoTracking *track;
 
 	}*/
 	//cv::Canny(image, image, 100, 500);
-	//image = showWatershedSegmentation(image_copy);
+	image = showWatershedSegmentation(image_copy);
 
 
 //    cvtColor(image_copy, image, CV_BGR2BGRA);
@@ -66,39 +66,16 @@ VideoTracking *track;
 
 }
 
-#define SEG_OUTER_BG 10
 Mat showWatershedSegmentation(Mat image)
 {
-    Mat blank(image.size(),CV_8U,Scalar(0xFF));
-    Mat dest;
-
-    // Create markers image
-    Mat markers(image.size(),CV_8U,Scalar(-1));
-
-    //top rectangle
-    markers(cv::Rect(0,0,image.cols, SEG_OUTER_BG)) = Scalar::all(1);
-    //bottom rectangle
-    markers(cv::Rect(0,image.rows - SEG_OUTER_BG,image.cols, SEG_OUTER_BG)) = cv::Scalar::all(1);
-    //left rectangle
-    markers(cv::Rect(0,0, SEG_OUTER_BG,image.rows)) = Scalar::all(1);
-    //right rectangle
-    markers(cv::Rect(image.cols - SEG_OUTER_BG,0, SEG_OUTER_BG,image.rows)) = cv::Scalar::all(1);
-    //centre rectangle
-    int centreW = image.cols/4;
-    int centreH = image.rows/4;
-    markers(cv::Rect((image.cols/2)-(centreW/2),(image.rows/2)-(centreH/2), centreW, centreH)) = cv::Scalar::all(2);
-
-    markers.convertTo(markers, CV_BGR2GRAY);
+    //Mat blank(image.size(),CV_8U,Scalar(0xFF));
 
     //Create watershed segmentation object
     WatershedSegmenter segmenter;
-    segmenter.setMarkers(markers);
+    segmenter.createMarkersFromImage(image);
 	Mat wshedMask = segmenter.findSegments(image);
-    Mat mask;
-    convertScaleAbs(wshedMask, mask, 1, 0);
-    threshold(mask, mask, 1, 255, THRESH_BINARY);
-    bitwise_and(image, image, dest, mask);
-    dest.convertTo(dest,CV_8U);
+	Mat mask;
+	segmenter.getSegmentedMask(wshedMask, mask);
 
     return mask;
 }
