@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>E0700DD0-4D11-4A83-AEB5-A74C939D252A</string>
+	<key>IDESourceControlProjectName</key>
+	<string>OpenCVTest</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>E0840166-9986-456D-959B-4036C41FC755</key>
+		<string>https://github.com/zivl/Destroy-Around-Me.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>GlobalProject/iOS/OpenCVTest.xcodeproj/project.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>E0840166-9986-456D-959B-4036C41FC755</key>
+		<string>../../../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/zivl/Destroy-Around-Me.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>110</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>E0840166-9986-456D-959B-4036C41FC755</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>E0840166-9986-456D-959B-4036C41FC755</string>
+			<key>IDESourceControlWCCName</key>
+			<string>Destroy-Around-Me</string>
+		</dict>
+	</array>
+</dict>
+</plist>
