@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "C9F4CAB918C3C1BA0020D812"
-               BuildableName = "OpenCVTest.app"
+               BuildableName = "DestroyAroundMe.app"
                BlueprintName = "DestroyAroundMe"
                ReferencedContainer = "container:DestroyAroundMe.xcodeproj">
             </BuildableReference>
@@ -33,7 +33,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "C9F4CADA18C3C1BA0020D812"
-               BuildableName = "OpenCVTestTests.xctest"
+               BuildableName = "DestroyAroundMeTests.xctest"
                BlueprintName = "DestroyAroundMeTests"
                ReferencedContainer = "container:DestroyAroundMe.xcodeproj">
             </BuildableReference>
@@ -43,7 +43,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "C9F4CAB918C3C1BA0020D812"
-            BuildableName = "OpenCVTest.app"
+            BuildableName = "DestroyAroundMe.app"
             BlueprintName = "DestroyAroundMe"
             ReferencedContainer = "container:DestroyAroundMe.xcodeproj">
          </BuildableReference>
@@ -62,7 +62,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "C9F4CAB918C3C1BA0020D812"
-            BuildableName = "OpenCVTest.app"
+            BuildableName = "DestroyAroundMe.app"
             BlueprintName = "DestroyAroundMe"
             ReferencedContainer = "container:DestroyAroundMe.xcodeproj">
          </BuildableReference>
@@ -80,7 +80,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "C9F4CAB918C3C1BA0020D812"
-            BuildableName = "OpenCVTest.app"
+            BuildableName = "DestroyAroundMe.app"
             BlueprintName = "DestroyAroundMe"
             ReferencedContainer = "container:DestroyAroundMe.xcodeproj">
          </BuildableReference>

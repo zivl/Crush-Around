@@ -13,5 +13,13 @@ OpenCVFinal/Debug/
 OpenCVFinal/OpenCVFinal/Debug/
 GlobalProject/win32/Box2d/bin/
 GlobalProject/win32/Box2d/obj/
+GlobalProject/win32/Debug/
+GlobalProject/win32/OpenCvTracking/Debug/
+*.vcxproj.user
+*.suo
 
-GlobalProject/iOS/DestroyAroundMe.xcodeproj/project.xcworkspace/xcuserdata/zivl.xcuserdatad/UserInterfaceState.xcuserstate
+*.xcuserstate
+
+*.xcscheme
+
+*.xcuserstate
