@@ -361,7 +361,7 @@ void VideoTracking::calcHomographyAndTransformScene(cv::Mat& outputFrame)
             {
                 cv::circle(transformedScene, this->m_destroyedPoints[i], 5, cv::Scalar(200, 200, 200), -1);
             }
-
+            
             cv::circle(transformedScene,
                        cv::Point2f(m_ballBody->GetPosition().x * PTM_RATIO, m_ballBody->GetPosition().y * PTM_RATIO),
                        26, cv::Scalar(255, 0, 0), -1);
@@ -428,6 +428,7 @@ void VideoTracking::setObjectsToBeModeled(const std::vector<std::vector<cv::Poin
             {
                 vertices[j].x = currentShape[j].x / PTM_RATIO;
                 vertices[j].y = currentShape[j].y / PTM_RATIO;
+
                 cv::line(m_scene, currentShape[j], currentShape[(j + 1) % numOfPoints], cv::Scalar(0,0,255));
                 std::cout << "[" << vertices[j].x << "," <<vertices[j].y << "]" << std::endl;
             }

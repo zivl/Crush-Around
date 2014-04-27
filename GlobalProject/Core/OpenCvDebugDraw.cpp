@@ -3,8 +3,11 @@
 // Convert b2Vec2 to cv::Point
 #define b2Vec2ToCvPoint(vec2) cv::Point(vec2.x * this->m_ptmRatio, vec2.y * this->m_ptmRatio);
 
+// Convert b2Color to Open CV Scalar. Open CV colors are in BGR with opacity
+#define b2ColorToCvScalar(color, opacity) cv::Scalar(color.b * 255, color.g * 255, color.r * 255, opacity);
+
 // Convert b2Color to Open CV Scalar. Open CV colors are in BGR
-#define b2ColorToCvScalar(color) cv::Scalar(color.b, color.g, color.r);
+//#define b2ColorToCvScalar(color) b2ColorToCvScalar(color, 255);
 
 OpenCvDebugDraw::OpenCvDebugDraw(void)
 {
@@ -47,7 +50,7 @@ void OpenCvDebugDraw::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, con
     }
 
     //Open CV colors are in BGR
-    cv::Scalar colorInCv = b2ColorToCvScalar(color);
+    cv::Scalar colorInCv = b2ColorToCvScalar(color, 40);
 
     for(int idx = 0; idx < vertexCount; idx++)
     {
@@ -77,7 +80,7 @@ void OpenCvDebugDraw::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount
     }
 
     //Open CV colors are in BGR
-    cv::Scalar colorInCv = b2ColorToCvScalar(color);
+    cv::Scalar colorInCv = b2ColorToCvScalar(color, 40);
     const cv::Point* ppt[1] = { pnts };
     int npt[] = { vertexCount };
     cv::fillPoly(this->m_scene, ppt, npt, 1, colorInCv);
@@ -86,7 +89,7 @@ void OpenCvDebugDraw::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount
 /// Draw a circle.
 void OpenCvDebugDraw::DrawCircle(const b2Vec2& center, float32 radius, const b2Color& color)
 {
-    cv::Scalar colorInCv = b2ColorToCvScalar(color);
+    cv::Scalar colorInCv = b2ColorToCvScalar(color, 40);
     cv::Point centerInCv = b2Vec2ToCvPoint(center);
     cv::circle(this->m_scene, centerInCv, radius * this->m_ptmRatio, colorInCv, 2);
 }
@@ -94,7 +97,7 @@ void OpenCvDebugDraw::DrawCircle(const b2Vec2& center, float32 radius, const b2C
 /// Draw a solid circle.
 void OpenCvDebugDraw::DrawSolidCircle(const b2Vec2& center, float32 radius, const b2Vec2& axis, const b2Color& color)
 {
-    cv::Scalar colorInCv = b2ColorToCvScalar(color);
+    cv::Scalar colorInCv = b2ColorToCvScalar(color, 40);
     cv::Point centerInCv = b2Vec2ToCvPoint(center);
     cv::circle(this->m_scene, centerInCv, radius * this->m_ptmRatio, colorInCv, -1);
 
@@ -106,7 +109,7 @@ void OpenCvDebugDraw::DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Co
 {
     cv::Point p1Cv = b2Vec2ToCvPoint(p1);
     cv::Point p2Cv = b2Vec2ToCvPoint(p2);
-    cv::Scalar colorInCv = b2ColorToCvScalar(color);
+    cv::Scalar colorInCv = b2ColorToCvScalar(color, 40);
     cv::line(this->m_scene, p1Cv, p2Cv, colorInCv, 2);
 }
 
