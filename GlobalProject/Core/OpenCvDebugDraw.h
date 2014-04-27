@@ -34,10 +34,12 @@ public:
 
     void SetPtmRatio(float ratio);
 
+    void SetLineThickness(int thinkness);
+
 private:
     cv::Mat m_scene;
 
     float m_ptmRatio;
-
+    int m_thickness;
 };
 

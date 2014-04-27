@@ -12,11 +12,13 @@
 OpenCvDebugDraw::OpenCvDebugDraw(void)
 {
     this->SetPtmRatio(1.0F / 32.0F);
+    this->SetLineThickness(2);
 }
 
 OpenCvDebugDraw::OpenCvDebugDraw(float ratio)
 {
     this->SetPtmRatio(ratio);
+    this->SetLineThickness(2);
 }
 
 
@@ -40,6 +42,11 @@ void OpenCvDebugDraw::SetPtmRatio(float ratio)
     this->m_ptmRatio = ratio;
 }
 
+void OpenCvDebugDraw::SetLineThickness(int thickness)
+{
+    this->m_thickness = thickness;
+}
+
 /// Draw a closed polygon provided in CCW order.
 void OpenCvDebugDraw::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
 {
@@ -58,7 +65,7 @@ void OpenCvDebugDraw::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, con
                  cvPoint(vertices[idx].x * this->m_ptmRatio, vertices[idx].y * this->m_ptmRatio), 
                  cvPoint(vertices[idx + 1 % vertexCount].x * this->m_ptmRatio, vertices[idx + 1 % vertexCount].y * this->m_ptmRatio), 
                  colorInCv, 
-                 1);
+                 this->m_thickness);
     }
 }
 
@@ -70,7 +77,6 @@ void OpenCvDebugDraw::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount
     {
         return;
     }
-
 
     cv::Point * pnts = (cv::Point*)malloc(sizeof(cv::Point) * vertexCount);
 
@@ -84,6 +90,10 @@ void OpenCvDebugDraw::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount
     const cv::Point* ppt[1] = { pnts };
     int npt[] = { vertexCount };
     cv::fillPoly(this->m_scene, ppt, npt, 1, colorInCv);
+
+    b2Color edgesColor(color.r * 0.8, color.g * 0.8, color.b * 0.8);
+
+    this->DrawPolygon(vertices, vertexCount, edgesColor);
 }
 
 /// Draw a circle.
@@ -91,7 +101,7 @@ void OpenCvDebugDraw::DrawCircle(const b2Vec2& center, float32 radius, const b2C
 {
     cv::Scalar colorInCv = b2ColorToCvScalar(color, 40);
     cv::Point centerInCv = b2Vec2ToCvPoint(center);
-    cv::circle(this->m_scene, centerInCv, radius * this->m_ptmRatio, colorInCv, 2);
+    cv::circle(this->m_scene, centerInCv, radius * this->m_ptmRatio, colorInCv, this->m_thickness);
 }
     
 /// Draw a solid circle.
@@ -102,6 +112,8 @@ void OpenCvDebugDraw::DrawSolidCircle(const b2Vec2& center, float32 radius, cons
     cv::circle(this->m_scene, centerInCv, radius * this->m_ptmRatio, colorInCv, -1);
 
     //TODO: draw the axis
+    b2Color edgesColor(color.r * 0.8, color.g * 0.8, color.b * 0.8);
+    this->DrawCircle(center, radius, edgesColor);
 }
     
 /// Draw a line segment.
@@ -110,7 +122,7 @@ void OpenCvDebugDraw::DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Co
     cv::Point p1Cv = b2Vec2ToCvPoint(p1);
     cv::Point p2Cv = b2Vec2ToCvPoint(p2);
     cv::Scalar colorInCv = b2ColorToCvScalar(color, 40);
-    cv::line(this->m_scene, p1Cv, p2Cv, colorInCv, 2);
+    cv::line(this->m_scene, p1Cv, p2Cv, colorInCv, this->m_thickness);
 }
 
 /// Draw a transform. Choose your own length scale.
