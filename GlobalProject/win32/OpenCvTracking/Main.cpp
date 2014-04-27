@@ -146,12 +146,12 @@ int track2()
             if(waitKey(30) >= 0) break;
         }
 
-        ++frames;
+/*        ++frames;
         if (frames % 100 == 0)
         {
             double diff = time(0) - start;
             cout << frames / diff << " fps" << endl;
-        }           
+        }   */        
     }
 
     return 1;

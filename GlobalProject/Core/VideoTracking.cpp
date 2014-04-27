@@ -390,8 +390,8 @@ void VideoTracking::onMouse( int event, int x, int y, int, void* )
     // add to the world model
     b2BodyDef bodyDef;
     bodyDef.type = b2_staticBody;
-    bodyDef.position.Set(targetPoints[0].x /PTM_RATIO, targetPoints[0].y/PTM_RATIO);
-    std::cout << "[" << targetPoints[0].x /PTM_RATIO << "," <<targetPoints[0].y/PTM_RATIO << "]" << std::endl;
+    bodyDef.position.Set(targetPoints[0].x/PTM_RATIO, targetPoints[0].y/PTM_RATIO);
+    std::cout << "[" << targetPoints[0].x/PTM_RATIO << "," <<targetPoints[0].y/PTM_RATIO << "]" << std::endl;
     b2Body *body = m_world->CreateBody(&bodyDef);
 
     b2CircleShape circle;
@@ -438,7 +438,7 @@ void VideoTracking::setObjectsToBeModeled(const std::vector<std::vector<cv::Poin
 
             b2BodyDef objectBodyDef;
             objectBodyDef.type = b2_staticBody;
-            objectBodyDef.position.Set(polygon.m_centroid.x, polygon.m_centroid.y);
+            //objectBodyDef.position.Set(polygon.m_centroid.x, polygon.m_centroid.y);
             std::cout << "center=[" << polygon.m_centroid.x << "," << polygon.m_centroid.y << "]" << std::endl;
             b2Body *objectBody = m_world->CreateBody(&objectBodyDef);
 
@@ -447,7 +447,6 @@ void VideoTracking::setObjectsToBeModeled(const std::vector<std::vector<cv::Poin
             objectShapeDef.density = 10.0f;
             objectShapeDef.friction = 0.0f;
             objectBody->CreateFixture(&objectShapeDef);
-
         }
     }
 }
