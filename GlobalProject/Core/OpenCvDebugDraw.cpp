@@ -59,7 +59,7 @@ void OpenCvDebugDraw::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, con
     //Open CV colors are in BGR
     cv::Scalar colorInCv = b2ColorToCvScalar(color, 40);
 
-    for(int idx = 0; idx < vertexCount; idx++)
+    for(int idx = 0; idx < vertexCount - 1; idx++)
     {
         cv::line(this->m_scene, 
                  cvPoint(vertices[idx].x * this->m_ptmRatio, vertices[idx].y * this->m_ptmRatio), 
@@ -67,6 +67,12 @@ void OpenCvDebugDraw::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, con
                  colorInCv, 
                  this->m_thickness);
     }
+
+    cv::line(this->m_scene, 
+             cvPoint(vertices[vertexCount - 1].x * this->m_ptmRatio, vertices[vertexCount - 1].y * this->m_ptmRatio), 
+             cvPoint(vertices[0].x * this->m_ptmRatio, vertices[0].y * this->m_ptmRatio), 
+             colorInCv, 
+             this->m_thickness);
 }
 
 /// Draw a solid closed polygon provided in CCW order.
