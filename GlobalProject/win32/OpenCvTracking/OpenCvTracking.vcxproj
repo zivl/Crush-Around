@@ -75,6 +75,7 @@
     <ClCompile Include="..\..\Core\MyContactListener.cpp" />
     <ClCompile Include="..\..\Core\ObjectTrackingClass.cpp" />
     <ClCompile Include="..\..\Core\ObjectTrackingSample.cpp" />
+    <ClCompile Include="..\..\Core\OpenCvDebugDraw.cpp" />
     <ClCompile Include="..\..\Core\SampleBase.cpp" />
     <ClCompile Include="..\..\Core\SampleOptions.cpp" />
     <ClCompile Include="..\..\Core\VideoTracking.cpp" />
@@ -87,6 +88,7 @@
     <ClInclude Include="..\..\Core\MyContactListener.h" />
     <ClInclude Include="..\..\Core\ObjectTrackingClass.h" />
     <ClInclude Include="..\..\Core\ObjectTrackingSample.h" />
+    <ClInclude Include="..\..\Core\OpenCvDebugDraw.h" />
     <ClInclude Include="..\..\Core\SampleBase.h" />
     <ClInclude Include="..\..\Core\SampleOptions.h" />
     <ClInclude Include="..\..\Core\VideoTracking.hpp" />

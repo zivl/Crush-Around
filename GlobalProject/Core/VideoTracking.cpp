@@ -31,6 +31,8 @@ VideoTracking::VideoTracking()
     m_matcher = new cv::FlannBasedMatcher(new cv::flann::LshIndexParams(5, 24, 2));
 
     dt = 1.0f/60.0f;
+
+    this->m_debugDraw = new OpenCvDebugDraw(PTM_RATIO);
 }
 
 //! Gets a sample name
@@ -169,6 +171,10 @@ bool VideoTracking::processFrame(const cv::Mat& inputFrame, cv::Mat& outputFrame
         calcHomographyAndTransformScene(outputFrame);
     }
 
+    // add the debug drawing
+    this->m_debugDraw->SetScene(outputFrame);
+    this->m_world->DrawDebugData();
+
     //outputFrame += m_scene;
 
     return true;
@@ -236,6 +242,10 @@ void VideoTracking::setReferenceFrame(const cv::Mat& reference)
     // define world with gravity
     b2Vec2 gravity = b2Vec2(0.0f, 0.0f);
     m_world = new b2World(gravity);
+
+    m_world->SetDebugDraw(this->m_debugDraw);
+
+    this->m_debugDraw->SetFlags( b2Draw::e_shapeBit );
 
     // Create edges around the entire screen
     b2BodyDef groundBodyDef;
@@ -312,8 +322,8 @@ void VideoTracking::calcHomographyAndTransformScene(cv::Mat& outputFrame)
             if( dist > max_dist ) max_dist = dist;
         }
 
-		//        std::cout << "-- Max dist : " << max_dist << std::endl;
-		//        std::cout << "-- Min dist : " << min_dist << std::endl;
+        //        std::cout << "-- Max dist : " << max_dist << std::endl;
+        //        std::cout << "-- Min dist : " << min_dist << std::endl;
 
         // Draw only "good" matches (i.e. whose distance is less than 3*min_dist )
         std::vector< cv::DMatch > good_matches;
@@ -368,7 +378,7 @@ void VideoTracking::onMouse( int event, int x, int y, int, void* )
 {
     if (event != CV_EVENT_LBUTTONDOWN || this->m_refFrame2CurrentHomography.empty()){
         return;
-	}
+    }
 
     std::vector<cv::Point2f> sourcePoints;
     sourcePoints.push_back(cv::Point2f(x, y));
@@ -381,8 +391,8 @@ void VideoTracking::onMouse( int event, int x, int y, int, void* )
     b2BodyDef bodyDef;
     bodyDef.type = b2_staticBody;
     bodyDef.position.Set(targetPoints[0].x /PTM_RATIO, targetPoints[0].y/PTM_RATIO);
-	std::cout << "[" << targetPoints[0].x /PTM_RATIO << "," <<targetPoints[0].y/PTM_RATIO << "]" << std::endl;
-	b2Body *body = m_world->CreateBody(&bodyDef);
+    std::cout << "[" << targetPoints[0].x /PTM_RATIO << "," <<targetPoints[0].y/PTM_RATIO << "]" << std::endl;
+    b2Body *body = m_world->CreateBody(&bodyDef);
 
     b2CircleShape circle;
     circle.m_radius = 5.0/PTM_RATIO;
@@ -405,41 +415,40 @@ void VideoTracking::mouseCallback(int event, int x, int y, int flags, void *para
 
 void VideoTracking::setObjectsToBeModeled(const std::vector<std::vector<cv::Point>> contours) {
 
-	int contourSize = (int)contours.size();
-	for(int i = 0; i < /*contourSize*/1; i++ )
-	{
-		std::vector<cv::Point> currentShape = contours[i];
-		int numOfPoints = (int)currentShape.size();
-		if(numOfPoints <= 8){
+    int contourSize = (int)contours.size();
+    for(int i = 0; i < contourSize/*1*/; i++ )
+    {
+        std::vector<cv::Point> currentShape = contours[i];
+        int numOfPoints = (int)currentShape.size();
+        if(numOfPoints <= 8)
+        {
 //			std::cout << "Shape: " << i << " Points: " << numOfPoints << std::endl;
-			b2Vec2 vertices[8];
-			for (int j = 0; j < numOfPoints; j++)
-			{
-				vertices[j].x = currentShape[j].x / PTM_RATIO;
-				vertices[j].y = currentShape[j].y / PTM_RATIO;
-				cv::line(m_scene, currentShape[j], currentShape[(j + 1) % numOfPoints], cv::Scalar(0,0,255));
-				std::cout << "[" << vertices[j].x << "," <<vertices[j].y << "]" << std::endl;
-			}
+            b2Vec2 vertices[8];
+            for (int j = 0; j < numOfPoints; j++)
+            {
+                vertices[j].x = currentShape[j].x / PTM_RATIO;
+                vertices[j].y = currentShape[j].y / PTM_RATIO;
+                cv::line(m_scene, currentShape[j], currentShape[(j + 1) % numOfPoints], cv::Scalar(0,0,255));
+                std::cout << "[" << vertices[j].x << "," <<vertices[j].y << "]" << std::endl;
+            }
 
+            b2PolygonShape polygon;
+            polygon.Set(vertices, numOfPoints);
 
-			b2PolygonShape polygon;
-			polygon.Set(vertices, numOfPoints);
+            b2BodyDef objectBodyDef;
+            objectBodyDef.type = b2_staticBody;
+            objectBodyDef.position.Set(polygon.m_centroid.x, polygon.m_centroid.y);
+            std::cout << "center=[" << polygon.m_centroid.x << "," << polygon.m_centroid.y << "]" << std::endl;
+            b2Body *objectBody = m_world->CreateBody(&objectBodyDef);
 
-			b2BodyDef objectBodyDef;
-			objectBodyDef.type = b2_staticBody;
-			objectBodyDef.position.Set(polygon.m_centroid.x, polygon.m_centroid.y);
-			std::cout << "center=[" << polygon.m_centroid.x << "," << polygon.m_centroid.y << "]" << std::endl;
-			b2Body *objectBody = m_world->CreateBody(&objectBodyDef);
+            b2FixtureDef objectShapeDef;
+            objectShapeDef.shape = &polygon;
+            objectShapeDef.density = 10.0f;
+            objectShapeDef.friction = 0.0f;
+            objectBody->CreateFixture(&objectShapeDef);
 
-
-			b2FixtureDef objectShapeDef;
-			objectShapeDef.shape = &polygon;
-			objectShapeDef.density = 10.0f;
-			objectShapeDef.friction = 0.0f;
-			objectBody->CreateFixture(&objectShapeDef);
-
-		}
-	}
+        }
+    }
 }
 
 

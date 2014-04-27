@@ -12,6 +12,8 @@
 #include <vector>
 #include <Box2D/Box2D.h>
 
+#include "OpenCvDebugDraw.h"
+
 #define PTM_RATIO 32.0
 
 class VideoTracking : public SampleBase
@@ -40,7 +42,7 @@ public:
 
     static void mouseCallback(int event, int x, int y, int flags, void *param);
 
-	void setObjectsToBeModeled(const std::vector<std::vector<cv::Point>> contours);
+    void setObjectsToBeModeled(const std::vector<std::vector<cv::Point>> contours);
     
 private:
     int m_maxNumberOfPoints;
@@ -101,6 +103,9 @@ private:
     cv::Mat m_refFrame2CurrentHomography;
 
     cv::vector<cv::Point2f> m_destroyedPoints;
+
+    OpenCvDebugDraw* m_debugDraw;
+
 };
 
 
