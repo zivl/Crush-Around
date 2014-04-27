@@ -18,7 +18,7 @@
 #include "Core/ObjectTrackingSample.h"
 #include "Core/VideoTracking.hpp"
 #include "Core/WatershedSegmenter.h"
-#include "Core/LcObjectDetector.h";
+#include "Core/LcObjectDetector.h"
 
 #include <ctime>
 

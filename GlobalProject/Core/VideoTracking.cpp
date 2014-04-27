@@ -32,7 +32,29 @@ VideoTracking::VideoTracking()
 
     dt = 1.0f/60.0f;
 
-    this->m_debugDraw = new OpenCvDebugDraw(PTM_RATIO);
+    // define world with gravity
+    b2Vec2 gravity = b2Vec2(0.0f, 0.0f);
+    this->m_world = new b2World(gravity);
+
+    // set and enable debug drawing
+    // TODO: make optional
+    this->m_debugDraw = new OpenCvDebugDraw(PTM_RATIO);    
+    
+    m_world->SetDebugDraw(this->m_debugDraw);
+    this->m_debugDraw->SetFlags( b2Draw::e_shapeBit );
+
+    this->m_contactListener = new MyContactListener();
+    this->m_world->SetContactListener(this->m_contactListener);
+}
+
+VideoTracking::~VideoTracking()
+{
+    delete m_world;
+    m_ballBody = NULL;
+    m_world = NULL;
+
+    delete m_debugDraw;
+    delete m_contactListener;
 }
 
 //! Gets a sample name
@@ -64,6 +86,30 @@ std::string VideoTracking::getSampleIcon() const
 bool VideoTracking::processFrame(const cv::Mat& inputFrame, cv::Mat& outputFrame)
 {
     this->m_world->Step(dt, 10, 10);
+
+    //check contacts
+    std::vector<MyContact>::iterator pos;
+    for(pos = this->m_contactListener->m_contacts.begin(); 
+      pos != this->m_contactListener->m_contacts.end(); 
+      ++pos) 
+    {
+        MyContact contact = *pos;
+
+        if ((contact.fixtureA == this->m_ballFixture || contact.fixtureB == this->m_ballFixture) &&
+            (contact.fixtureA->GetBody() != m_groundBody && contact.fixtureB->GetBody() != m_groundBody))
+        {
+            std::cout << "Ball Contact with object at [" << contact.contactPoint->x << "," << contact.contactPoint->y << "]" << std::endl;
+            b2Fixture* objectFixture = contact.fixtureA == this->m_ballFixture ? contact.fixtureB : contact.fixtureA;
+
+            // change the shape of the fixture
+            b2Body *objectBody = objectFixture->GetBody();
+            
+            // get the current shape and change it (TBD)
+            b2PolygonShape* shape = (b2PolygonShape*)objectFixture->GetShape();
+            b2Vec2 pnts[4] = { b2Vec2(5, 5), b2Vec2(5, 6), b2Vec2(4, 6), b2Vec2(4, 5) };
+            //shape->Set(pnts, 4);
+        }
+    }
 
     inputFrame.copyTo(outputFrame);
 
@@ -180,9 +226,7 @@ bool VideoTracking::processFrame(const cv::Mat& inputFrame, cv::Mat& outputFrame
     return true;
 }
 
-// TC: following code was added 2014-04-22
-
-//! Sets the reference frame for latter processing
+// Sets the reference frame for latter processing
 void VideoTracking::setReferenceFrame(const cv::Mat& reference)
 {
     // save the reference frame
@@ -239,42 +283,34 @@ void VideoTracking::setReferenceFrame(const cv::Mat& reference)
     line(m_scene, cvPoint(reference.cols - 20, 20), cvPoint(20, 20), cv::Scalar(0, 255, 0), 2);
 
     // TC: following is box2d world/ball initialization
-    // define world with gravity
-    b2Vec2 gravity = b2Vec2(0.0f, 0.0f);
-    m_world = new b2World(gravity);
-
-    m_world->SetDebugDraw(this->m_debugDraw);
-
-    this->m_debugDraw->SetFlags( b2Draw::e_shapeBit );
-
     // Create edges around the entire screen
     b2BodyDef groundBodyDef;
     groundBodyDef.position.Set(0,0);
 
     cv::Size visibleSize(reference.cols, reference.rows);
 
-    b2Body *groundBody = m_world->CreateBody(&groundBodyDef);
+    this->m_groundBody = m_world->CreateBody(&groundBodyDef);
     b2EdgeShape groundEdge;
     b2FixtureDef boxShapeDef;
     boxShapeDef.shape = &groundEdge;
 
     // wall definitions - bottom
     groundEdge.Set(b2Vec2(0,0), b2Vec2(visibleSize.width/PTM_RATIO, 0));
-    groundBody->CreateFixture(&boxShapeDef);
+    this->m_groundBody->CreateFixture(&boxShapeDef);
 
     // left
     groundEdge.Set(b2Vec2(0,0), b2Vec2(0, visibleSize.height/PTM_RATIO));
-    groundBody->CreateFixture(&boxShapeDef);
+    this->m_groundBody->CreateFixture(&boxShapeDef);
 
     // top
     groundEdge.Set(b2Vec2(0, visibleSize.height/PTM_RATIO),
                    b2Vec2(visibleSize.width/PTM_RATIO, visibleSize.height/PTM_RATIO));
-    groundBody->CreateFixture(&boxShapeDef);
+    this->m_groundBody->CreateFixture(&boxShapeDef);
 
     // right
     groundEdge.Set(b2Vec2(visibleSize.width/PTM_RATIO, visibleSize.height/PTM_RATIO),
                    b2Vec2(visibleSize.width/PTM_RATIO, 0));
-    groundBody->CreateFixture(&boxShapeDef);
+    this->m_groundBody->CreateFixture(&boxShapeDef);
 
     // Create ball body and shape
     b2BodyDef ballBodyDef;
@@ -374,6 +410,7 @@ void VideoTracking::calcHomographyAndTransformScene(cv::Mat& outputFrame)
     }
 }
 
+// Handle mouse event adding a body to the worlds at the mouse/touch location.
 void VideoTracking::onMouse( int event, int x, int y, int, void* )
 {
     if (event != CV_EVENT_LBUTTONDOWN || this->m_refFrame2CurrentHomography.empty()){
@@ -407,12 +444,14 @@ void VideoTracking::onMouse( int event, int x, int y, int, void* )
     m_destroyedPoints.push_back(targetPoints[0]);
 }
 
+// Static callback for allowing mouse events registration in Open CV window.
 void VideoTracking::mouseCallback(int event, int x, int y, int flags, void *param)
 {
     VideoTracking *self = static_cast<VideoTracking*>(param);
     self->onMouse(event, x, y, flags, param);
 }
 
+// Set the objects (defined by contour points) to be models in the world and scene.
 void VideoTracking::setObjectsToBeModeled(const std::vector<std::vector<cv::Point>> contours) {
 
     int contourSize = (int)contours.size();
@@ -420,10 +459,10 @@ void VideoTracking::setObjectsToBeModeled(const std::vector<std::vector<cv::Poin
     {
         std::vector<cv::Point> currentShape = contours[i];
         int numOfPoints = (int)currentShape.size();
-        if(numOfPoints <= 8)
+        if(numOfPoints <= 25)
         {
 //			std::cout << "Shape: " << i << " Points: " << numOfPoints << std::endl;
-            b2Vec2 vertices[8];
+            b2Vec2 vertices[25];
             for (int j = 0; j < numOfPoints; j++)
             {
                 vertices[j].x = currentShape[j].x / PTM_RATIO;

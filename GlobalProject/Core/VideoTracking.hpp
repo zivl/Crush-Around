@@ -13,6 +13,8 @@
 #include <Box2D/Box2D.h>
 
 #include "OpenCvDebugDraw.h"
+#include "MyContactListener.h"
+
 
 #define PTM_RATIO 32.0
 
@@ -20,6 +22,7 @@ class VideoTracking : public SampleBase
 {
 public:
     VideoTracking();
+    ~VideoTracking();
 
     //! Gets a sample name
     virtual std::string getName() const;
@@ -98,6 +101,9 @@ private:
     b2World * m_world;
     b2Body * m_ballBody;
     b2Fixture * m_ballFixture;
+    b2Body * m_groundBody;
+    b2Fixture * m_groundFixture;
+
     float dt;
 
     cv::Mat m_refFrame2CurrentHomography;
@@ -105,6 +111,9 @@ private:
     cv::vector<cv::Point2f> m_destroyedPoints;
 
     OpenCvDebugDraw* m_debugDraw;
+
+     // Contact listener for colision response
+    MyContactListener *m_contactListener;
 
 };
 
