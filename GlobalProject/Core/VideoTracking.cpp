@@ -512,7 +512,7 @@ void VideoTracking::setObjectsToBeModeled(const std::vector<std::vector<cv::Poin
             objectShapeDef.friction = 0.0f;
             objectBody->CreateFixture(&objectShapeDef);
 #endif
-            delete vertices;
+            delete[] vertices;
             
 #if (!USE_EDGES_FOR_MODEL)
         }

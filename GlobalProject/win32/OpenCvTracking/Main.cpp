@@ -243,7 +243,7 @@ int track2()
                 int npt[] = { contours[i].size() };
                 fillPoly(frame3, ppt, npt, 1, Scalar(120, 250, 50));
 
-                delete pnts;
+                delete[] pnts;
             }
 
             imshow("input", frame);

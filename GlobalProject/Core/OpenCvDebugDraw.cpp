@@ -84,11 +84,11 @@ void OpenCvDebugDraw::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount
         return;
     }
 
-    cv::Point * pnts = new cv::Point[vertexCount];  //(cv::Point*)malloc(sizeof(cv::Point) * vertexCount);
+    cv::Point * pnts = new cv::Point[vertexCount];
 
     for(int idx = 0; idx < vertexCount; idx++)
     {
-        pnts[idx] = b2Vec2ToCvPoint(vertices[idx]);//cvPoint(vertices[idx].x * this->m_ptmRatio, vertices[idx].y * this->m_ptmRatio);
+        pnts[idx] = b2Vec2ToCvPoint(vertices[idx]);
     }
 
     //Open CV colors are in BGR
@@ -99,7 +99,7 @@ void OpenCvDebugDraw::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount
 
     b2Color edgesColor(color.r * 0.8, color.g * 0.8, color.b * 0.8);
 
-    delete pnts;
+    delete[] pnts;
 
     this->DrawPolygon(vertices, vertexCount, edgesColor);
 }
