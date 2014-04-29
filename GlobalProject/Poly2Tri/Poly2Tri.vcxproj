@@ -11,22 +11,23 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{CC190AB5-7AD0-4E1F-85DE-EC75A70F6F16}</ProjectGuid>
-    <RootNamespace>OpenCVFinal</RootNamespace>
+    <ProjectGuid>{5B28450C-A7C5-40C8-A329-D4A478F99916}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>Poly2Tri</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v110</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v110</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -39,60 +40,65 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(OPENCV_DIR)\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(OPENCV_DIR)\x86\vc10\lib;$(LibraryPath)</LibraryPath>
+    <LinkIncremental>true</LinkIncremental>
+    <TargetExt>.lib</TargetExt>
+    <OutDir>bin\$(Configuration)\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;POLY2TRI_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>D:\Documents\Destroy-Around-Me\GlobalProject;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>MY_TOMER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>opencv_calib3d248d.lib;opencv_contrib248d.lib;opencv_core248d.lib;opencv_features2d248d.lib;opencv_flann248d.lib;opencv_gpu248d.lib;opencv_highgui248d.lib;opencv_imgproc248d.lib;opencv_legacy248d.lib;opencv_ml248d.lib;opencv_nonfree248d.lib;opencv_objdetect248d.lib;opencv_photo248d.lib;opencv_stitching248d.lib;opencv_ts248d.lib;opencv_video248d.lib;opencv_videostab248d.lib;D:\Documents\Destroy-Around-Me\GlobalProject\win32\Box2d\bin\Debug\Box2D.lib;D:\Documents\Destroy-Around-Me\GlobalProject\win32\bin\Debug\Poly2Tri.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;POLY2TRI_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\Core\Globals.cpp" />
-    <ClCompile Include="..\..\Core\LcObjectDetector.cpp" />
-    <ClCompile Include="..\..\Core\MyContactListener.cpp" />
-    <ClCompile Include="..\..\Core\ObjectTrackingClass.cpp" />
-    <ClCompile Include="..\..\Core\ObjectTrackingSample.cpp" />
-    <ClCompile Include="..\..\Core\OpenCvDebugDraw.cpp" />
-    <ClCompile Include="..\..\Core\SampleBase.cpp" />
-    <ClCompile Include="..\..\Core\SampleOptions.cpp" />
-    <ClCompile Include="..\..\Core\VideoTracking.cpp" />
-    <ClCompile Include="..\..\Core\WatershedSegmenter.cpp" />
-    <ClCompile Include="Main.cpp" />
+    <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Core\Globals.h" />
-    <ClInclude Include="..\..\Core\LcObjectDetector.h" />
-    <ClInclude Include="..\..\Core\MyContactListener.h" />
-    <ClInclude Include="..\..\Core\ObjectTrackingClass.h" />
-    <ClInclude Include="..\..\Core\ObjectTrackingSample.h" />
-    <ClInclude Include="..\..\Core\OpenCvDebugDraw.h" />
-    <ClInclude Include="..\..\Core\SampleBase.h" />
-    <ClInclude Include="..\..\Core\SampleOptions.h" />
-    <ClInclude Include="..\..\Core\VideoTracking.hpp" />
-    <ClInclude Include="..\..\Core\WatershedSegmenter.h" />
+    <ClInclude Include="common\shapes.h" />
+    <ClInclude Include="common\utils.h" />
+    <ClInclude Include="poly2tri.h" />
+    <ClInclude Include="sweep\advancing_front.h" />
+    <ClInclude Include="sweep\cdt.h" />
+    <ClInclude Include="sweep\sweep.h" />
+    <ClInclude Include="sweep\sweep_context.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="common\shapes.cc" />
+    <ClCompile Include="sweep\advancing_front.cc">
+      <FileType>CppClass</FileType>
+    </ClCompile>
+    <ClCompile Include="sweep\cdt.cc">
+      <FileType>CppClass</FileType>
+    </ClCompile>
+    <ClCompile Include="sweep\sweep.cc" />
+    <ClCompile Include="sweep\sweep_context.cc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

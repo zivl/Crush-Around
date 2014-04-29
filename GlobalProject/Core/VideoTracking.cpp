@@ -1,7 +1,12 @@
 
 
 #include <iostream>
+#include <Box2D/Collision/Shapes/b2Shape.h>  // for shape types (can remove layter probably)
 #include "VideoTracking.hpp"
+
+// set to positive value to use edges or negative to use polygon
+// note that using polygon restricts the shape of the object to 25 vertices
+#define USE_EDGES_FOR_MODEL 1
 
 static const int TrackingAlgorithmKLT           = 0;
 static const int TrackingAlgorithmBRIEF         = 1;
@@ -106,8 +111,13 @@ bool VideoTracking::processFrame(const cv::Mat& inputFrame, cv::Mat& outputFrame
             
             // get the current shape and change it (TBD)
             b2PolygonShape* shape = (b2PolygonShape*)objectFixture->GetShape();
-            b2Vec2 pnts[4] = { b2Vec2(5, 5), b2Vec2(5, 6), b2Vec2(4, 6), b2Vec2(4, 5) };
-            //shape->Set(pnts, 4);
+            if (shape)
+            {
+                b2Vec2 pnts[4] = { b2Vec2(5, 5), b2Vec2(5, 6), b2Vec2(4, 6), b2Vec2(4, 5) };
+                //shape->Set(pnts, 4);
+
+                std::cout << "Shape is " << (b2Shape::e_edge == shape->GetType() ? "edge" : "polygon") << std::endl;
+            }
         }
     }
 
@@ -459,10 +469,12 @@ void VideoTracking::setObjectsToBeModeled(const std::vector<std::vector<cv::Poin
     {
         std::vector<cv::Point> currentShape = contours[i];
         int numOfPoints = (int)currentShape.size();
+
+#if (!USE_EDGES_FOR_MODEL)
         if(numOfPoints <= 25)
         {
-//			std::cout << "Shape: " << i << " Points: " << numOfPoints << std::endl;
-            b2Vec2 vertices[25];
+#endif
+            b2Vec2 * vertices = new b2Vec2[numOfPoints];
             for (int j = 0; j < numOfPoints; j++)
             {
                 vertices[j].x = currentShape[j].x / PTM_RATIO;
@@ -471,22 +483,40 @@ void VideoTracking::setObjectsToBeModeled(const std::vector<std::vector<cv::Poin
                 cv::line(m_scene, currentShape[j], currentShape[(j + 1) % numOfPoints], cv::Scalar(0,0,255));
                 std::cout << "[" << vertices[j].x << "," <<vertices[j].y << "]" << std::endl;
             }
-
-            b2PolygonShape polygon;
-            polygon.Set(vertices, numOfPoints);
-
+                    
             b2BodyDef objectBodyDef;
             objectBodyDef.type = b2_staticBody;
-            //objectBodyDef.position.Set(polygon.m_centroid.x, polygon.m_centroid.y);
-            std::cout << "center=[" << polygon.m_centroid.x << "," << polygon.m_centroid.y << "]" << std::endl;
+            
             b2Body *objectBody = m_world->CreateBody(&objectBodyDef);
+
+#if (USE_EDGES_FOR_MODEL)
+            b2EdgeShape objectEdgeShape;
+            b2FixtureDef objectShapeDef;
+            objectShapeDef.shape = &objectEdgeShape;
+
+            for (int j = 0; j < numOfPoints - 1; j++)
+            {
+                objectEdgeShape.Set(vertices[j], vertices[j+1 %25]);
+                objectBody->CreateFixture(&objectShapeDef);
+            }
+
+            objectEdgeShape.Set(vertices[numOfPoints - 1], vertices[0]);
+            objectBody->CreateFixture(&objectShapeDef);
+#else
+            b2PolygonShape polygon;
+            polygon.Set(vertices, numOfPoints);
 
             b2FixtureDef objectShapeDef;
             objectShapeDef.shape = &polygon;
             objectShapeDef.density = 10.0f;
             objectShapeDef.friction = 0.0f;
             objectBody->CreateFixture(&objectShapeDef);
+#endif
+            delete vertices;
+            
+#if (!USE_EDGES_FOR_MODEL)
         }
+#endif
     }
 }
 

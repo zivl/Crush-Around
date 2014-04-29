@@ -20,6 +20,10 @@
 #include "Core/WatershedSegmenter.h"
 #include "Core/LcObjectDetector.h"
 
+#include "Poly2Tri/poly2tri.h"
+
+#include "Poly2Tri/sweep/cdt.h"
+
 #include <ctime>
 
 using namespace std;
@@ -31,6 +35,8 @@ int simpleTrack();
 
 void processImage(Mat& image);
 int track2();
+
+int triangulation();
 
 bool isFirst = true;
 Mat firstImage;
@@ -45,6 +51,122 @@ int main( int argc, char** argv )
 {
     //return simpleTrack();
     track2();
+    //triangulation();
+}
+
+int triangulation()
+{
+    VideoCapture cap(0); // open the default camera
+    if(!cap.isOpened())  // check if we succeeded
+        return -1;
+ 
+    cap.set(CV_CAP_PROP_FRAME_WIDTH, 352);
+    cap.set(CV_CAP_PROP_FRAME_HEIGHT, 288);
+
+    Mat testFrame;
+    while(testFrame.empty())
+    {
+        cap >> testFrame;
+    }
+
+    namedWindow("output", 1);
+    namedWindow("input", 2);
+
+    track = new VideoTracking();
+
+    setMouseCallback("output", VideoTracking::mouseCallback, track );
+
+    vector<vector<Point> > contours;
+
+    time_t start = time(0);
+    long frames = 0;
+    LcObjectDetector objDetector;
+    bool initialized = false;
+    int key = 0;
+
+    for(;;)
+    {        
+        Mat frame, frame2, frame3;        
+        cap >> frame; // get a new frame from camera
+
+        imshow("input", frame);
+
+        cv::Point points[4] = 
+        { 
+            cv::Point(100,100), 
+            cv::Point(200,100), 
+            cv::Point(200,200), 
+            cv::Point(100, 200) 
+        };
+
+        const cv::Point* ppt[1] = { points };
+        int npt[] = { 4 };
+        //cv::fillPoly(frame, ppt, npt, 1, Scalar(200, 100, 5));
+
+        std::vector<p2t::Point*> polygon;
+        /*for (int idx = 0; idx < 4; idx++)
+        {
+            polygon.push_back(new p2t::Point(points[idx].x, points[idx].y));
+        }*/
+
+        /*polygon.push_back(new p2t::Point(148.3,87.06));
+        polygon.push_back(new p2t::Point(143.3,75));
+        polygon.push_back(new p2t::Point(135.36,64.64));
+        polygon.push_back(new p2t::Point(125,56.7));
+        polygon.push_back(new p2t::Point(112.94,51.7));
+        polygon.push_back(new p2t::Point(100,50));
+        polygon.push_back(new p2t::Point(87.06,51.7));
+        polygon.push_back(new p2t::Point(75,56.7));
+        polygon.push_back(new p2t::Point(64.64,64.64));
+        polygon.push_back(new p2t::Point(56.7,75));
+        polygon.push_back(new p2t::Point(51.7,87.06));
+        polygon.push_back(new p2t::Point(50,100));
+        polygon.push_back(new p2t::Point(51.7,112.94));
+        polygon.push_back(new p2t::Point(56.7,125));
+        polygon.push_back(new p2t::Point(64.64,135.36));
+        polygon.push_back(new p2t::Point(75,143.3));
+        polygon.push_back(new p2t::Point(87.06,148.3));
+        polygon.push_back(new p2t::Point(100,150));
+        polygon.push_back(new p2t::Point(112.94,148.3));
+        polygon.push_back(new p2t::Point(125,143.3));
+        polygon.push_back(new p2t::Point(135.36,135.36));
+        polygon.push_back(new p2t::Point(143.3,125));
+        polygon.push_back(new p2t::Point(148.3,112.94));
+        polygon.push_back(new p2t::Point(150,100));*/
+
+        polygon.push_back(new p2t::Point(150,100));
+        polygon.push_back(new p2t::Point(200,150));
+        polygon.push_back(new p2t::Point(175,175));
+
+        p2t::CDT* cdt = new p2t::CDT(polygon);
+
+        cdt->Triangulate();
+
+        std::vector<p2t::Triangle*> triangles = cdt->GetTriangles();
+
+        for (int idx = 0; idx < triangles.size(); idx++)
+        {
+            p2t::Triangle* triangle = triangles[idx];
+
+            cv::Point p1(triangle->GetPoint(0)->x, triangle->GetPoint(0)->y);
+            cv::Point p2(triangle->GetPoint(1)->x, triangle->GetPoint(1)->y);
+            cv::Point p3(triangle->GetPoint(2)->x, triangle->GetPoint(2)->y);
+            
+            line(frame, p1, p2, Scalar(200, 100, 50));
+            line(frame, p2, p3, Scalar(200, 100, 50));
+            line(frame, p3, p1, Scalar(200, 100, 50));
+        }
+
+
+        imshow("output", frame);
+
+        key = waitKey(30);
+
+        if (key > 0)
+        {
+            break;
+        }
+    }    
 }
 
 Mat showWatershedSegmentation(Mat image)
@@ -104,7 +226,6 @@ int track2()
         {
             frame.copyTo(frame2);
             frame.copyTo(frame3);
-
         
             contours = objDetector.getObjectContours(frame2);
 
@@ -112,7 +233,7 @@ int track2()
             // test each contour
             for( size_t i = 0; i < contours.size(); i++ )
             {          
-                Point* pnts = (Point*)malloc(sizeof(Point) * contours[i].size());
+                Point* pnts = new Point[contours[i].size()]; //(Point*)malloc(sizeof(Point) * contours[i].size());
                 for (int j = 0; j < contours[i].size(); j++)
                 {
                     pnts[j] = contours[i][j];

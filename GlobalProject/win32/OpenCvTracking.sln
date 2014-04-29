@@ -5,6 +5,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenCvTracking", "OpenCvTra
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Box2D", "Box2d\Box2D.vcxproj", "{98400D17-43A5-1A40-95BE-C53AC78E7694}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Poly2Tri", "..\Poly2Tri\Poly2Tri.vcxproj", "{5B28450C-A7C5-40C8-A329-D4A478F99916}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -27,6 +29,12 @@ Global
 		{98400D17-43A5-1A40-95BE-C53AC78E7694}.Release|Win32.Build.0 = Release|Win32
 		{98400D17-43A5-1A40-95BE-C53AC78E7694}.Release|x64.ActiveCfg = Release|x64
 		{98400D17-43A5-1A40-95BE-C53AC78E7694}.Release|x64.Build.0 = Release|x64
+		{5B28450C-A7C5-40C8-A329-D4A478F99916}.Debug|Win32.ActiveCfg = Debug|Win32
+		{5B28450C-A7C5-40C8-A329-D4A478F99916}.Debug|Win32.Build.0 = Debug|Win32
+		{5B28450C-A7C5-40C8-A329-D4A478F99916}.Debug|x64.ActiveCfg = Debug|Win32
+		{5B28450C-A7C5-40C8-A329-D4A478F99916}.Release|Win32.ActiveCfg = Release|Win32
+		{5B28450C-A7C5-40C8-A329-D4A478F99916}.Release|Win32.Build.0 = Release|Win32
+		{5B28450C-A7C5-40C8-A329-D4A478F99916}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

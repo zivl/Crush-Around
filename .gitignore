@@ -25,3 +25,6 @@ GlobalProject/win32/OpenCvTracking/Debug/
 *.xcuserstate
 
 *.xcbkptlist
+GlobalProject/Poly2Tri/Debug/
+GlobalProject/Poly2Tri/bin/
+GlobalProject/win32/bin/

@@ -84,7 +84,7 @@ void OpenCvDebugDraw::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount
         return;
     }
 
-    cv::Point * pnts = (cv::Point*)malloc(sizeof(cv::Point) * vertexCount);
+    cv::Point * pnts = new cv::Point[vertexCount];  //(cv::Point*)malloc(sizeof(cv::Point) * vertexCount);
 
     for(int idx = 0; idx < vertexCount; idx++)
     {
@@ -98,6 +98,8 @@ void OpenCvDebugDraw::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount
     cv::fillPoly(this->m_scene, ppt, npt, 1, colorInCv);
 
     b2Color edgesColor(color.r * 0.8, color.g * 0.8, color.b * 0.8);
+
+    delete pnts;
 
     this->DrawPolygon(vertices, vertexCount, edgesColor);
 }
