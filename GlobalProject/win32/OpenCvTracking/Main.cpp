@@ -1,8 +1,8 @@
 /**
- * @file SURF_Homography
- * @brief SURF detector + descriptor + FLANN Matcher + FindHomography
- * @author A. Huaman
- */
+* @file SURF_Homography
+* @brief SURF detector + descriptor + FLANN Matcher + FindHomography
+* @author A. Huaman
+*/
 
 #include <stdio.h>
 #include <iostream>
@@ -14,6 +14,8 @@
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/calib3d/calib3d.hpp"
 #include "opencv2/nonfree/features2d.hpp"
+#include "opencv2/photo/photo.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
 
 #include "Core/ObjectTrackingSample.h"
 #include "Core/VideoTracking.hpp"
@@ -23,6 +25,8 @@
 #include "Poly2Tri/poly2tri.h"
 
 #include "Poly2Tri/sweep/cdt.h"
+
+#include "Core/clipper.hpp"
 
 #include <ctime>
 
@@ -35,6 +39,8 @@ int simpleTrack();
 
 void processImage(Mat& image);
 int track2();
+int inPaint();
+int clipping();
 
 int triangulation();
 
@@ -44,14 +50,208 @@ Mat firstImage;
 VideoTracking *track;
 
 /**
- * @function main
- * @brief Main function
- */
+* @function main
+* @brief Main function
+*/
 int main( int argc, char** argv )
 {
     //return simpleTrack();
-    track2();
+    //track2();
     //triangulation();
+    //inPaint();
+    clipping();
+}
+
+int clipping()
+{
+    VideoCapture cap(0); // open the default camera
+    if(!cap.isOpened())  // check if we succeeded
+    {
+        return -1;
+    }
+
+    cap.set(CV_CAP_PROP_FRAME_WIDTH, 352);
+    cap.set(CV_CAP_PROP_FRAME_HEIGHT, 288);
+
+    Mat testFrame;
+    while(testFrame.empty())
+    {
+        cap >> testFrame;
+    }
+
+    namedWindow("output", 1);
+    namedWindow("input", 2);
+
+    track = new VideoTracking();
+
+    setMouseCallback("output", VideoTracking::mouseCallback, track );
+
+    vector<vector<Point> > contours;
+
+    time_t start = time(0);
+    long frames = 0;
+    LcObjectDetector objDetector;
+    bool initialized = false;
+    int key = 0;
+
+    Mat frame, frame2, frame3;        
+    cap >> frame; // get a new frame from camera
+
+
+    
+
+    //draw
+    cv::Scalar blue(200, 45, 60);
+    line(frame, cv::Point(100, 100), cv::Point(200, 100), blue, 2);
+    line(frame, cv::Point(200, 100), cv::Point(200, 200), blue, 2);
+    line(frame, cv::Point(200, 200), cv::Point(100, 200), blue, 2);
+    line(frame, cv::Point(100, 200), cv::Point(100, 100), blue, 2);
+
+    cv::Scalar red(38, 45, 200);
+    line(frame, cv::Point(80, 80), cv::Point(120, 80), red, 2);
+    line(frame, cv::Point(120, 80), cv::Point(120, 120), red, 2);
+    line(frame, cv::Point(120, 120), cv::Point(80, 120), red, 2);
+    line(frame, cv::Point(80, 120), cv::Point(80, 80), red, 2);
+
+
+    imshow("input", frame);
+
+    
+    // define object
+    ClipperLib::Paths object(1);
+    object[0].push_back(ClipperLib::IntPoint(100, 100));
+    object[0].push_back(ClipperLib::IntPoint(200, 100));
+    object[0].push_back(ClipperLib::IntPoint(200, 200));
+    object[0].push_back(ClipperLib::IntPoint(100, 200));
+
+    // define clipping
+    ClipperLib::Paths clip(1);
+    clip[0].push_back(ClipperLib::IntPoint(80, 80));
+    clip[0].push_back(ClipperLib::IntPoint(120, 80));
+    clip[0].push_back(ClipperLib::IntPoint(120, 120));
+    clip[0].push_back(ClipperLib::IntPoint(80, 120));
+
+    // do the clipping and get the solution
+    ClipperLib::Clipper clipper;
+
+    ClipperLib::Paths solution;
+    clipper.AddPaths(object, ClipperLib::ptSubject, true);
+    clipper.AddPaths(clip, ClipperLib::ptClip, true);
+    
+    cv::Scalar orange(0, 140, 255);
+    if(clipper.Execute(ClipperLib::ctIntersection, solution, ClipperLib::pftNonZero, ClipperLib::pftEvenOdd))
+    {
+        // draw the solution(s)
+        for (int i = 0; i < solution.size(); i++)
+        {
+            for (int j = 0; j < solution[i].size() - 1; j++)
+            {
+                line(frame, cv::Point(solution[i][j].X, solution[i][j].Y), cv::Point(solution[i][j + 1].X, solution[i][j + 1].Y), orange, 1);
+            }
+
+            line(frame, cv::Point(solution[i][solution[i].size() - 1].X, solution[i][solution[i].size() - 1].Y), cv::Point(solution[i][0].X, solution[i][0].Y), orange, 1);
+        }
+    }      
+    imshow("output", frame);
+
+    key = waitKey();
+
+      
+}
+
+int inPaint()
+{
+    VideoCapture cap(0); // open the default camera
+    if(!cap.isOpened())  // check if we succeeded
+        return -1;
+
+    cap.set(CV_CAP_PROP_FRAME_WIDTH, 352);
+    cap.set(CV_CAP_PROP_FRAME_HEIGHT, 288);
+
+    Mat testFrame;
+    while(testFrame.empty())
+    {
+        cap >> testFrame;
+    }
+
+    bool initialized = false;
+    LcObjectDetector objDetector;
+    std::vector<std::vector<cv::Point>> contours;
+    int key = 0;
+
+    Mat mask, frame, output;
+
+    for(;;)
+    {        
+        Mat frame2, frame3;
+
+        cap >> frame; // get a new frame from camera
+
+        if (!initialized)
+        {
+            frame.copyTo(frame2);
+            frame.copyTo(frame3);
+
+            contours = objDetector.getObjectContours(frame2);
+
+            vector<Point> approx;
+            // test each contour
+            for( size_t i = 0; i < contours.size(); i++ )
+            {          
+                Point* pnts = new Point[contours[i].size()]; //(Point*)malloc(sizeof(Point) * contours[i].size());
+                for (int j = 0; j < contours[i].size(); j++)
+                {
+                    pnts[j] = contours[i][j];
+                }
+
+                const Point* ppt[1] = { pnts };
+                int npt[] = { contours[i].size() };
+                fillPoly(frame3, ppt, npt, 1, Scalar(120, 250, 50));
+
+                delete[] pnts;
+            }
+
+            imshow("input", frame);
+            imshow("edges", frame3);
+
+            key = waitKey(30);
+
+            if (105 == key)
+            {
+                initialized = true;
+                isFirst = false;
+
+                mask.create(frame.rows, frame.cols, CV_8UC1);
+                mask = cv::Scalar(0);
+                vector<Point> approx;
+
+                // test each contour
+                for( size_t i = 0; i < contours.size(); i++ )
+                {          
+                    Point* pnts = new Point[contours[i].size()];
+                    for (int j = 0; j < contours[i].size(); j++)
+                    {
+                        pnts[j] = contours[i][j];
+                    }
+
+                    const Point* ppt[1] = { pnts };
+                    int npt[] = { contours[i].size() };
+                    fillPoly(mask, ppt, npt, 1, Scalar(255, 255, 250));
+
+                    delete[] pnts;
+                }
+
+                imshow("mask", mask);
+                break;
+            }
+        }
+    }
+
+    cv::inpaint(frame, mask, output, 15, INPAINT_TELEA);
+
+    imshow("results", output);
+    
+    waitKey();
 }
 
 int triangulation()
@@ -59,7 +259,7 @@ int triangulation()
     VideoCapture cap(0); // open the default camera
     if(!cap.isOpened())  // check if we succeeded
         return -1;
- 
+
     cap.set(CV_CAP_PROP_FRAME_WIDTH, 352);
     cap.set(CV_CAP_PROP_FRAME_HEIGHT, 288);
 
@@ -89,7 +289,7 @@ int triangulation()
         Mat frame, frame2, frame3;        
         cap >> frame; // get a new frame from camera
 
-        imshow("input", frame);
+        imshow("input", frame);        
 
         cv::Point points[4] = 
         { 
@@ -106,33 +306,8 @@ int triangulation()
         std::vector<p2t::Point*> polygon;
         /*for (int idx = 0; idx < 4; idx++)
         {
-            polygon.push_back(new p2t::Point(points[idx].x, points[idx].y));
+        polygon.push_back(new p2t::Point(points[idx].x, points[idx].y));
         }*/
-
-        /*polygon.push_back(new p2t::Point(148.3,87.06));
-        polygon.push_back(new p2t::Point(143.3,75));
-        polygon.push_back(new p2t::Point(135.36,64.64));
-        polygon.push_back(new p2t::Point(125,56.7));
-        polygon.push_back(new p2t::Point(112.94,51.7));
-        polygon.push_back(new p2t::Point(100,50));
-        polygon.push_back(new p2t::Point(87.06,51.7));
-        polygon.push_back(new p2t::Point(75,56.7));
-        polygon.push_back(new p2t::Point(64.64,64.64));
-        polygon.push_back(new p2t::Point(56.7,75));
-        polygon.push_back(new p2t::Point(51.7,87.06));
-        polygon.push_back(new p2t::Point(50,100));
-        polygon.push_back(new p2t::Point(51.7,112.94));
-        polygon.push_back(new p2t::Point(56.7,125));
-        polygon.push_back(new p2t::Point(64.64,135.36));
-        polygon.push_back(new p2t::Point(75,143.3));
-        polygon.push_back(new p2t::Point(87.06,148.3));
-        polygon.push_back(new p2t::Point(100,150));
-        polygon.push_back(new p2t::Point(112.94,148.3));
-        polygon.push_back(new p2t::Point(125,143.3));
-        polygon.push_back(new p2t::Point(135.36,135.36));
-        polygon.push_back(new p2t::Point(143.3,125));
-        polygon.push_back(new p2t::Point(148.3,112.94));
-        polygon.push_back(new p2t::Point(150,100));*/
 
         polygon.push_back(new p2t::Point(150,100));
         polygon.push_back(new p2t::Point(200,150));
@@ -151,7 +326,7 @@ int triangulation()
             cv::Point p1(triangle->GetPoint(0)->x, triangle->GetPoint(0)->y);
             cv::Point p2(triangle->GetPoint(1)->x, triangle->GetPoint(1)->y);
             cv::Point p3(triangle->GetPoint(2)->x, triangle->GetPoint(2)->y);
-            
+
             line(frame, p1, p2, Scalar(200, 100, 50));
             line(frame, p2, p3, Scalar(200, 100, 50));
             line(frame, p3, p1, Scalar(200, 100, 50));
@@ -188,8 +363,10 @@ int track2()
 {
     VideoCapture cap(0); // open the default camera
     if(!cap.isOpened())  // check if we succeeded
+    {  
         return -1;
- 
+    }
+
     cap.set(CV_CAP_PROP_FRAME_WIDTH, 352);
     cap.set(CV_CAP_PROP_FRAME_HEIGHT, 288);
 
@@ -218,15 +395,13 @@ int track2()
     {        
         Mat frame, frame2, frame3;
 
-        
         cap >> frame; // get a new frame from camera
 
-        
         if (!initialized)
         {
             frame.copyTo(frame2);
             frame.copyTo(frame3);
-        
+
             contours = objDetector.getObjectContours(frame2);
 
             vector<Point> approx;
@@ -255,7 +430,7 @@ int track2()
             {
                 initialized = true;
                 isFirst = false;
-                
+
                 track->setReferenceFrame(frame);
                 track->setObjectsToBeModeled(contours);
             }
@@ -267,11 +442,11 @@ int track2()
             if(waitKey(30) >= 0) break;
         }
 
-/*        ++frames;
+        /*        ++frames;
         if (frames % 100 == 0)
         {
-            double diff = time(0) - start;
-            cout << frames / diff << " fps" << endl;
+        double diff = time(0) - start;
+        cout << frames / diff << " fps" << endl;
         }   */        
     }
 
@@ -279,7 +454,7 @@ int track2()
 }
 
 
-    // this function is being called for each frame
+// this function is being called for each frame
 void processImage(Mat& image)
 {
     Mat image_copy;
@@ -306,7 +481,7 @@ int simpleTrack()
     if(!cap.isOpened())  // check if we succeeded
         return -1;
 
-    
+
     namedWindow("edges",1);
 
 
@@ -323,13 +498,13 @@ int simpleTrack()
 
     Mat img;
     Mat img_prev;
-   
+
     vector<KeyPoint> keypoints_prev;
     vector<KeyPoint> keypoints_object;
 
     Mat descriptors_object;
     Mat descriptors_prev;
- 
+
     int itr = 0;
     for(;;)
     {        
@@ -338,7 +513,7 @@ int simpleTrack()
         cvtColor(frame, img, CV_BGR2GRAY); // convert to grayscale
 
         // detect features and extract descriptors for current image
-        
+
         detector.detect( img, keypoints_object );
         extractor.compute( img, keypoints_object, descriptors_object );
 
@@ -376,8 +551,8 @@ int simpleTrack()
 
                 Mat img_matches;
                 drawMatches( img, keypoints_object, img_prev, keypoints_prev,
-                            good_matches, img_matches, Scalar::all(-1), Scalar::all(-1),
-                            vector<char>(), DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS );
+                    good_matches, img_matches, Scalar::all(-1), Scalar::all(-1),
+                    vector<char>(), DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS );
 
                 //-- Localize the object
                 std::vector<Point2f> obj;
@@ -434,7 +609,7 @@ int simpleTrack()
         img_prev = img;
         keypoints_prev = keypoints_object;
         descriptors_prev = descriptors_object;
-      
+
         imshow("edges", img);
         if(waitKey(30) >= 0) break;
     }
@@ -444,105 +619,105 @@ int simpleTrack()
 
 int matchImages(int argc, char** argv)
 {
-  if( argc != 3 )
-  { readme(); return -1; }
+    if( argc != 3 )
+    { readme(); return -1; }
 
-  Mat img_object = imread( argv[1], IMREAD_GRAYSCALE );
-  Mat img_scene = imread( argv[2], IMREAD_GRAYSCALE );
+    Mat img_object = imread( argv[1], IMREAD_GRAYSCALE );
+    Mat img_scene = imread( argv[2], IMREAD_GRAYSCALE );
 
-  if( !img_object.data || !img_scene.data )
-  { std::cout<< " --(!) Error reading images " << std::endl; return -1; }
+    if( !img_object.data || !img_scene.data )
+    { std::cout<< " --(!) Error reading images " << std::endl; return -1; }
 
-  //-- Step 1: Detect the keypoints using SURF Detector
-  int minHessian = 200;
+    //-- Step 1: Detect the keypoints using SURF Detector
+    int minHessian = 200;
 
-  SurfFeatureDetector detector( minHessian );
+    SurfFeatureDetector detector( minHessian );
 
-  std::vector<KeyPoint> keypoints_object, keypoints_scene;
+    std::vector<KeyPoint> keypoints_object, keypoints_scene;
 
-  detector.detect( img_object, keypoints_object );
-  detector.detect( img_scene, keypoints_scene );
+    detector.detect( img_object, keypoints_object );
+    detector.detect( img_scene, keypoints_scene );
 
-  //-- Step 2: Calculate descriptors (feature vectors)
-  SurfDescriptorExtractor extractor;
+    //-- Step 2: Calculate descriptors (feature vectors)
+    SurfDescriptorExtractor extractor;
 
-  Mat descriptors_object, descriptors_scene;
+    Mat descriptors_object, descriptors_scene;
 
-  extractor.compute( img_object, keypoints_object, descriptors_object );
-  extractor.compute( img_scene, keypoints_scene, descriptors_scene );
+    extractor.compute( img_object, keypoints_object, descriptors_object );
+    extractor.compute( img_scene, keypoints_scene, descriptors_scene );
 
-  //-- Step 3: Matching descriptor vectors using FLANN matcher
-  FlannBasedMatcher matcher;
-  std::vector< DMatch > matches;
-  matcher.match( descriptors_object, descriptors_scene, matches );
+    //-- Step 3: Matching descriptor vectors using FLANN matcher
+    FlannBasedMatcher matcher;
+    std::vector< DMatch > matches;
+    matcher.match( descriptors_object, descriptors_scene, matches );
 
-  double max_dist = 0; double min_dist = 100;
+    double max_dist = 0; double min_dist = 100;
 
-  //-- Quick calculation of max and min distances between keypoints
-  for( int i = 0; i < descriptors_object.rows; i++ )
-  { double dist = matches[i].distance;
+    //-- Quick calculation of max and min distances between keypoints
+    for( int i = 0; i < descriptors_object.rows; i++ )
+    { double dist = matches[i].distance;
     if( dist < min_dist ) min_dist = dist;
     if( dist > max_dist ) max_dist = dist;
-  }
+    }
 
-  printf("-- Max dist : %f \n", max_dist );
-  printf("-- Min dist : %f \n", min_dist );
+    printf("-- Max dist : %f \n", max_dist );
+    printf("-- Min dist : %f \n", min_dist );
 
-  //-- Draw only "good" matches (i.e. whose distance is less than 3*min_dist )
-  std::vector< DMatch > good_matches;
+    //-- Draw only "good" matches (i.e. whose distance is less than 3*min_dist )
+    std::vector< DMatch > good_matches;
 
-  for( int i = 0; i < descriptors_object.rows; i++ )
-  { if( matches[i].distance < 3*min_dist )
+    for( int i = 0; i < descriptors_object.rows; i++ )
+    { if( matches[i].distance < 3*min_dist )
     { good_matches.push_back( matches[i]); }
-  }
+    }
 
-  Mat img_matches;
-  drawMatches( img_object, keypoints_object, img_scene, keypoints_scene,
-               good_matches, img_matches, Scalar::all(-1), Scalar::all(-1),
-               vector<char>(), DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS );
-
-
-  //-- Localize the object from img_1 in img_2
-  std::vector<Point2f> obj;
-  std::vector<Point2f> scene;
-
-  for( size_t i = 0; i < good_matches.size(); i++ )
-  {
-    //-- Get the keypoints from the good matches
-    obj.push_back( keypoints_object[ good_matches[i].queryIdx ].pt );
-    scene.push_back( keypoints_scene[ good_matches[i].trainIdx ].pt );
-  }
+    Mat img_matches;
+    drawMatches( img_object, keypoints_object, img_scene, keypoints_scene,
+        good_matches, img_matches, Scalar::all(-1), Scalar::all(-1),
+        vector<char>(), DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS );
 
 
-  Mat H = findHomography( obj, scene, RANSAC );
+    //-- Localize the object from img_1 in img_2
+    std::vector<Point2f> obj;
+    std::vector<Point2f> scene;
 
-  //-- Get the corners from the image_1 ( the object to be "detected" )
-  std::vector<Point2f> obj_corners(4);
-  obj_corners[0] = Point(0,0); obj_corners[1] = Point( img_object.cols, 0 );
-  obj_corners[2] = Point( img_object.cols, img_object.rows ); obj_corners[3] = Point( 0, img_object.rows );
-  std::vector<Point2f> scene_corners(4);
+    for( size_t i = 0; i < good_matches.size(); i++ )
+    {
+        //-- Get the keypoints from the good matches
+        obj.push_back( keypoints_object[ good_matches[i].queryIdx ].pt );
+        scene.push_back( keypoints_scene[ good_matches[i].trainIdx ].pt );
+    }
 
-  perspectiveTransform( obj_corners, scene_corners, H);
+
+    Mat H = findHomography( obj, scene, RANSAC );
+
+    //-- Get the corners from the image_1 ( the object to be "detected" )
+    std::vector<Point2f> obj_corners(4);
+    obj_corners[0] = Point(0,0); obj_corners[1] = Point( img_object.cols, 0 );
+    obj_corners[2] = Point( img_object.cols, img_object.rows ); obj_corners[3] = Point( 0, img_object.rows );
+    std::vector<Point2f> scene_corners(4);
+
+    perspectiveTransform( obj_corners, scene_corners, H);
 
 
-  //-- Draw lines between the corners (the mapped object in the scene - image_2 )
-  Point2f offset( (float)img_object.cols, 0);
-  line( img_matches, scene_corners[0] + offset, scene_corners[1] + offset, Scalar(0, 255, 0), 4 );
-  line( img_matches, scene_corners[1] + offset, scene_corners[2] + offset, Scalar( 0, 255, 0), 4 );
-  line( img_matches, scene_corners[2] + offset, scene_corners[3] + offset, Scalar( 0, 255, 0), 4 );
-  line( img_matches, scene_corners[3] + offset, scene_corners[0] + offset, Scalar( 0, 255, 0), 4 );
+    //-- Draw lines between the corners (the mapped object in the scene - image_2 )
+    Point2f offset( (float)img_object.cols, 0);
+    line( img_matches, scene_corners[0] + offset, scene_corners[1] + offset, Scalar(0, 255, 0), 4 );
+    line( img_matches, scene_corners[1] + offset, scene_corners[2] + offset, Scalar( 0, 255, 0), 4 );
+    line( img_matches, scene_corners[2] + offset, scene_corners[3] + offset, Scalar( 0, 255, 0), 4 );
+    line( img_matches, scene_corners[3] + offset, scene_corners[0] + offset, Scalar( 0, 255, 0), 4 );
 
-  //-- Show detected matches
-  imshow( "Good Matches & Object detection", img_matches );
+    //-- Show detected matches
+    imshow( "Good Matches & Object detection", img_matches );
 
-  waitKey(0);
+    waitKey(0);
 
-  return 0;
+    return 0;
 }
 
 /**
- * @function readme
- */
+* @function readme
+*/
 void readme()
 { 
     std::cout << " Usage: ./SURF_Homography <img1> <img2>" << std::endl; 

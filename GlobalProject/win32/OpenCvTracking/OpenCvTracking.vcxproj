@@ -70,6 +70,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Core\clipper.cpp" />
     <ClCompile Include="..\..\Core\Globals.cpp" />
     <ClCompile Include="..\..\Core\LcObjectDetector.cpp" />
     <ClCompile Include="..\..\Core\MyContactListener.cpp" />
@@ -83,6 +84,7 @@
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Core\clipper.hpp" />
     <ClInclude Include="..\..\Core\Globals.h" />
     <ClInclude Include="..\..\Core\LcObjectDetector.h" />
     <ClInclude Include="..\..\Core\MyContactListener.h" />
