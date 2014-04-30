@@ -157,7 +157,7 @@ bool VideoTracking::processFrame(const cv::Mat& inputFrame, cv::Mat& outputFrame
         if (needDetectAdditionalPoints)
         {
             m_detector->detect(m_nextImg, m_nextKeypoints, m_mask);
-            int pointsToDetect = m_maxNumberOfPoints - trackedPts.size();
+            int pointsToDetect = m_maxNumberOfPoints - (int)trackedPts.size();
 
             if (m_nextKeypoints.size() > pointsToDetect)
             {

@@ -15,7 +15,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "385"
             endingLineNumber = "385"
-            landmarkName = "VideoTracking::onMouse( int event, int x, int y, int, void* )"
+            landmarkName = "VideoTracking::calcHomographyAndTransformScene(cv::Mat&amp; outputFrame)"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
