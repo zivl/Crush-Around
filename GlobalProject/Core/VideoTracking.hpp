@@ -16,7 +16,7 @@
 
 #include "OpenCvDebugDraw.h"
 #include "MyContactListener.h"
-
+#include "Core/LcInPaint.h"
 
 #define PTM_RATIO 32.0
 
@@ -49,6 +49,10 @@ public:
 
     void setObjectsToBeModeled(const std::vector<std::vector<cv::Point>> contours);
     
+    void prapreInPaintedScene(const cv::Mat scene, const std::vector<std::vector<cv::Point>> contours);
+
+    void setDebugDraw(bool enabled);
+
 private:
     int m_maxNumberOfPoints;
 
@@ -116,6 +120,15 @@ private:
 
      // Contact listener for colision response
     MyContactListener *m_contactListener;   
+
+    // inpainted scene used to fill over "destroyed" parts of the image
+    cv::Mat m_inpaintedScene;
+
+    // a list of destroyed regions
+    std::vector<cv::Point*> m_destroyedPolygons;
+    std::vector<int> m_destroyedPolygonsPointCount;
+
+    bool m_debugDrawEnabled;
 };
 
 

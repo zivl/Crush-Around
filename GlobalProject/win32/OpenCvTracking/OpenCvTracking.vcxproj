@@ -72,6 +72,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\Core\clipper.cpp" />
     <ClCompile Include="..\..\Core\Globals.cpp" />
+    <ClCompile Include="..\..\Core\LcInPaint.cpp" />
     <ClCompile Include="..\..\Core\LcObjectDetector.cpp" />
     <ClCompile Include="..\..\Core\MyContactListener.cpp" />
     <ClCompile Include="..\..\Core\ObjectTrackingClass.cpp" />
@@ -86,6 +87,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\Core\clipper.hpp" />
     <ClInclude Include="..\..\Core\Globals.h" />
+    <ClInclude Include="..\..\Core\LcInPaint.h" />
     <ClInclude Include="..\..\Core\LcObjectDetector.h" />
     <ClInclude Include="..\..\Core\MyContactListener.h" />
     <ClInclude Include="..\..\Core\ObjectTrackingClass.h" />

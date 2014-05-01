@@ -27,6 +27,7 @@
 #include "Poly2Tri/sweep/cdt.h"
 
 #include "Core/clipper.hpp"
+#include "Core/LcInPaint.h"
 
 #include <ctime>
 
@@ -173,6 +174,7 @@ int inPaint()
         cap >> testFrame;
     }
 
+    
     bool initialized = false;
     LcObjectDetector objDetector;
     std::vector<std::vector<cv::Point>> contours;
@@ -220,33 +222,15 @@ int inPaint()
                 initialized = true;
                 isFirst = false;
 
-                mask.create(frame.rows, frame.cols, CV_8UC1);
-                mask = cv::Scalar(0);
-                vector<Point> approx;
-
-                // test each contour
-                for( size_t i = 0; i < contours.size(); i++ )
-                {          
-                    Point* pnts = new Point[contours[i].size()];
-                    for (int j = 0; j < contours[i].size(); j++)
-                    {
-                        pnts[j] = contours[i][j];
-                    }
-
-                    const Point* ppt[1] = { pnts };
-                    int npt[] = { contours[i].size() };
-                    fillPoly(mask, ppt, npt, 1, Scalar(255, 255, 250));
-
-                    delete[] pnts;
-                }
-
-                imshow("mask", mask);
                 break;
             }
         }
     }
 
-    cv::inpaint(frame, mask, output, 15, INPAINT_TELEA);
+    LcInPaint inpaint;
+    inpaint.inpaint(frame, contours, output);
+
+    //cv::inpaint(frame, mask, output, 15, INPAINT_TELEA);
 
     imshow("results", output);
     
@@ -373,6 +357,7 @@ int track2()
     namedWindow("input", 2);
 
     track = new VideoTracking();
+    track->setDebugDraw(false);
 
     setMouseCallback("output", VideoTracking::mouseCallback, track );
 
@@ -401,7 +386,7 @@ int track2()
             // test each contour
             for( size_t i = 0; i < contours.size(); i++ )
             {          
-                Point* pnts = new Point[contours[i].size()]; //(Point*)malloc(sizeof(Point) * contours[i].size());
+                Point* pnts = new Point[contours[i].size()];
                 for (int j = 0; j < contours[i].size(); j++)
                 {
                     pnts[j] = contours[i][j];
@@ -425,14 +410,18 @@ int track2()
                 isFirst = false;
 
                 track->setReferenceFrame(frame);
-                contours.clear();
-                std::vector<cv::Point> square;
-                square.push_back(cv::Point(220, 200));
-                square.push_back(cv::Point(220, 250));
-                square.push_back(cv::Point(270, 250));
-                square.push_back(cv::Point(270, 200));
-                contours.push_back(square);
+                //contours.clear();
+                //std::vector<cv::Point> square;
+                //square.push_back(cv::Point(220, 200));
+                //square.push_back(cv::Point(220, 250));
+                //square.push_back(cv::Point(270, 250));
+                //square.push_back(cv::Point(270, 200));
+                //contours.push_back(square);
                 track->setObjectsToBeModeled(contours);
+                track->prapreInPaintedScene(frame, contours);
+
+                //imshow("inpainted", track->m_inpaintedScene);
+                //waitKey();
             }
         }
         else

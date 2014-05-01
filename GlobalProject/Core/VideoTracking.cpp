@@ -60,6 +60,10 @@ VideoTracking::~VideoTracking()
 
     delete m_debugDraw;
     delete m_contactListener;
+
+    m_destroyedPoints.clear();
+    m_destroyedPolygons.clear();
+    m_destroyedPolygonsPointCount.clear();
 }
 
 //! Gets a sample name
@@ -147,7 +151,30 @@ bool VideoTracking::processFrame(const cv::Mat& inputFrame, cv::Mat& outputFrame
 
                     // Save the new polygons of this body
                     objectBody->SetUserData(newPolygons);  
-                    newBodyMap[objectBody] = newPolygons;                     
+                    newBodyMap[objectBody] = newPolygons;  
+
+                    // now, find the intersection regions - these should be inpainted to the scene
+                    ClipperLib::Paths destroyedParts;
+                    clipper.Execute(ClipperLib::ctIntersection, destroyedParts, ClipperLib::pftEvenOdd, ClipperLib::pftEvenOdd);
+
+                    
+
+                    // paint the required areas to be coppied
+                    for (int i = 0; i < destroyedParts.size(); i++)
+                    {
+                        cv::Point* points = new cv::Point[destroyedParts[i].size()];
+
+                        for (int j = 0; j < destroyedParts[i].size(); j++)
+                        {
+                            points[j].x = destroyedParts[i][j].X;
+                            points[j].y = destroyedParts[i][j].Y;
+                        }
+
+                        m_destroyedPolygons.push_back(points);   
+                        m_destroyedPolygonsPointCount.push_back(destroyedParts[i].size());
+                    }
+
+                                     
                 }               
             }
             else if (objectFixture->GetType() == b2Shape::e_circle)
@@ -156,6 +183,16 @@ bool VideoTracking::processFrame(const cv::Mat& inputFrame, cv::Mat& outputFrame
             }
         }
     }
+
+    cv::Mat mask_image( inputFrame.size(), CV_8U, cv::Scalar(0));
+    for (int i = 0; i < m_destroyedPolygons.size(); i++)
+    {
+        const cv::Point* ppt[1] = { m_destroyedPolygons[i] };
+        int npt[] = { m_destroyedPolygonsPointCount[i] };
+        fillPoly(mask_image, ppt, npt, 1, cv::Scalar(255, 255, 255));
+    }
+    // now that the mask is prepared, copy the points from the inpainted to the scene
+    m_inpaintedScene.copyTo(outputFrame, mask_image);
 
     std::map<b2Body*, ClipperLib::Paths*>::iterator iter;
 
@@ -311,11 +348,12 @@ bool VideoTracking::processFrame(const cv::Mat& inputFrame, cv::Mat& outputFrame
         calcHomographyAndTransformScene(outputFrame);
     }
 
-    // add the debug drawing
-    this->m_debugDraw->SetScene(outputFrame);
-    this->m_world->DrawDebugData();
-
-    //outputFrame += m_scene;
+    if (m_debugDrawEnabled)
+    {
+        // add the debug drawing
+        this->m_debugDraw->SetScene(outputFrame);
+        this->m_world->DrawDebugData();
+    }
 
     return true;
 }
@@ -647,10 +685,17 @@ void VideoTracking::setObjectsToBeModeled(const std::vector<std::vector<cv::Poin
 }
 
 
+void VideoTracking::prapreInPaintedScene(const cv::Mat scene, const std::vector<std::vector<cv::Point>> contours)
+{
+    LcInPaint inpaint;
+    inpaint.inpaint(scene, contours, m_inpaintedScene);
+}
 
 
-
-
+void VideoTracking::setDebugDraw(bool enabled)
+{
+    this->m_debugDrawEnabled = enabled;
+}
 
 
 
