@@ -56,10 +56,10 @@ VideoTracking *track;
 int main( int argc, char** argv )
 {
     //return simpleTrack();
-    //track2();
+    track2();
     //triangulation();
     //inPaint();
-    clipping();
+    //clipping();
 }
 
 int clipping()
@@ -104,8 +104,8 @@ int clipping()
     cv::Scalar blue(200, 45, 60);
     line(frame, cv::Point(100, 100), cv::Point(200, 100), blue, 2);
     line(frame, cv::Point(200, 100), cv::Point(200, 200), blue, 2);
-    line(frame, cv::Point(200, 200), cv::Point(100, 200), blue, 2);
-    line(frame, cv::Point(100, 200), cv::Point(100, 100), blue, 2);
+    //line(frame, cv::Point(200, 200), cv::Point(100, 200), blue, 2);
+    line(frame, cv::Point(200, 200), cv::Point(100, 100), blue, 2);
 
     cv::Scalar red(38, 45, 200);
     line(frame, cv::Point(80, 80), cv::Point(120, 80), red, 2);
@@ -121,7 +121,6 @@ int clipping()
     ClipperLib::Paths object(1);
     object[0].push_back(ClipperLib::IntPoint(100, 100));
     object[0].push_back(ClipperLib::IntPoint(200, 100));
-    object[0].push_back(ClipperLib::IntPoint(200, 200));
     object[0].push_back(ClipperLib::IntPoint(100, 200));
 
     // define clipping
@@ -138,8 +137,8 @@ int clipping()
     clipper.AddPaths(object, ClipperLib::ptSubject, true);
     clipper.AddPaths(clip, ClipperLib::ptClip, true);
     
-    cv::Scalar orange(0, 140, 255);
-    if(clipper.Execute(ClipperLib::ctIntersection, solution, ClipperLib::pftNonZero, ClipperLib::pftEvenOdd))
+    cv::Scalar orange(0, 100, 255);
+    if(clipper.Execute(ClipperLib::ctIntersection, solution, ClipperLib::pftEvenOdd, ClipperLib::pftEvenOdd))
     {
         // draw the solution(s)
         for (int i = 0; i < solution.size(); i++)
@@ -291,27 +290,12 @@ int triangulation()
 
         imshow("input", frame);        
 
-        cv::Point points[4] = 
-        { 
-            cv::Point(100,100), 
-            cv::Point(200,100), 
-            cv::Point(200,200), 
-            cv::Point(100, 200) 
-        };
-
-        const cv::Point* ppt[1] = { points };
-        int npt[] = { 4 };
-        //cv::fillPoly(frame, ppt, npt, 1, Scalar(200, 100, 5));
-
         std::vector<p2t::Point*> polygon;
-        /*for (int idx = 0; idx < 4; idx++)
-        {
-        polygon.push_back(new p2t::Point(points[idx].x, points[idx].y));
-        }*/
 
-        polygon.push_back(new p2t::Point(150,100));
-        polygon.push_back(new p2t::Point(200,150));
-        polygon.push_back(new p2t::Point(175,175));
+        polygon.push_back(new p2t::Point(100,100));
+        polygon.push_back(new p2t::Point(200,100));
+        polygon.push_back(new p2t::Point(200,200));
+        polygon.push_back(new p2t::Point(100,200));
 
         p2t::CDT* cdt = new p2t::CDT(polygon);
 
@@ -319,6 +303,7 @@ int triangulation()
 
         std::vector<p2t::Triangle*> triangles = cdt->GetTriangles();
 
+        cv:Scalar color(200, 100, 50);
         for (int idx = 0; idx < triangles.size(); idx++)
         {
             p2t::Triangle* triangle = triangles[idx];
@@ -327,9 +312,17 @@ int triangulation()
             cv::Point p2(triangle->GetPoint(1)->x, triangle->GetPoint(1)->y);
             cv::Point p3(triangle->GetPoint(2)->x, triangle->GetPoint(2)->y);
 
-            line(frame, p1, p2, Scalar(200, 100, 50));
-            line(frame, p2, p3, Scalar(200, 100, 50));
-            line(frame, p3, p1, Scalar(200, 100, 50));
+            line(frame, p1, p2, color, 2);
+            line(frame, p2, p3, color, 2);
+            line(frame, p3, p1, color, 2);
+
+            // Find the mid-point of the triangle
+            cv::Point midPoint((p1.x + p2.x + p3.x) / 3, (p1.y + p2.y + p3.y) / 3);
+
+            // draw the lines
+            line(frame, midPoint, p1, color, 2);
+            line(frame, midPoint, p2, color, 2);
+            line(frame, midPoint, p3, color, 2);
         }
 
 
@@ -432,6 +425,13 @@ int track2()
                 isFirst = false;
 
                 track->setReferenceFrame(frame);
+                contours.clear();
+                std::vector<cv::Point> square;
+                square.push_back(cv::Point(220, 200));
+                square.push_back(cv::Point(220, 250));
+                square.push_back(cv::Point(270, 250));
+                square.push_back(cv::Point(270, 200));
+                contours.push_back(square);
                 track->setObjectsToBeModeled(contours);
             }
         }

@@ -14,12 +14,24 @@ MyContactListener::~MyContactListener(void)
 // The data from contact is copied because b2Contact passed in is reused
 void MyContactListener::BeginContact(b2Contact* contact) {
     
-    b2WorldManifold manifold;
-    contact->GetWorldManifold(&manifold);
+    if (!contact->IsTouching())
+    {
+        return;
+    }
+    
+    b2WorldManifold worldManifold;
+    contact->GetWorldManifold(&worldManifold);    
 
-    b2Vec2* point = new b2Vec2(manifold.points[0]);
+    b2Vec2 vel1 = contact->GetFixtureA()->GetBody()->GetLinearVelocityFromWorldPoint( worldManifold.points[0] );
+    b2Vec2 vel2 = contact->GetFixtureB()->GetBody()->GetLinearVelocityFromWorldPoint( worldManifold.points[0] );
+   
+    
+    b2Vec2* impactVelocityA = new b2Vec2(vel1);
+    b2Vec2* impactVelocityB = new b2Vec2(vel2);
 
-    MyContact myContact = { contact->GetFixtureA(), contact->GetFixtureB(), point };
+    b2Vec2* point = new b2Vec2(worldManifold.points[0]);
+
+    MyContact myContact = { contact->GetFixtureA(), contact->GetFixtureB(), point, impactVelocityA, impactVelocityB };
     this->m_contacts.push_back(myContact);       
 }
 

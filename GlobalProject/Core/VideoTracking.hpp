@@ -11,6 +11,8 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <vector>
 #include <Box2D/Box2D.h>
+#include <Poly2Tri/sweep/cdt.h>
+#include <Core/clipper.hpp>
 
 #include "OpenCvDebugDraw.h"
 #include "MyContactListener.h"
@@ -108,13 +110,12 @@ private:
 
     cv::Mat m_refFrame2CurrentHomography;
 
-    cv::vector<cv::Point2f> m_destroyedPoints;
+    cv::vector<cv::Point2f*> m_destroyedPoints;
 
     OpenCvDebugDraw* m_debugDraw;
 
      // Contact listener for colision response
-    MyContactListener *m_contactListener;
-
+    MyContactListener *m_contactListener;   
 };
 
 

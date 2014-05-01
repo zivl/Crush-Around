@@ -9,6 +9,8 @@ struct MyContact {
     b2Fixture *fixtureA;
     b2Fixture *fixtureB;
     b2Vec2* contactPoint;
+    b2Vec2* impactVelocityA;
+    b2Vec2* impactVelocityB;
 
 
     bool operator==(const MyContact& other) const
