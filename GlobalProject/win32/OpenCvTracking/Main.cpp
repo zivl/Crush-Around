@@ -402,7 +402,7 @@ int track2()
             imshow("input", frame);
             imshow("output", frame3);
 
-            key = waitKey(30);
+            key = waitKey(5);
 
             if (105 == key)
             {

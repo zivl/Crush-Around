@@ -117,8 +117,7 @@ bool VideoTracking::processFrame(const cv::Mat& inputFrame, cv::Mat& outputFrame
 
             if (objectFixture->GetType() == b2Shape::e_edge)
             {
-                // change the shape of the fixture
-                    
+                // change the shape of the fixture                    
                 // only go into processing if this body was not processed yet (possible ball hit two fixture of same body)
                 if (newBodyMap.find(objectBody) == newBodyMap.end())
                 {
@@ -156,9 +155,7 @@ bool VideoTracking::processFrame(const cv::Mat& inputFrame, cv::Mat& outputFrame
                     // now, find the intersection regions - these should be inpainted to the scene
                     ClipperLib::Paths destroyedParts;
                     clipper.Execute(ClipperLib::ctIntersection, destroyedParts, ClipperLib::pftEvenOdd, ClipperLib::pftEvenOdd);
-
-                    
-
+                   
                     // paint the required areas to be coppied
                     for (int i = 0; i < destroyedParts.size(); i++)
                     {
@@ -183,17 +180,7 @@ bool VideoTracking::processFrame(const cv::Mat& inputFrame, cv::Mat& outputFrame
             }
         }
     }
-
-    cv::Mat mask_image( inputFrame.size(), CV_8U, cv::Scalar(0));
-    for (int i = 0; i < m_destroyedPolygons.size(); i++)
-    {
-        const cv::Point* ppt[1] = { m_destroyedPolygons[i] };
-        int npt[] = { m_destroyedPolygonsPointCount[i] };
-        fillPoly(mask_image, ppt, npt, 1, cv::Scalar(255, 255, 255));
-    }
-    // now that the mask is prepared, copy the points from the inpainted to the scene
-    m_inpaintedScene.copyTo(outputFrame, mask_image);
-
+ 
     std::map<b2Body*, ClipperLib::Paths*>::iterator iter;
 
     for(iter = newBodyMap.begin(); iter != newBodyMap.end(); iter++)
@@ -240,9 +227,8 @@ bool VideoTracking::processFrame(const cv::Mat& inputFrame, cv::Mat& outputFrame
 
         removeList[i]->GetWorld()->DestroyBody(removeList[i]);
     }
-
+    
    
-
     inputFrame.copyTo(outputFrame);
 
     getGray(inputFrame, m_nextImg);
@@ -471,14 +457,17 @@ void VideoTracking::setReferenceFrame(const cv::Mat& reference)
 void VideoTracking::calcHomographyAndTransformScene(cv::Mat& outputFrame)
 {
     // transform the sence using descriptors, correspondance and homography
-    if (m_refKeypoints.size() > 0)
+    if (m_refKeypoints.size() > 3)
     {
         // create vector for matches and find matches between reference and new descriptors
         std::vector<cv::DMatch> matches;
 
+        std::cout << "There are " << m_refKeypoints.size() << " refs and " << m_nextKeypoints.size() << " new" << std::endl;
         // m_refDescriptors is keypoint descriptors from the first frame
         // m_nextDescriptors is keypoint descriptors from the current processed frame
         m_matcher->match(m_refDescriptors, m_nextDescriptors, matches);
+
+        std::cout << "Found " << matches.size() << " matches" << std::endl;
 
         double max_dist = 0; double min_dist = 100;
 
@@ -509,12 +498,14 @@ void VideoTracking::calcHomographyAndTransformScene(cv::Mat& outputFrame)
         // Localize the object
         std::vector<cv::Point2f> refPoints, newPoints;
 
-        for( int i = 0; i < good_matches.size(); i++ )
+        for( int i = 0; i < matches.size(); i++ )
         {
             // Get the keypoints from the good matche (reference and new)
-            refPoints.push_back(m_refKeypoints[good_matches[i].queryIdx].pt);
-            newPoints.push_back( m_nextKeypoints[good_matches[i].trainIdx].pt);
+            refPoints.push_back(m_refKeypoints[matches[i].queryIdx].pt);
+            newPoints.push_back( m_nextKeypoints[matches[i].trainIdx].pt);
         }
+
+        std::cout << refPoints.size() << " good matches" << std::endl;
 
         if (refPoints.size() > 3 && newPoints.size() > 3)
         {
@@ -529,11 +520,21 @@ void VideoTracking::calcHomographyAndTransformScene(cv::Mat& outputFrame)
             {
                 cv::circle(transformedScene, *this->m_destroyedPoints[i], 5, cv::Scalar(200, 200, 200), -1);
             }
+
+             cv::Mat mask_image(outputFrame.size(), CV_8U, cv::Scalar(0));
+            for (int i = 0; i < m_destroyedPolygons.size(); i++)
+            {
+                const cv::Point* ppt[1] = { m_destroyedPolygons[i] };
+                int npt[] = { m_destroyedPolygonsPointCount[i] };
+                fillPoly(mask_image, ppt, npt, 1, cv::Scalar(255, 255, 255));
+            }
+            // now that the mask is prepared, copy the points from the inpainted to the scene
+            m_inpaintedScene.copyTo(transformedScene, mask_image);
             
             cv::circle(transformedScene,
                        cv::Point2f(m_ballBody->GetPosition().x * PTM_RATIO, m_ballBody->GetPosition().y * PTM_RATIO),
                        26, cv::Scalar(255, 0, 0), -1);
-
+            
             warpPerspective(transformedScene, transformedScene, this->m_refFrame2CurrentHomography, outputFrame.size(), CV_INTER_LINEAR);
 
             // add to the output
