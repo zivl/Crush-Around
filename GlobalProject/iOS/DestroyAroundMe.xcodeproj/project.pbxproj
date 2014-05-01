@@ -7,8 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C90C7DB6190D4D7600E5476F /* MyContactListener.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C90C7DB2190D4D7600E5476F /* MyContactListener.cpp */; };
+		C90C7DB7190D4D7600E5476F /* OpenCvDebugDraw.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C90C7DB4190D4D7600E5476F /* OpenCvDebugDraw.cpp */; };
+		C90C7DB8190D5D2F00E5476F /* b2Settings.h in Sources */ = {isa = PBXBuildFile; fileRef = C99B1FA0190BB0EC003F19C1 /* b2Settings.h */; };
 		C95BF521190BDBF7008D9497 /* WatershedSegmenter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C95BF51E190BDBF7008D9497 /* WatershedSegmenter.cpp */; };
 		C95BF524190C075D008D9497 /* LcObjectDetector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C95BF522190C075D008D9497 /* LcObjectDetector.cpp */; };
+		C991A3A419118D01000C8377 /* clipper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C991A3A219118D01000C8377 /* clipper.cpp */; };
+		C991A3A719119D3A000C8377 /* LcInPaint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C991A3A519119D3A000C8377 /* LcInPaint.cpp */; };
 		C99B1FEF190BB0EC003F19C1 /* b2BroadPhase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C99B1F80190BB0EC003F19C1 /* b2BroadPhase.cpp */; };
 		C99B1FF0190BB0EC003F19C1 /* b2CollideCircle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C99B1F82190BB0EC003F19C1 /* b2CollideCircle.cpp */; };
 		C99B1FF1190BB0EC003F19C1 /* b2CollideEdge.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C99B1F83190BB0EC003F19C1 /* b2CollideEdge.cpp */; };
@@ -97,10 +102,18 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		C90C7DB2190D4D7600E5476F /* MyContactListener.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MyContactListener.cpp; sourceTree = "<group>"; };
+		C90C7DB3190D4D7600E5476F /* MyContactListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyContactListener.h; sourceTree = "<group>"; };
+		C90C7DB4190D4D7600E5476F /* OpenCvDebugDraw.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OpenCvDebugDraw.cpp; sourceTree = "<group>"; };
+		C90C7DB5190D4D7600E5476F /* OpenCvDebugDraw.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OpenCvDebugDraw.h; sourceTree = "<group>"; };
 		C95BF51E190BDBF7008D9497 /* WatershedSegmenter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WatershedSegmenter.cpp; sourceTree = "<group>"; };
 		C95BF51F190BDBF7008D9497 /* WatershedSegmenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WatershedSegmenter.h; sourceTree = "<group>"; };
 		C95BF522190C075D008D9497 /* LcObjectDetector.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LcObjectDetector.cpp; sourceTree = "<group>"; };
 		C95BF523190C075D008D9497 /* LcObjectDetector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LcObjectDetector.h; sourceTree = "<group>"; };
+		C991A3A219118D01000C8377 /* clipper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = clipper.cpp; sourceTree = "<group>"; };
+		C991A3A319118D01000C8377 /* clipper.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = clipper.hpp; sourceTree = "<group>"; };
+		C991A3A519119D3A000C8377 /* LcInPaint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LcInPaint.cpp; sourceTree = "<group>"; };
+		C991A3A619119D3A000C8377 /* LcInPaint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LcInPaint.h; sourceTree = "<group>"; };
 		C99B1F7E190BB0EC003F19C1 /* Box2D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Box2D.h; sourceTree = "<group>"; };
 		C99B1F80190BB0EC003F19C1 /* b2BroadPhase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = b2BroadPhase.cpp; sourceTree = "<group>"; };
 		C99B1F81190BB0EC003F19C1 /* b2BroadPhase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = b2BroadPhase.h; sourceTree = "<group>"; };
@@ -429,6 +442,12 @@
 		C99B1FE2190BB0EC003F19C1 /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				C991A3A219118D01000C8377 /* clipper.cpp */,
+				C991A3A319118D01000C8377 /* clipper.hpp */,
+				C90C7DB2190D4D7600E5476F /* MyContactListener.cpp */,
+				C90C7DB3190D4D7600E5476F /* MyContactListener.h */,
+				C90C7DB4190D4D7600E5476F /* OpenCvDebugDraw.cpp */,
+				C90C7DB5190D4D7600E5476F /* OpenCvDebugDraw.h */,
 				C95BF522190C075D008D9497 /* LcObjectDetector.cpp */,
 				C95BF523190C075D008D9497 /* LcObjectDetector.h */,
 				C95BF51E190BDBF7008D9497 /* WatershedSegmenter.cpp */,
@@ -445,6 +464,8 @@
 				C99B1FEC190BB0EC003F19C1 /* SampleOptions.h */,
 				C99B1FED190BB0EC003F19C1 /* VideoTracking.cpp */,
 				C99B1FEE190BB0EC003F19C1 /* VideoTracking.hpp */,
+				C991A3A519119D3A000C8377 /* LcInPaint.cpp */,
+				C991A3A619119D3A000C8377 /* LcInPaint.h */,
 			);
 			name = Core;
 			path = ../Core;
@@ -631,6 +652,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C90C7DB8190D5D2F00E5476F /* b2Settings.h in Sources */,
 				C99B2022190BB0EC003F19C1 /* VideoTracking.cpp in Sources */,
 				C99B1FF8190BB0EC003F19C1 /* b2CircleShape.cpp in Sources */,
 				C95BF524190C075D008D9497 /* LcObjectDetector.cpp in Sources */,
@@ -663,6 +685,7 @@
 				C99B200E190BB0EC003F19C1 /* b2PolygonAndCircleContact.cpp in Sources */,
 				C99B2009190BB0EC003F19C1 /* b2CircleContact.cpp in Sources */,
 				C99B2011190BB0EC003F19C1 /* b2FrictionJoint.cpp in Sources */,
+				C90C7DB7190D4D7600E5476F /* OpenCvDebugDraw.cpp in Sources */,
 				C99B2019190BB0EC003F19C1 /* b2RopeJoint.cpp in Sources */,
 				C99B201B190BB0EC003F19C1 /* b2WheelJoint.cpp in Sources */,
 				C99B2001190BB0EC003F19C1 /* b2Body.cpp in Sources */,
@@ -675,14 +698,17 @@
 				C99B201D190BB0EC003F19C1 /* Globals.cpp in Sources */,
 				C99B2015190BB0EC003F19C1 /* b2MouseJoint.cpp in Sources */,
 				C99B2005190BB0EC003F19C1 /* b2World.cpp in Sources */,
+				C90C7DB6190D4D7600E5476F /* MyContactListener.cpp in Sources */,
 				C99B2021190BB0EC003F19C1 /* SampleOptions.cpp in Sources */,
 				C99B201F190BB0EC003F19C1 /* ObjectTrackingSample.cpp in Sources */,
 				C99B1FF2190BB0EC003F19C1 /* b2CollidePolygon.cpp in Sources */,
 				C99B2016190BB0EC003F19C1 /* b2PrismaticJoint.cpp in Sources */,
+				C991A3A419118D01000C8377 /* clipper.cpp in Sources */,
 				C99B2000190BB0EC003F19C1 /* b2Timer.cpp in Sources */,
 				C99B2010190BB0EC003F19C1 /* b2DistanceJoint.cpp in Sources */,
 				C99B1FFE190BB0EC003F19C1 /* b2Settings.cpp in Sources */,
 				C99B2014190BB0EC003F19C1 /* b2MotorJoint.cpp in Sources */,
+				C991A3A719119D3A000C8377 /* LcInPaint.cpp in Sources */,
 				C99B201E190BB0EC003F19C1 /* ObjectTrackingClass.cpp in Sources */,
 				C99B1FF9190BB0EC003F19C1 /* b2EdgeShape.cpp in Sources */,
 				C99B1FF1190BB0EC003F19C1 /* b2CollideEdge.cpp in Sources */,
