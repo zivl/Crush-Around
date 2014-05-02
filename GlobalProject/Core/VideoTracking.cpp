@@ -538,7 +538,8 @@ void VideoTracking::calcHomographyAndTransformScene(cv::Mat& outputFrame)
             warpPerspective(transformedScene, transformedScene, this->m_refFrame2CurrentHomography, outputFrame.size(), CV_INTER_LINEAR);
 
             // add to the output
-            outputFrame += transformedScene;
+//            outputFrame += transformedScene;
+			transformedScene.copyTo(outputFrame, transformedScene);
         }
     }
 }
@@ -607,7 +608,7 @@ void VideoTracking::setObjectsToBeModeled(const std::vector<std::vector<cv::Poin
             ClipperLib::Path polygon;
             
 #endif
-            std::vector<p2t::Point*> polyPoints;
+//            std::vector<p2t::Point*> polyPoints;
 
 
             for (int j = 0; j < numOfPoints; j++)
@@ -618,8 +619,8 @@ void VideoTracking::setObjectsToBeModeled(const std::vector<std::vector<cv::Poin
                 //cv::line(m_scene, currentShape[j], currentShape[(j + 1) % numOfPoints], cv::Scalar(0,0,255));
                 //std::cout << "[" << vertices[j].x << "," <<vertices[j].y << "]" << std::endl;
 
-                polyPoints.push_back(new p2t::Point(currentShape[j].x, currentShape[j].y));
-#if(USE_EDGES_FOR_MODEL)  
+//                polyPoints.push_back(new p2t::Point(currentShape[j].x, currentShape[j].y));
+#if(USE_EDGES_FOR_MODEL)
                 polygon.push_back(ClipperLib::IntPoint(currentShape[j].x, currentShape[j].y));
 #endif
             }

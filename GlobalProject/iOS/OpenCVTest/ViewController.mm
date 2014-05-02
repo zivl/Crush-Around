@@ -18,6 +18,19 @@
 
 @implementation ViewController
 @synthesize videoCamera;
+@synthesize fontLarge;
+@synthesize fontSmall;
+@synthesize blowItUpLabel;
+@synthesize blowItUpPanel;
+@synthesize scoreLabel;
+@synthesize scoringPanel;
+@synthesize innerScorePanelBG;
+@synthesize scorePoints;
+@synthesize score;
+- (void)setScore:(NSInteger)iScore {
+    score = iScore;
+    [self.scorePoints setText:[NSNumberFormatter localizedStringFromNumber:@(score) numberStyle:NSNumberFormatterDecimalStyle]];
+}
 
 BOOL isFirst = YES;
 BOOL imageForSegmentationHasBeenTaken = NO;
@@ -28,9 +41,17 @@ VideoTracking *track;
 - (void)viewDidLoad
 {
 	[super viewDidLoad];
-    // Do any additional setup after loading the view, typically from a nib.
-	track = new VideoTracking();
 
+	[self loadGameControls];
+
+	[self configureImageCameraAndImageProcessingObjects];
+	[self configureGestures];
+
+
+
+}
+
+-(void)configureImageCameraAndImageProcessingObjects{
     self.videoCamera = [[CvVideoCamera alloc] initWithParentView:imageView];
 	self.videoCamera.delegate = self;
     self.videoCamera.defaultAVCaptureDevicePosition = AVCaptureDevicePositionBack;
@@ -38,14 +59,31 @@ VideoTracking *track;
     self.videoCamera.defaultAVCaptureVideoOrientation = AVCaptureVideoOrientationLandscapeLeft;
     self.videoCamera.defaultFPS = 30;
     self.videoCamera.grayscaleMode = NO;
-	UITapGestureRecognizer *gestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onTap:)];
-	[imageView addGestureRecognizer:gestureRecognizer];
-	gestureRecognizer.delegate = self;
 	[self.videoCamera start];
 }
 
-#pragma mark - Protocol CvVideoCameraDelegate
+-(void)configureGestures {
+	UITapGestureRecognizer *gestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onTap:)];
+	[imageView addGestureRecognizer:gestureRecognizer];
+	gestureRecognizer.delegate = self;
+}
 
+static const CGFloat kCornerRadius = 10.0f;
+
+-(void)loadGameControls {
+	self.fontLarge = [UIFont fontWithName:@"GROBOLD" size:18.0f];
+    self.fontSmall = [UIFont fontWithName:@"GROBOLD" size:14.0f];
+	[self.blowItUpLabel setFont:self.fontLarge];
+	[self.innerScorePanelBG.layer setCornerRadius:kCornerRadius];
+    [self.innerScorePanelBG setClipsToBounds:YES];
+    [self.innerScorePanelBG setBackgroundColor:[UIColor clearColor]];
+    [self.scorePoints setFont:self.fontLarge];
+    [self.scoreLabel setFont:self.fontLarge];
+	[self setScore:0];
+}
+
+#pragma mark - Protocol CvVideoCameraDelegate
+#ifdef __cplusplus
 std::vector<std::vector<cv::Point>> getLCDetection(const cv::Mat &image, cv::Mat &output){
 	std::vector<std::vector<cv::Point>> contours;
 
@@ -72,8 +110,10 @@ std::vector<std::vector<cv::Point>> getLCDetection(const cv::Mat &image, cv::Mat
 	return contours;
 }
 
-#ifdef __cplusplus
-/*- (void)processImage:(Mat&)image;
+
+std::vector<std::vector<cv::Point>> contours;
+
+- (void)processImage:(Mat&)image;
 {
 	Mat image_copy;
     cvtColor(image, image_copy, CV_BGRA2BGR);
@@ -82,92 +122,26 @@ std::vector<std::vector<cv::Point>> getLCDetection(const cv::Mat &image, cv::Mat
 		if(isFirst){
 			isFirst = !isFirst;
 			firstImage = image_copy;
+			track = new VideoTracking();
+//			track->setDebugDraw(true);
 			track->setReferenceFrame(firstImage);
-			cv::Mat temp;
-			track->setObjectsToBeModeled(getLCDetection(firstImage, temp));
-			
+			track->setObjectsToBeModeled(contours);
+			track->prapreInPaintedScene(image_copy, contours);
 		}
 		else {
 			track->processFrame(image_copy, image_copy);
-
 		}
 		cvtColor(image_copy, image, CV_BGR2BGRA);
 	}
 	else{
 
 		//image = showWatershedSegmentation(image_copy);
-		getLCDetection(image, image);
+		contours = getLCDetection(image, image);
 	}
-}*/
-
-LcObjectDetector objDetector;
-std::vector<std::vector<cv::Point>> contours;
-
-cv::Mat mask;
-
-cv::Mat frame2, frame3;
-
-- (void)processImage:(Mat&)image;
-{
-	Mat image_copy;
-	cvtColor(image, image_copy, CV_BGRA2BGR);
-
-	if (!imageForSegmentationHasBeenTaken)
-	{
-		image_copy.copyTo(frame2);
-		image_copy.copyTo(frame3);
-
-		contours = objDetector.getObjectContours(frame2);
-
-		std::vector<cv::Point> approx;
-		// test each contour
-		for( size_t i = 0; i < contours.size(); i++ )
-		{
-			cv::Point* pnts = new cv::Point[contours[i].size()];
-			for (int j = 0; j < contours[i].size(); j++)
-			{
-				pnts[j] = contours[i][j];
-			}
-
-			const cv::Point* ppt[1] = { pnts };
-			int npt[] = { static_cast<int>(contours[i].size()) };
-			fillPoly(frame3, ppt, npt, 1, cv::Scalar(120, 250, 50));
-
-			delete[] pnts;
-		}
-
-	}
-	else {
-
-		mask.create(image_copy.rows, image_copy.cols, CV_8UC1);
-		mask = cv::Scalar(0);
-		std::vector<cv::Point> approx;
-
-		// test each contour
-		for( size_t i = 0; i < contours.size(); i++ )
-		{
-			cv::Point* pnts = new cv::Point[contours[i].size()];
-			for (int j = 0; j < contours[i].size(); j++)
-			{
-				pnts[j] = contours[i][j];
-			}
-
-			const cv::Point* ppt[1] = { pnts };
-			int npt[] = { static_cast<int>(contours[i].size()) };
-			fillPoly(mask, ppt, npt, 1, cv::Scalar(255, 255, 250));
-
-			delete[] pnts;
-		}
-
-		//    cv::inpaint(image, mask, output, 15, INPAINT_TELEA);
-		cv::inpaint(image_copy, mask, image, 15, INPAINT_TELEA);
-	}
-
 }
 
 Mat getWatershedSegmentation(Mat image)
 {
-
     //Create watershed segmentation object
     WatershedSegmenter segmenter;
     segmenter.createMarkersFromImage(image);
@@ -186,13 +160,15 @@ Mat getWatershedSegmentation(Mat image)
 	[self.videoCamera start];
 }
 
--(IBAction)markObjectButton:(id)sender {
+-(IBAction)onBlowItUpButton:(id)sender {
 	imageForSegmentationHasBeenTaken = YES;
 }
 
 -(void)onTap:(UITapGestureRecognizer *)recognizer {
-	CGPoint location = [recognizer locationInView:imageView];
-	track->onMouse(1, location.x, location.y, nil, nil);
+	if(track){
+		CGPoint location = [recognizer locationInView:imageView];
+		track->onMouse(1, location.x, location.y, nil, nil);
+	}
 }
 
 - (void)didReceiveMemoryWarning

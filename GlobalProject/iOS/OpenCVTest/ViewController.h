@@ -42,11 +42,26 @@ using namespace cv;
 
 @property (nonatomic, retain) CvVideoCamera* videoCamera;
 
+@property (nonatomic, strong) UIFont * fontLarge;
+@property (nonatomic, strong) UIFont * fontSmall;
+
+@property (nonatomic, assign) NSInteger score;
+
+// UI Elements
+@property (nonatomic, weak) IBOutlet UIView * scoringPanel;
+@property (nonatomic, weak) IBOutlet UIImageView * innerScorePanelBG;
+@property (nonatomic, weak) IBOutlet UILabel * scoreLabel;
+@property (nonatomic, weak) IBOutlet UILabel * scorePoints;
+
+@property (nonatomic, weak) IBOutlet UIView * blowItUpPanel;
+@property (nonatomic, weak) IBOutlet UILabel * blowItUpLabel;
+
+
 -(void)onTap:(UITapGestureRecognizer *)recognizer;
 
 -(IBAction)resetCameraFirstPositionButton:(id)sender;
 
--(IBAction)markObjectButton:(id)sender;
+-(IBAction)onBlowItUpButton:(id)sender;
 
 
 

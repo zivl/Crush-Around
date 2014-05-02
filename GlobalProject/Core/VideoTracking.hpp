@@ -11,12 +11,12 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <vector>
 #include <Box2D/Box2D.h>
-#include <Poly2Tri/sweep/cdt.h>
-#include <Core/clipper.hpp>
+
+#include "clipper.hpp"
 
 #include "OpenCvDebugDraw.h"
 #include "MyContactListener.h"
-#include "Core/LcInPaint.h"
+#include "LcInPaint.h"
 
 #define PTM_RATIO 32.0
 

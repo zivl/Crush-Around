@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		C90C7DB6190D4D7600E5476F /* MyContactListener.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C90C7DB2190D4D7600E5476F /* MyContactListener.cpp */; };
 		C90C7DB7190D4D7600E5476F /* OpenCvDebugDraw.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C90C7DB4190D4D7600E5476F /* OpenCvDebugDraw.cpp */; };
-		C90C7DB8190D5D2F00E5476F /* b2Settings.h in Sources */ = {isa = PBXBuildFile; fileRef = C99B1FA0190BB0EC003F19C1 /* b2Settings.h */; };
+		C94F006A1913E5C300EBA9C9 /* GROBOLD.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C94F00691913E5C300EBA9C9 /* GROBOLD.ttf */; };
 		C95BF521190BDBF7008D9497 /* WatershedSegmenter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C95BF51E190BDBF7008D9497 /* WatershedSegmenter.cpp */; };
 		C95BF524190C075D008D9497 /* LcObjectDetector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C95BF522190C075D008D9497 /* LcObjectDetector.cpp */; };
 		C991A3A419118D01000C8377 /* clipper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C991A3A219118D01000C8377 /* clipper.cpp */; };
@@ -106,6 +106,10 @@
 		C90C7DB3190D4D7600E5476F /* MyContactListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyContactListener.h; sourceTree = "<group>"; };
 		C90C7DB4190D4D7600E5476F /* OpenCvDebugDraw.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OpenCvDebugDraw.cpp; sourceTree = "<group>"; };
 		C90C7DB5190D4D7600E5476F /* OpenCvDebugDraw.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OpenCvDebugDraw.h; sourceTree = "<group>"; };
+		C94F006319136B5500EBA9C9 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
+		C94F006519136B6700EBA9C9 /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
+		C94F006719136B7100EBA9C9 /* libgll.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libgll.dylib; path = usr/lib/libgll.dylib; sourceTree = SDKROOT; };
+		C94F00691913E5C300EBA9C9 /* GROBOLD.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = GROBOLD.ttf; sourceTree = "<group>"; };
 		C95BF51E190BDBF7008D9497 /* WatershedSegmenter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WatershedSegmenter.cpp; sourceTree = "<group>"; };
 		C95BF51F190BDBF7008D9497 /* WatershedSegmenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WatershedSegmenter.h; sourceTree = "<group>"; };
 		C95BF522190C075D008D9497 /* LcObjectDetector.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LcObjectDetector.cpp; sourceTree = "<group>"; };
@@ -282,6 +286,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		C94F006B1913E5C700EBA9C9 /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				C94F00691913E5C300EBA9C9 /* GROBOLD.ttf */,
+			);
+			name = Fonts;
+			sourceTree = "<group>";
+		};
 		C99B1F7D190BB0EC003F19C1 /* Box2D */ = {
 			isa = PBXGroup;
 			children = (
@@ -495,6 +507,9 @@
 		C9F4CABC18C3C1BA0020D812 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				C94F006719136B7100EBA9C9 /* libgll.dylib */,
+				C94F006519136B6700EBA9C9 /* GLKit.framework */,
+				C94F006319136B5500EBA9C9 /* OpenGLES.framework */,
 				C99B2023190BB14B003F19C1 /* opencv2.framework */,
 				C9F4CB0218C3E17D0020D812 /* libz.dylib */,
 				C9F4CAF418C3DB940020D812 /* Accelerate.framework */,
@@ -529,6 +544,7 @@
 		C9F4CAC418C3C1BA0020D812 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				C94F006B1913E5C700EBA9C9 /* Fonts */,
 				C9F4CAC518C3C1BA0020D812 /* DestroyAroundMe-Info.plist */,
 				C9F4CAC618C3C1BA0020D812 /* InfoPlist.strings */,
 				C9F4CAC918C3C1BA0020D812 /* main.m */,
@@ -631,6 +647,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C94F006A1913E5C300EBA9C9 /* GROBOLD.ttf in Resources */,
 				C9F4CAD618C3C1BA0020D812 /* Images.xcassets in Resources */,
 				C9F4CAC818C3C1BA0020D812 /* InfoPlist.strings in Resources */,
 				C9F4CAD118C3C1BA0020D812 /* Main.storyboard in Resources */,
@@ -652,7 +669,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C90C7DB8190D5D2F00E5476F /* b2Settings.h in Sources */,
 				C99B2022190BB0EC003F19C1 /* VideoTracking.cpp in Sources */,
 				C99B1FF8190BB0EC003F19C1 /* b2CircleShape.cpp in Sources */,
 				C95BF524190C075D008D9497 /* LcObjectDetector.cpp in Sources */,
@@ -798,6 +814,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				USER_HEADER_SEARCH_PATHS = "/Users/zivl/git/Destroy-Around-Me/GlobalProject /Users/zivl/git/Destroy-Around-Me/GlobalProject/Core";
 			};
 			name = Debug;
 		};
@@ -829,6 +846,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				SDKROOT = iphoneos;
+				USER_HEADER_SEARCH_PATHS = "/Users/zivl/git/Destroy-Around-Me/GlobalProject /Users/zivl/git/Destroy-Around-Me/GlobalProject/Core";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -852,6 +870,7 @@
 				);
 				INFOPLIST_FILE = "OpenCVTest/DestroyAroundMe-Info.plist";
 				PRODUCT_NAME = DestroyAroundMe;
+				USER_HEADER_SEARCH_PATHS = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -875,6 +894,7 @@
 				);
 				INFOPLIST_FILE = "OpenCVTest/DestroyAroundMe-Info.plist";
 				PRODUCT_NAME = DestroyAroundMe;
+				USER_HEADER_SEARCH_PATHS = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

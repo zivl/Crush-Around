@@ -7,7 +7,7 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/photo/photo.hpp>
 
-#include "Core/clipper.hpp"
+#include "clipper.hpp"
 
 class LcInPaint {
 private:
