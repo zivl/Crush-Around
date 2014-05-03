@@ -1,0 +1,419 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<logicalClassDesignerModel xmlns:dm0="http://schemas.microsoft.com/VisualStudio/2008/DslTools/Core" xmlns:dm1="http://schemas.microsoft.com/dsltools/Kernel" xmlns:dm2="http://schemas.microsoft.com/dsltools/Component" xmlns:dm3="http://schemas.microsoft.com/dsltools/UseCase" xmlns:dm4="http://schemas.microsoft.com/dsltools/Activity" xmlns:dm5="http://schemas.microsoft.com/dsltools/Interaction" xmlns:dm6="http://schemas.microsoft.com/dsltools/UmlModelLibrary" xmlns:dm7="http://schemas.microsoft.com/dsltools/UmlDiagrams" xmlns:dm8="http://schemas.microsoft.com/dsltools/ModelStore" xmlns:dm9="http://schemas.microsoft.com/VisualStudio/TeamArchitect/SequenceDesigner" dslVersion="1.0.0.0" Id="faba6080-7684-4ffa-b6b2-5b6ba7b0817a" name="DestroyAroundMe" linkedPackageId="0d688917-6bdb-47fd-930b-c14b3a2d8ecb" xmlns="http://schemas.microsoft.com/dsltools/LogicalClassDesigner">
+  <ownedCommentsInternal>
+    <comment Id="7ac29b60-2361-4e8f-8e4e-c5210a4da1bd">
+      <elementDefinition Id="d7f3abac-953d-46ac-9ce4-733bba13b23d" />
+      <body>Main game mechanism
+iOS: controller
+Win32: simple Main()</body>
+      <annotatedElements>
+        <classMoniker Id="75132cca-3fb0-400e-b4ca-1fb977ab232c" LastKnownName="GameController" />
+      </annotatedElements>
+    </comment>
+    <comment Id="791d8c66-a8c0-44fe-aa94-8b122b2b1042">
+      <elementDefinition Id="4b85102b-9906-4753-9602-7f29b87d030c" />
+      <body>Implement Image Processing (feature detercation and extraction, matching (correspondance) and homography calculation in addition to Pyhsics simulation and drawing of final image (should be refactored)</body>
+      <annotatedElements>
+        <classMoniker Id="309fe018-5030-4f85-a3dd-4701764c5c47" LastKnownName="VideoTracking" />
+      </annotatedElements>
+    </comment>
+    <comment Id="8305e4eb-a535-4907-9e9c-e6ff275ec948">
+      <elementDefinition Id="62f746d4-549c-49a2-ac4a-5b980730d35a" />
+      <body>Utility class for image in-painting</body>
+      <annotatedElements>
+        <classMoniker Id="7020bd18-a869-4c48-8015-3fe204e83d39" LastKnownName="LcInPaint" />
+      </annotatedElements>
+    </comment>
+    <comment Id="982018d2-732f-4663-a916-6edb6dd6be0d">
+      <elementDefinition Id="ba9c1d0e-0a73-41d1-8dbe-ce35353bcc55" />
+      <body>Object detector (using Canny + findContours + contour simplification)</body>
+      <annotatedElements>
+        <classMoniker Id="817c7c3c-0d98-4c20-8081-5594febf3276" LastKnownName="LcObjectDetector" />
+      </annotatedElements>
+    </comment>
+  </ownedCommentsInternal>
+  <profileInstances>
+    <packageHasProfileInstances Id="70764e4c-0760-4c11-9c14-21e7fbd101ca">
+      <profileInstance Id="67327c54-84a9-4a7c-b838-bd4b5c06f996" name="StandardProfileL2">
+        <elementDefinition Id="e34d544e-0fea-4ed6-ac5e-1b74119ac791" />
+      </profileInstance>
+      <elementDefinition Id="0caec977-1f8c-4ba3-a7db-8cc9ad9cc73b" />
+    </packageHasProfileInstances>
+    <packageHasProfileInstances Id="cc0d1bad-2e45-4d54-874f-37808799dc75">
+      <profileInstance Id="557b037a-9f38-4d49-b161-aac6dd977d05" name="StandardProfileL3">
+        <elementDefinition Id="532ea607-fb19-44b8-8502-3351b05452be" />
+      </profileInstance>
+      <elementDefinition Id="29349502-908c-4fda-9054-c48619c59ed0" />
+    </packageHasProfileInstances>
+  </profileInstances>
+  <packagedElements>
+    <logicalClassDesignerModelHasTypes>
+      <class Id="309fe018-5030-4f85-a3dd-4701764c5c47" name="VideoTracking" isAbstract="false" isLeaf="false" isActiveClass="false">
+        <elementDefinition Id="956cb02d-f210-4853-b5fe-99d338d00cd3" />
+        <suppliersInternal>
+          <dependency Id="3151f039-b8fc-42ba-8c61-c10d661f3e82">
+            <classMoniker Id="7131bcbd-4886-4c9a-8ba1-49d4d36fdfcf" LastKnownName="Contours" />
+            <elementDefinition Id="591dd788-7f56-458d-9151-e843a0a8071d" />
+          </dependency>
+        </suppliersInternal>
+        <targetEnds>
+          <association Id="8136dc21-6b90-4ee8-a4b0-89fd415b30e8" isDerived="false" sourceEndRoleName="" targetEndRoleName="m_detector" isLeaf="false" isAbstract="false">
+            <classMoniker Id="3a69502d-0c83-490d-83fd-0b7a1288a55e" LastKnownName="FeatureDetector" />
+            <relationshipOwnedElementsInternal>
+              <associationHasOwnedEnds>
+                <memberEnd Id="978a734c-aedd-4ce8-b6b9-195098c3f1ff" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="Composite" isComposite="false" isNavigableOwned="false">
+                  <elementDefinition Id="a5ecb2ad-5586-4b18-80a1-7bcd6c09281d" />
+                </memberEnd>
+              </associationHasOwnedEnds>
+              <associationHasOwnedEnds>
+                <memberEnd Id="be924fa6-c0b3-41ae-9a12-962344f33912" name="m_detector" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="None" isComposite="true">
+                  <elementDefinition Id="60ad59db-77fa-45c5-9edf-5c5fb1ef5c45" />
+                </memberEnd>
+              </associationHasOwnedEnds>
+            </relationshipOwnedElementsInternal>
+            <elementDefinition Id="d2ceb797-9d7a-4b97-aebf-78d276416145" />
+          </association>
+          <association Id="b8d53211-f1f0-47b9-b7de-ecb2b6b9dcbd" isDerived="false" sourceEndRoleName="" targetEndRoleName="m_matcher" isLeaf="false" isAbstract="false">
+            <classMoniker Id="c5a5ed49-0e52-48a1-8051-0e70b1c0fef4" LastKnownName="FeatureMatcher" />
+            <relationshipOwnedElementsInternal>
+              <associationHasOwnedEnds>
+                <memberEnd Id="6bdf8a13-dfd6-41f5-ae45-47d466645c43" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="Composite" isComposite="false" isNavigableOwned="false">
+                  <elementDefinition Id="c3f022e0-81e7-466a-9160-16d7aa00892a" />
+                </memberEnd>
+              </associationHasOwnedEnds>
+              <associationHasOwnedEnds>
+                <memberEnd Id="a4a49ae8-a0d5-4593-9e19-37d106f25519" name="m_matcher" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="None" isComposite="true">
+                  <elementDefinition Id="19e75076-29bf-415d-86c4-87ee05346127" />
+                </memberEnd>
+              </associationHasOwnedEnds>
+            </relationshipOwnedElementsInternal>
+            <elementDefinition Id="0ef6e2a8-a1aa-4021-8107-15e9ca587b18" />
+          </association>
+          <association Id="81626458-9741-4468-b68b-1ef3cac3c71e" isDerived="false" sourceEndRoleName="" targetEndRoleName="LcInPaint" isLeaf="false" isAbstract="false">
+            <classMoniker Id="7020bd18-a869-4c48-8015-3fe204e83d39" LastKnownName="LcInPaint" />
+            <relationshipOwnedElementsInternal>
+              <associationHasOwnedEnds>
+                <memberEnd Id="291a3f96-8164-4038-8f2d-acfb50368b4e" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="Composite" isComposite="false" isNavigableOwned="false">
+                  <elementDefinition Id="52eef180-ed91-44d7-b7ca-46fe706398a9" />
+                </memberEnd>
+              </associationHasOwnedEnds>
+              <associationHasOwnedEnds>
+                <memberEnd Id="e344c11e-b436-4691-ba19-f2d31bfb7004" name="LcInPaint" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="None" isComposite="true">
+                  <elementDefinition Id="fc62ec19-f56e-4a0b-8b36-d903694adfa5" />
+                </memberEnd>
+              </associationHasOwnedEnds>
+            </relationshipOwnedElementsInternal>
+            <elementDefinition Id="e0384a98-70e0-4671-bc3b-0904cf81e511" />
+          </association>
+          <association Id="18953492-78bf-4163-84f4-b061e934afcc" isDerived="false" sourceEndRoleName="" targetEndRoleName="m_scene" isLeaf="false" isAbstract="false">
+            <classMoniker Id="c18d60f2-ca14-4ae3-b805-7f7fba0c5ddf" LastKnownName="Mat" />
+            <relationshipOwnedElementsInternal>
+              <associationHasOwnedEnds>
+                <memberEnd Id="624afaa3-a9a6-4c65-8ada-068e749998bf" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="Composite" isComposite="false" isNavigableOwned="false">
+                  <elementDefinition Id="4111657e-ca44-425b-b56f-c3c7a1c56bbf" />
+                </memberEnd>
+              </associationHasOwnedEnds>
+              <associationHasOwnedEnds>
+                <memberEnd Id="67561ccb-fd08-44b7-8738-546245f380a0" name="m_scene" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="None" isComposite="true">
+                  <elementDefinition Id="2542159a-fef1-4735-86e3-d92b5a0a2182" />
+                </memberEnd>
+              </associationHasOwnedEnds>
+            </relationshipOwnedElementsInternal>
+            <elementDefinition Id="43590737-806c-4a2e-b54d-149455c9903e" />
+          </association>
+        </targetEnds>
+        <ownedAttributesInternal>
+          <property Id="35887d3e-cb48-433f-950a-9532bb135cce" name="m_scene" isLeaf="false" isStatic="false" isReadOnly="false" isUnique="false" isDerived="false" isDerivedUnion="false" aggregation="None" isComposite="false">
+            <elementDefinition Id="60759dde-dda8-4088-808a-c10d5e2a0e24" />
+          </property>
+          <property Id="c9c8f6c6-6dea-4d33-8ace-12769add7c92" name="m_refKeyPoints" isLeaf="false" isStatic="false" isReadOnly="false" isUnique="false" isDerived="false" isDerivedUnion="false" aggregation="None" isComposite="false">
+            <elementDefinition Id="649839b7-ebeb-4bda-86f2-4fe4d9feeaf5" />
+          </property>
+          <property Id="6bbbf98a-3f2a-4ecc-910e-a4453382ff68" name="m_refDescriptors" isLeaf="false" isStatic="false" isReadOnly="false" isUnique="false" isDerived="false" isDerivedUnion="false" aggregation="None" isComposite="false">
+            <elementDefinition Id="f635c62b-6f2b-4dd4-9d83-afc5ed9cb2d2" />
+          </property>
+          <property Id="b511f664-087f-4ded-b2cc-d162aff1114b" name="m_refFrame2CurrentHomography" isLeaf="false" isStatic="false" isReadOnly="false" isUnique="false" isDerived="false" isDerivedUnion="false" aggregation="None" isComposite="false">
+            <elementDefinition Id="56e531e9-6ba6-4b46-acfe-ea78ad96f284" />
+          </property>
+        </ownedAttributesInternal>
+        <ownedOperationsInternal>
+          <operation Id="4d80e957-40f1-45e3-9875-7f43ffa2d68d" name="processFrame" isLeaf="false" isStatic="false" isAbstract="false" concurrency="Sequential" isQuery="false">
+            <elementDefinition Id="aa6c5fac-f6ce-469d-bb65-b7cd256eb8f5" />
+            <ownedParameters>
+              <operationHasOwnedParameters>
+                <parameter Id="9e439aef-d33d-4e3b-a754-e556649cb988" name="input" direction="In">
+                  <elementDefinition Id="f81e94ef-fd3b-46c8-8bd9-c238ffac7cb2" />
+                  <type_NamedElement>
+                    <referencedTypeMoniker Id="9dd7f9bc-6fed-4495-99ee-63b4e3514a9d" LastKnownName="Mat" />
+                  </type_NamedElement>
+                </parameter>
+              </operationHasOwnedParameters>
+              <operationHasOwnedParameters>
+                <parameter Id="c65ee76d-a854-44b7-8192-747b7a4c6b57" name="output" direction="Out">
+                  <elementDefinition Id="07a35f35-a97a-4d7d-9cf5-7e989e3131b4" />
+                  <type_NamedElement>
+                    <referencedTypeMoniker Id="9dd7f9bc-6fed-4495-99ee-63b4e3514a9d" LastKnownName="Mat" />
+                  </type_NamedElement>
+                </parameter>
+              </operationHasOwnedParameters>
+            </ownedParameters>
+          </operation>
+          <operation Id="0a9c8cf6-fed6-4497-8cdf-b402320e8063" name="setReferenceFrame" isLeaf="false" isStatic="false" isAbstract="false" concurrency="Sequential" isQuery="false">
+            <elementDefinition Id="41768b7c-9eac-4c50-b135-c372e7d06ec3" />
+            <ownedParameters>
+              <operationHasOwnedParameters>
+                <parameter Id="e2a96062-78fb-45c9-a298-364e3ef98838" name="frame" direction="In">
+                  <elementDefinition Id="36a93cb2-fdcf-4273-84c2-d2e19f290e0a" />
+                  <type_NamedElement>
+                    <referencedTypeMoniker Id="9dd7f9bc-6fed-4495-99ee-63b4e3514a9d" LastKnownName="Mat" />
+                  </type_NamedElement>
+                </parameter>
+              </operationHasOwnedParameters>
+            </ownedParameters>
+          </operation>
+          <operation Id="d10d8ec6-d4ff-4a57-b0d1-800ccdf41031" name="setObjectsToBeModeled" isLeaf="false" isStatic="false" isAbstract="false" concurrency="Sequential" isQuery="false">
+            <elementDefinition Id="d0a677aa-228f-405e-8661-d5e54e3b55ba" />
+            <ownedParameters>
+              <operationHasOwnedParameters>
+                <parameter Id="83eba1c2-3f67-4211-bee9-9658adb48644" name="contours" direction="In">
+                  <elementDefinition Id="9a398d92-9a3c-443c-9fbf-9b5829f78515" />
+                </parameter>
+              </operationHasOwnedParameters>
+            </ownedParameters>
+          </operation>
+          <operation Id="7b8eaaed-7590-442f-909c-ca5cee1032f9" name="prapreInPaintedScene" isLeaf="false" isStatic="false" isAbstract="false" concurrency="Sequential" isQuery="false">
+            <elementDefinition Id="90968bfe-6e12-494c-9e1f-b3423fb276ca" />
+            <ownedParameters>
+              <operationHasOwnedParameters>
+                <parameter Id="2ec1aa71-8d0d-4b8c-8df9-0856c4c647f2" name="frame" direction="In">
+                  <elementDefinition Id="1db3cb5e-53bc-4891-9c6c-9d1e13f17a68" />
+                  <type_NamedElement>
+                    <referencedTypeMoniker Id="9dd7f9bc-6fed-4495-99ee-63b4e3514a9d" LastKnownName="Mat" />
+                  </type_NamedElement>
+                </parameter>
+              </operationHasOwnedParameters>
+            </ownedParameters>
+          </operation>
+          <operation Id="7d393eb9-ce8c-43b5-b306-992c694205a7" name="calcHomographyAndTransformScene" isLeaf="false" isStatic="false" isAbstract="false" concurrency="Sequential" isQuery="false">
+            <elementDefinition Id="08297f39-bfde-4be7-ba81-326206d9fa5a" />
+          </operation>
+        </ownedOperationsInternal>
+      </class>
+    </logicalClassDesignerModelHasTypes>
+    <logicalClassDesignerModelHasTypes>
+      <class Id="817c7c3c-0d98-4c20-8081-5594febf3276" name="LcObjectDetector" isAbstract="false" isLeaf="false" isActiveClass="false">
+        <elementDefinition Id="3031920c-12d8-4234-8182-73cf561166da" />
+        <suppliersInternal>
+          <dependency Id="4e06ed2f-cf79-4896-a512-beb173d220d3">
+            <classMoniker Id="c18d60f2-ca14-4ae3-b805-7f7fba0c5ddf" LastKnownName="Mat" />
+            <elementDefinition Id="0f7695df-5dee-408b-94b0-5e8ac361a777" />
+          </dependency>
+          <dependency Id="d5062788-7479-47ab-8ce1-c497b1eb90ae">
+            <classMoniker Id="7131bcbd-4886-4c9a-8ba1-49d4d36fdfcf" LastKnownName="Contours" />
+            <elementDefinition Id="ee92f7b0-89e0-435f-abe8-fafb3d41423d" />
+          </dependency>
+        </suppliersInternal>
+        <ownedOperationsInternal>
+          <operation Id="3aaaf7d9-26be-41e0-ab32-b17b9060172f" name="getObjectContours" isLeaf="false" isStatic="false" isAbstract="false" concurrency="Sequential" isQuery="false">
+            <elementDefinition Id="2b2d2d74-2693-49e8-bd13-56927dd5d0f7" />
+            <ownedParameters>
+              <operationHasOwnedParameters>
+                <parameter Id="6be28262-9ea3-4bdc-9bc2-03e826b7f85b" name="frame" direction="In">
+                  <elementDefinition Id="2020dc77-8269-4406-98eb-9295f1f66148" />
+                </parameter>
+              </operationHasOwnedParameters>
+            </ownedParameters>
+          </operation>
+        </ownedOperationsInternal>
+      </class>
+    </logicalClassDesignerModelHasTypes>
+    <logicalClassDesignerModelHasTypes>
+      <class Id="7020bd18-a869-4c48-8015-3fe204e83d39" name="LcInPaint" isAbstract="false" isLeaf="false" isActiveClass="false">
+        <elementDefinition Id="59664166-987d-4b18-ab77-d5a57e1eb9b8" />
+        <suppliersInternal>
+          <dependency Id="f65446ed-7e95-46b0-b337-92ca74272ace">
+            <classMoniker Id="c18d60f2-ca14-4ae3-b805-7f7fba0c5ddf" LastKnownName="Mat" />
+            <elementDefinition Id="be3ea50c-fe61-4d87-afbf-ce34a5109568" />
+          </dependency>
+        </suppliersInternal>
+        <ownedOperationsInternal>
+          <operation Id="000a6bfd-d501-4ce2-813a-f61bdba110ac" name="inpaint" isLeaf="false" isStatic="false" isAbstract="false" concurrency="Sequential" isQuery="false">
+            <elementDefinition Id="99d055b1-f90a-40d4-8a20-5c3e2aff1621" />
+            <ownedParameters>
+              <operationHasOwnedParameters>
+                <parameter Id="a219ef01-f297-4865-9b90-0bea203db1bc" name="frame" direction="In">
+                  <elementDefinition Id="44496fe5-8a5d-4429-8898-b89862a0fd58" />
+                  <type_NamedElement>
+                    <referencedTypeMoniker Id="9dd7f9bc-6fed-4495-99ee-63b4e3514a9d" LastKnownName="Mat" />
+                  </type_NamedElement>
+                </parameter>
+              </operationHasOwnedParameters>
+              <operationHasOwnedParameters>
+                <parameter Id="591a22ba-8f08-42eb-9734-868ec773a60f" name="contours" direction="In">
+                  <elementDefinition Id="c07fe9ef-bf35-4a4a-874a-83c0cc26db27" />
+                  <type_NamedElement>
+                    <referencedTypeMoniker Id="3609da3e-8fab-4e93-bb9e-bf4d20ac8e2f" LastKnownName="Contours" />
+                  </type_NamedElement>
+                </parameter>
+              </operationHasOwnedParameters>
+            </ownedParameters>
+          </operation>
+        </ownedOperationsInternal>
+      </class>
+    </logicalClassDesignerModelHasTypes>
+    <logicalClassDesignerModelHasTypes>
+      <class Id="75132cca-3fb0-400e-b4ca-1fb977ab232c" name="GameController" isAbstract="false" isLeaf="false" isActiveClass="false">
+        <elementDefinition Id="1546b6ac-727c-4348-9c55-3ed4571b3bf7" />
+        <suppliersInternal>
+          <dependency Id="82de6dd4-a539-48c1-8a67-ea7222a77d91">
+            <classMoniker Id="ab541b72-c27f-4d80-8249-2e850e1e3a4f" LastKnownName="Capture" />
+            <elementDefinition Id="eb901bb7-f9cf-454b-9e4a-13946b9c28b5" />
+          </dependency>
+        </suppliersInternal>
+        <targetEnds>
+          <association Id="02776575-9179-4677-aea2-f1ad70e60ec3" isDerived="false" sourceEndRoleName="" targetEndRoleName="track" isLeaf="false" isAbstract="false">
+            <classMoniker Id="309fe018-5030-4f85-a3dd-4701764c5c47" LastKnownName="VideoTracking" />
+            <relationshipOwnedElementsInternal>
+              <associationHasOwnedEnds>
+                <memberEnd Id="313bb81e-f711-4aa3-a1ca-b56b087f0593" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="None" isComposite="false" isNavigableOwned="false">
+                  <elementDefinition Id="81400d43-6d12-452a-aaa0-cf3b3689fd12" />
+                </memberEnd>
+              </associationHasOwnedEnds>
+              <associationHasOwnedEnds>
+                <memberEnd Id="4e7290b1-3d95-467d-9b36-2f9ffa910734" name="track" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="None" isComposite="false">
+                  <elementDefinition Id="5c12d1c6-0078-456c-b0da-71772a405477" />
+                </memberEnd>
+              </associationHasOwnedEnds>
+            </relationshipOwnedElementsInternal>
+            <elementDefinition Id="cc558486-942e-46d4-b94c-32faa755b235" />
+          </association>
+          <association Id="fd7a8997-3b8a-47d0-b95a-f3543d1b89d8" isDerived="false" sourceEndRoleName="" targetEndRoleName="LcObjectDetector" isLeaf="false" isAbstract="false">
+            <classMoniker Id="817c7c3c-0d98-4c20-8081-5594febf3276" LastKnownName="LcObjectDetector" />
+            <relationshipOwnedElementsInternal>
+              <associationHasOwnedEnds>
+                <memberEnd Id="12664898-3003-4f5a-aa29-2c678607cc57" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="None" isComposite="false" isNavigableOwned="false">
+                  <elementDefinition Id="b6cd625e-e8b9-479e-ac43-67c1de120a41" />
+                </memberEnd>
+              </associationHasOwnedEnds>
+              <associationHasOwnedEnds>
+                <memberEnd Id="a2d4ee73-3c0a-48e4-b7da-fe65b2868031" name="LcObjectDetector" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="None" isComposite="false">
+                  <elementDefinition Id="0b82499e-9ebc-45ac-aef5-5134d4fce01b" />
+                </memberEnd>
+              </associationHasOwnedEnds>
+            </relationshipOwnedElementsInternal>
+            <elementDefinition Id="3af6db41-2c27-4d43-817d-5495ae726235" />
+          </association>
+          <association Id="1f38b895-8cfa-4685-bcd4-008288bc0e51" isDerived="false" sourceEndRoleName="" targetEndRoleName="View" isLeaf="false" isAbstract="false">
+            <classMoniker Id="5e774015-36d5-4804-8f73-50c904664a08" LastKnownName="View" />
+            <relationshipOwnedElementsInternal>
+              <associationHasOwnedEnds>
+                <memberEnd Id="f9e0b181-97d5-4452-b375-c4f748c67af8" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="None" isComposite="false" isNavigableOwned="false">
+                  <elementDefinition Id="bd3375a7-d014-438b-95be-af3e08c38fe6" />
+                </memberEnd>
+              </associationHasOwnedEnds>
+              <associationHasOwnedEnds>
+                <memberEnd Id="7ce2deda-8d28-48a7-8058-ea298c33e5e8" name="View" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="None" isComposite="false">
+                  <elementDefinition Id="c2fb1979-caa2-473d-8e74-c8f4c5e99399" />
+                </memberEnd>
+              </associationHasOwnedEnds>
+            </relationshipOwnedElementsInternal>
+            <elementDefinition Id="22b72053-f382-41db-8432-86c335096b23" />
+          </association>
+        </targetEnds>
+        <ownedOperationsInternal>
+          <operation Id="78632432-7a3e-4973-a369-ca9dde1584dc" name="GameLoop" isLeaf="false" isStatic="false" isAbstract="false" concurrency="Sequential" isQuery="false">
+            <elementDefinition Id="44f10ce2-8712-4227-8795-b555b5e52d9a" />
+          </operation>
+          <operation Id="8a4f9f41-21bc-4207-b6a2-887618b3a134" name="UpdateUserInput" isLeaf="false" isStatic="false" isAbstract="false" concurrency="Sequential" isQuery="false">
+            <elementDefinition Id="6753d737-5608-4a8d-a38e-196793db533b" />
+          </operation>
+        </ownedOperationsInternal>
+      </class>
+    </logicalClassDesignerModelHasTypes>
+    <logicalClassDesignerModelHasTypes>
+      <class Id="5e774015-36d5-4804-8f73-50c904664a08" name="View" isAbstract="false" isLeaf="false" isActiveClass="false">
+        <elementDefinition Id="55c0e83e-27d9-4053-82cc-3f9acf100e84" />
+        <ownedOperationsInternal>
+          <operation Id="ef258017-5774-4759-8856-4ae671699ec7" name="ShowImage" isLeaf="false" isStatic="false" isAbstract="false" concurrency="Sequential" isQuery="false">
+            <elementDefinition Id="ad900a78-c1b2-456a-b71b-ef553e0ba737" />
+          </operation>
+        </ownedOperationsInternal>
+      </class>
+    </logicalClassDesignerModelHasTypes>
+    <logicalClassDesignerModelHasTypes>
+      <class Id="7131bcbd-4886-4c9a-8ba1-49d4d36fdfcf" name="Contours" isAbstract="false" isLeaf="false" isActiveClass="false">
+        <elementDefinition Id="67b1bca2-5729-41f7-885d-f3e64e4c9485" />
+      </class>
+    </logicalClassDesignerModelHasTypes>
+    <packageHasNamedElement>
+      <referencedType Id="9dd7f9bc-6fed-4495-99ee-63b4e3514a9d" name="Mat" isAbstract="false" isLeaf="false" cachedFullName="DestroyAroundMe.model::cv::Mat">
+        <elementDefinition Id="0080ead6-2982-4e69-9ca4-cdc26e464ecc" />
+      </referencedType>
+    </packageHasNamedElement>
+    <packageHasNamedElement>
+      <referencedType Id="3609da3e-8fab-4e93-bb9e-bf4d20ac8e2f" name="Contours" isAbstract="false" isLeaf="false" cachedFullName="DestroyAroundMe.model::Contours">
+        <elementDefinition Id="67b1bca2-5729-41f7-885d-f3e64e4c9485" />
+      </referencedType>
+    </packageHasNamedElement>
+    <logicalClassDesignerModelHasTypes>
+      <class Id="ab541b72-c27f-4d80-8249-2e850e1e3a4f" name="Capture" isAbstract="false" isLeaf="false" isActiveClass="false">
+        <elementDefinition Id="f766a49e-e68a-4131-b2a1-fa9cd11b907e" />
+        <ownedOperationsInternal>
+          <operation Id="c4abec6a-7ab8-4b83-9b9f-ebf3dae020d4" name="GetFrame" isLeaf="false" isStatic="false" isAbstract="false" concurrency="Sequential" isQuery="false">
+            <elementDefinition Id="f9cbab89-06c4-4646-86c4-b18996fd728f" />
+            <ownedParameters>
+              <operationHasOwnedParameters>
+                <parameter Id="db70424e-866b-485e-9c95-930fe7791fcb" direction="Return">
+                  <elementDefinition Id="38ad6911-ca7c-4068-8c95-13b15d4db38f" />
+                  <type_NamedElement>
+                    <referencedTypeMoniker Id="1950575a-366f-480f-8564-881328c5d751" LastKnownName="Mat" />
+                  </type_NamedElement>
+                </parameter>
+              </operationHasOwnedParameters>
+            </ownedParameters>
+          </operation>
+        </ownedOperationsInternal>
+      </class>
+    </logicalClassDesignerModelHasTypes>
+    <packageHasNamedElement>
+      <referencedType Id="1950575a-366f-480f-8564-881328c5d751" name="Mat" isAbstract="false" isLeaf="false" cachedFullName="DestroyAroundMe.model::cv::Mat">
+        <elementDefinition Id="0080ead6-2982-4e69-9ca4-cdc26e464ecc" />
+      </referencedType>
+    </packageHasNamedElement>
+    <logicalClassDesignerModelHasPackages>
+      <package Id="baac6927-17ba-4121-a265-6784ea432e80" name="cv">
+        <elementDefinition Id="699fdb5b-15f3-46e0-a639-e150cdd45cb7" />
+        <packagedElements>
+          <packageHasNamedElement>
+            <class Id="3a69502d-0c83-490d-83fd-0b7a1288a55e" name="FeatureDetector" isAbstract="false" isLeaf="false" isActiveClass="false">
+              <elementDefinition Id="fcbaa994-d122-42be-a07e-74786b96a810" />
+              <ownedOperationsInternal>
+                <operation Id="472a76da-eed6-469d-98dc-5a3ad2c0ba3a" name="detect" isLeaf="false" isStatic="false" isAbstract="false" concurrency="Sequential" isQuery="false">
+                  <elementDefinition Id="219b6446-dbc3-42e5-afea-342a7cd57897" />
+                </operation>
+              </ownedOperationsInternal>
+            </class>
+          </packageHasNamedElement>
+          <packageHasNamedElement>
+            <class Id="c5a5ed49-0e52-48a1-8051-0e70b1c0fef4" name="FeatureMatcher" isAbstract="false" isLeaf="false" isActiveClass="false">
+              <elementDefinition Id="6d00318e-7b93-4179-9665-51f3392a9f67" />
+              <ownedOperationsInternal>
+                <operation Id="142b6e33-8dac-4ffc-a626-a5a7221ff202" name="match" isLeaf="false" isStatic="false" isAbstract="false" concurrency="Sequential" isQuery="false">
+                  <elementDefinition Id="89befa2a-7498-4f51-ade6-d4fceebe20b0" />
+                </operation>
+              </ownedOperationsInternal>
+            </class>
+          </packageHasNamedElement>
+          <packageHasNamedElement>
+            <class Id="c18d60f2-ca14-4ae3-b805-7f7fba0c5ddf" name="Mat" isAbstract="false" isLeaf="false" isActiveClass="false">
+              <elementDefinition Id="0080ead6-2982-4e69-9ca4-cdc26e464ecc" />
+            </class>
+          </packageHasNamedElement>
+        </packagedElements>
+      </package>
+    </logicalClassDesignerModelHasPackages>
+  </packagedElements>
+  <package Id="0d688917-6bdb-47fd-930b-c14b3a2d8ecb" name="DestroyAroundMe.model">
+    <elementDefinition Id="54847ae3-83a3-446b-bfa4-4efd4fea8978" />
+  </package>
+</logicalClassDesignerModel>
