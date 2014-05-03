@@ -64,7 +64,7 @@ void LcInPaint::inpaint(const Mat input, std::vector<std::vector<cv::Point>> con
 
             for (int j = 0; j < offsetPolygons[i].size(); j++)
             {
-                offsetContour.push_back(cv::Point(offsetPolygons[i][j].X, offsetPolygons[i][j].Y));
+                offsetContour.push_back(cv::Point((int)offsetPolygons[i][j].X, (int)offsetPolygons[i][j].Y));
             }
 
             offsetContours.push_back(offsetContour);

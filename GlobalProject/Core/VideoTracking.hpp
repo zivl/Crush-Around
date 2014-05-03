@@ -78,12 +78,6 @@ private:
     cv::BFMatcher m_orbMatcher;
 
     cv::GridAdaptedFeatureDetector m_fastDetector;
-    cv::BriefDescriptorExtractor m_briefExtractor;
-    cv::BFMatcher                m_briefMatcher;
-
-    //TC: following is all addition by Tomer - 2014-04-22
-    cv::Ptr<cv::FeatureDetector> m_detector;
-    int m_activeTrackingAlgorithm;
 
     // the original (first) frame.
     cv::Mat m_refFrame;

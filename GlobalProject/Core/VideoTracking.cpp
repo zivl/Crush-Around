@@ -8,28 +8,14 @@
 // note that using polygon restricts the shape of the object to 25 vertices
 #define USE_EDGES_FOR_MODEL 1
 
-static const int TrackingAlgorithmKLT           = 0;
-static const int TrackingAlgorithmBRIEF         = 1;
-static const int TrackingAlgorithmORB           = 2;
-
 VideoTracking::VideoTracking()
 : m_orbMatcher(cv::NORM_HAMMING, true)
-, m_briefMatcher(cv::NORM_HAMMING, true)
 , m_fastDetector(cv::Ptr<cv::FeatureDetector>(new cv::FastFeatureDetector()), 500)
 //nfeatures=500, scaleFactor=1.2f, nlevels=8, edgeThreshold=31, firstLevel=0, WTA_K=2, scoreType=ORB::HARRIS_SCORE, patchSize=31
 , m_orbFeatureEngine(500, 1.2f, 8, 31, 0, 2, cv::ORB::HARRIS_SCORE, 31)
 {
     m_maxNumberOfPoints = 50;
 
-    m_detector = cv::FeatureDetector::create("GridFAST");
-
-    std::vector<int> trackingAlgorithms;
-
-    trackingAlgorithms.push_back(TrackingAlgorithmKLT);
-    trackingAlgorithms.push_back(TrackingAlgorithmORB);
-    trackingAlgorithms.push_back(TrackingAlgorithmBRIEF);
-
-    m_activeTrackingAlgorithm = TrackingAlgorithmORB;
     registerOption("Points count", "ORB", &m_maxNumberOfPoints, 1, 100);
 
     // TC: instantiate a matcher for descriptor based correlation of features.
@@ -76,7 +62,7 @@ std::string VideoTracking::getName() const
 std::string VideoTracking::getUserFriendlyName() const
 {
     std::stringstream s;
-    s << "Video tracking using " << m_activeTrackingAlgorithm;
+    s << "Video tracking using ORB";
     return  s.str();
 }
 
@@ -163,8 +149,8 @@ bool VideoTracking::processFrame(const cv::Mat& inputFrame, cv::Mat& outputFrame
 
                         for (int j = 0; j < destroyedParts[i].size(); j++)
                         {
-                            points[j].x = destroyedParts[i][j].X;
-                            points[j].y = destroyedParts[i][j].Y;
+                            points[j].x = (int)destroyedParts[i][j].X;
+                            points[j].y = (int)destroyedParts[i][j].Y;
                         }
 
                         m_destroyedPolygons.push_back(points);   
@@ -215,127 +201,25 @@ bool VideoTracking::processFrame(const cv::Mat& inputFrame, cv::Mat& outputFrame
         }
     }
 
-    for (int i = 0; i < removeList.size(); i++)
-    {
+    for (int i = 0; i < removeList.size(); i++){
         cv::Point2f* p = (cv::Point2f*)removeList[i]->GetUserData();
 
         std::vector<cv::Point2f*>::iterator position = std::find(m_destroyedPoints.begin(), m_destroyedPoints.end(), p);
-        if (position != m_destroyedPoints.end()) // == vector.end() means the element was not found
-        {   
+        if (position != m_destroyedPoints.end()){ // == vector.end() means the element was not found
             m_destroyedPoints.erase(position);
         }
 
         removeList[i]->GetWorld()->DestroyBody(removeList[i]);
     }
-    
    
     inputFrame.copyTo(outputFrame);
 
     getGray(inputFrame, m_nextImg);
 
-    if (m_activeTrackingAlgorithm == TrackingAlgorithmKLT)
-    {
-        if (m_mask.rows != inputFrame.rows || m_mask.cols != inputFrame.cols)
-        {
-            m_mask.create(inputFrame.rows, inputFrame.cols, CV_8UC1);
-        }
+	m_orbFeatureEngine(m_nextImg, cv::Mat(), m_nextKeypoints, m_nextDescriptors);
+	calcHomographyAndTransformScene(outputFrame);
 
-        if (m_prevPts.size() > 0)
-        {
-            cv::calcOpticalFlowPyrLK(m_prevImg, m_nextImg, m_prevPts, m_nextPts, m_status, m_error);
-        }
-
-        m_mask = cv::Scalar(255);
-
-        std::vector<cv::Point2f> trackedPts;
-
-        for (size_t i=0; i<m_status.size(); i++)
-        {
-            if (m_status[i])
-            {
-                trackedPts.push_back(m_nextPts[i]);
-
-                cv::circle(m_mask, m_prevPts[i], 15, cv::Scalar(0), CV_FILLED);
-                cv::line(outputFrame, m_prevPts[i], m_nextPts[i], CV_RGB(0,250,0));
-                cv::circle(outputFrame, m_nextPts[i], 3, CV_RGB(0,250,0), CV_FILLED);
-            }
-        }
-
-        bool needDetectAdditionalPoints = trackedPts.size() < m_maxNumberOfPoints;
-        if (needDetectAdditionalPoints)
-        {
-            m_detector->detect(m_nextImg, m_nextKeypoints, m_mask);
-            int pointsToDetect = m_maxNumberOfPoints - (int)trackedPts.size();
-
-            if (m_nextKeypoints.size() > pointsToDetect)
-            {
-                std::random_shuffle(m_nextKeypoints.begin(), m_nextKeypoints.end());
-                m_nextKeypoints.resize(pointsToDetect);
-            }
-
-            //std::cout << "Detected additional " << m_nextKeypoints.size() << " points" << std::endl;
-
-            for (size_t i=0; i<m_nextKeypoints.size(); i++)
-            {
-                trackedPts.push_back(m_nextKeypoints[i].pt);
-                cv::circle(outputFrame, m_nextKeypoints[i].pt, 5, cv::Scalar(255,0,255), -1);
-            }
-        }
-
-        m_prevPts = trackedPts;
-        m_nextImg.copyTo(m_prevImg);
-
-        // transform the scene using optical flow and add to output
-        if (m_refPoints.size() > 0)
-        {
-            // calculate the homography comparing to the reference frame
-
-            // find the optical flow of the points between the reference frame and this one
-            cv::calcOpticalFlowPyrLK(m_refFrame, m_nextImg, m_refPoints, m_nextPts, m_status, m_error);
-
-            // loop on the status vector and include add/take points with optical flow
-            std::vector<cv::Point2f> refPoints, newPoints;
-            for (size_t i=0; i<m_status.size(); i++)
-            {
-                if (m_status[i])
-                {
-                    refPoints.push_back(m_refPoints[i]);
-                    newPoints.push_back(m_nextPts[i]);
-                }
-            }
-
-            if(refPoints.size() > 3 && newPoints.size() > 3){
-
-                // finally, find the homography
-                cv::Mat H = findHomography( refPoints, newPoints, CV_RANSAC );
-
-                // wrap/transform the scene
-                cv::Mat transformedScene;
-                warpPerspective(m_scene, transformedScene, H, outputFrame.size(), CV_INTER_LINEAR);
-
-                // add to the output
-                outputFrame += transformedScene;
-            }
-        }
-
-    }
-    else if (m_activeTrackingAlgorithm == TrackingAlgorithmORB)
-    {
-        m_orbFeatureEngine(m_nextImg, cv::Mat(), m_nextKeypoints, m_nextDescriptors);
-        calcHomographyAndTransformScene(outputFrame);
-
-    }
-    else if(m_activeTrackingAlgorithm == TrackingAlgorithmBRIEF)
-    {
-        m_fastDetector.detect(m_nextImg, m_nextKeypoints);
-        m_briefExtractor.compute(m_nextImg, m_nextKeypoints, m_nextDescriptors);
-
-        // TC: following code is added by Tomer 2014-04-22
-        calcHomographyAndTransformScene(outputFrame);
-    }
-
-    if (m_debugDrawEnabled)
-    {
+    if (m_debugDrawEnabled) {
         // add the debug drawing
         this->m_debugDraw->SetScene(outputFrame);
         this->m_world->DrawDebugData();
@@ -353,39 +237,8 @@ void VideoTracking::setReferenceFrame(const cv::Mat& reference)
     // get a gray image
     getGray(m_refFrame, m_refFrame);
 
-    // according to the used tracking algorithm,
-    // determine how to extract feature/keypoint/descriptors/points to use for tracking
-    if (m_activeTrackingAlgorithm == TrackingAlgorithmKLT)
-    {
-        // create the mask if not yet created
-        if (m_mask.rows != reference.rows || m_mask.cols != reference.cols)
-        {
-            m_mask.create(reference.rows, reference.cols, CV_8UC1);
-        }
-
-        // set it's color
-        m_mask = cv::Scalar(255);
-
-        // detect key points in the reference frame
-        m_detector->detect(m_refFrame, m_refKeypoints, m_mask);
-
-        // push the points into reference points vector
-        for (size_t i = 0; i < m_refKeypoints.size(); i++)
-        {
-            m_refPoints.push_back(m_refKeypoints[i].pt);
-        }
-    }
-    else if (m_activeTrackingAlgorithm == TrackingAlgorithmORB)
-    {
-        // detect key points and generate descriptors for the reference frame
-        m_orbFeatureEngine(m_refFrame, cv::Mat(), m_refKeypoints, m_refDescriptors);
-    }
-    else if(m_activeTrackingAlgorithm == TrackingAlgorithmBRIEF)
-    {
-        // detect key points and extract descriptors for the reference frame
-        m_fastDetector.detect(m_refFrame, m_refKeypoints);
-        m_briefExtractor.compute(m_refFrame, m_refKeypoints, m_refDescriptors);
-    }
+	// detect key points and generate descriptors for the reference frame
+	m_orbFeatureEngine(m_refFrame, cv::Mat(), m_refKeypoints, m_refDescriptors);
 
     // create the scene and draw square and borders in it
     m_scene.create(reference.rows, reference.cols, CV_8UC3);
