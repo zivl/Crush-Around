@@ -546,7 +546,7 @@ void VideoTracking::setObjectsToBeModeled(const std::vector<std::vector<cv::Poin
 }
 
 
-void VideoTracking::prapreInPaintedScene(const cv::Mat scene, const std::vector<std::vector<cv::Point>> contours)
+void VideoTracking::prepareInPaintedScene(const cv::Mat scene, const std::vector<std::vector<cv::Point>> contours)
 {
     LcInPaint inpaint;
     inpaint.inpaint(scene, contours, m_inpaintedScene);

@@ -51,7 +51,7 @@ public:
 
     void setObjectsToBeModeled(const std::vector<std::vector<cv::Point>> contours);
     
-    void prapreInPaintedScene(const cv::Mat scene, const std::vector<std::vector<cv::Point>> contours);
+    void prepareInPaintedScene(const cv::Mat scene, const std::vector<std::vector<cv::Point>> contours);
 
     void setDebugDraw(bool enabled);
 
