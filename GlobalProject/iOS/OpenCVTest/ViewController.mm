@@ -14,6 +14,7 @@
 
 @interface ViewController ()
 
+
 @end
 
 @implementation ViewController
@@ -31,6 +32,25 @@
     score = iScore;
     [self.scorePoints setText:[NSNumberFormatter localizedStringFromNumber:@(score) numberStyle:NSNumberFormatterDecimalStyle]];
 }
+
+@synthesize timerPanelBG;
+@synthesize timerPanelView;
+@synthesize timerTimeLeftLabel;
+@synthesize timerTitleLabel;
+@synthesize timer;
+@synthesize timeInSeconds;
+#define kMAX_TIME_SECONDS 3600
+#define kMIN_TIME_SECONDS 0
+-(void)setTimeInSeconds:(int)iTimeInSeconds{
+	if(kMIN_TIME_SECONDS < iTimeInSeconds && iTimeInSeconds < kMAX_TIME_SECONDS){
+		timeInSeconds = iTimeInSeconds;
+	}
+	else {
+		NSLog(@"invalid time was set: %d", iTimeInSeconds);
+	}
+	[self updateCountdown];
+}
+
 
 BOOL isFirst = YES;
 BOOL imageForSegmentationHasBeenTaken = NO;
@@ -78,13 +98,24 @@ static const CGFloat kCornerRadius = 10.0f;
 -(void)loadGameControls {
 	self.fontLarge = [UIFont fontWithName:@"GROBOLD" size:18.0f];
     self.fontSmall = [UIFont fontWithName:@"GROBOLD" size:14.0f];
+
 	[self.blowItUpLabel setFont:self.fontLarge];
+
 	[self.innerScorePanelBG.layer setCornerRadius:kCornerRadius];
     [self.innerScorePanelBG setClipsToBounds:YES];
     [self.innerScorePanelBG setBackgroundColor:[UIColor clearColor]];
     [self.scorePoints setFont:self.fontLarge];
     [self.scoreLabel setFont:self.fontLarge];
+
+	[self.timerPanelBG.layer setCornerRadius:kCornerRadius];
+    [self.timerPanelBG setClipsToBounds:YES];
+    [self.timerPanelBG setBackgroundColor:[UIColor clearColor]];
+	[self.timerTimeLeftLabel setFont:self.fontLarge];
+	[self.timerTitleLabel setFont:self.fontLarge];
+
 	[self setScore:0];
+	[self updateCountdown];
+
 }
 
 #pragma mark - Protocol CvVideoCameraDelegate
@@ -101,8 +132,7 @@ std::vector<std::vector<cv::Point>> getLCDetection(const cv::Mat &image, cv::Mat
 	for( size_t i = 0; i < contours.size(); i++ )
 	{
 		cv::Point* pnts = (cv::Point*)malloc(sizeof(cv::Point) * contours[i].size());
-		for (int j = 0; j < contours[i].size(); j++)
-		{
+		for (int j = 0; j < contours[i].size(); j++){
 			pnts[j] = contours[i][j];
 		}
 
@@ -131,6 +161,12 @@ std::vector<std::vector<cv::Point>> contours;
 			track->setDebugDraw(true);
 			track->setReferenceFrame(firstImage);
 			track->setObjectsToBeModeled(contours);
+			int numberOfObjects = contours.size();
+			double area = 0.0;
+			for(int i = 0; i < numberOfObjects; i++){
+				area += std::abs(cv::contourArea(cv::Mat(contours[i])));
+			}
+			[self calculateNecessaryTimeForArea: area andNumberOfObjects: numberOfObjects];
 			track->prapreInPaintedScene(image_copy, contours);
 		}
 		else {
@@ -158,14 +194,39 @@ Mat getWatershedSegmentation(Mat image)
 
 #endif
 
+-(void)calculateNecessaryTimeForArea:(double)area andNumberOfObjects:(int) numberOfObjects{
+
+	int time = area / numberOfObjects;
+	self.timeInSeconds = time;
+}
+
+-(void)startTimer{
+	self.timer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(timerFireMethod:) userInfo:nil repeats:YES];
+}
+
 -(IBAction)resetCameraFirstPositionButton:(id)sender {
 	[self.videoCamera stop];
 	isFirst = YES;
 	[self.videoCamera start];
 }
 
+- (void)timerFireMethod:(NSTimer *)timer {
+	self.timeInSeconds--;
+}
+
+-(void) updateCountdown {
+    int minutes = (self.timeInSeconds % 3600) / 60;
+	int seconds = (self.timeInSeconds % 3600) % 60;
+    self.timerTimeLeftLabel.text = [NSString stringWithFormat:@"%02d:%02d", minutes, seconds];
+	if (minutes == 0 && seconds == 0) {
+		//TODO: raise event of time's up!
+	}
+}
+
 -(IBAction)onBlowItUpButton:(id)sender {
 	imageForSegmentationHasBeenTaken = YES;
+
+	[self startTimer];
 }
 
 -(void)onTap:(UITapGestureRecognizer *)recognizer {
@@ -177,7 +238,6 @@ Mat getWatershedSegmentation(Mat image)
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
 	[super touchesBegan:touches withEvent:event];
-	NSLog(@"panning began");
 	touchPoints.clear();
 }
 

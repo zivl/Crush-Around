@@ -46,12 +46,20 @@ using namespace cv;
 @property (nonatomic, strong) UIFont * fontSmall;
 
 @property (nonatomic, assign) NSInteger score;
+@property (nonatomic, assign) NSTimer *timer;
+@property (nonatomic, assign) int timeInSeconds;
+
 
 // UI Elements
 @property (nonatomic, weak) IBOutlet UIView * scoringPanel;
 @property (nonatomic, weak) IBOutlet UIImageView * innerScorePanelBG;
 @property (nonatomic, weak) IBOutlet UILabel * scoreLabel;
 @property (nonatomic, weak) IBOutlet UILabel * scorePoints;
+
+@property (nonatomic, weak) IBOutlet UIView * timerPanelView;
+@property (nonatomic, weak) IBOutlet UIImageView * timerPanelBG;
+@property (nonatomic, weak) IBOutlet UILabel * timerTitleLabel;
+@property (nonatomic, weak) IBOutlet UILabel * timerTimeLeftLabel;
 
 @property (nonatomic, weak) IBOutlet UIView * blowItUpPanel;
 @property (nonatomic, weak) IBOutlet UILabel * blowItUpLabel;

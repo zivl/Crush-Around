@@ -6,16 +6,16 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "../Core/VideoTracking.cpp"
-            timestampString = "420228254.688868"
+            filePath = "OpenCVTest/ViewController.mm"
+            timestampString = "420809769.275011"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "385"
-            endingLineNumber = "385"
-            landmarkName = "VideoTracking::setReferenceFrame(const cv::Mat&amp; reference)"
+            startingLineNumber = "194"
+            endingLineNumber = "194"
+            landmarkName = "-calculateNecessaryTimeForArea:andNumberOfObjects:"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
