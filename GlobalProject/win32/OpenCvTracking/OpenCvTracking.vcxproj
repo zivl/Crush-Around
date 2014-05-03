@@ -80,6 +80,7 @@
     <ClCompile Include="..\..\Core\OpenCvDebugDraw.cpp" />
     <ClCompile Include="..\..\Core\SampleBase.cpp" />
     <ClCompile Include="..\..\Core\SampleOptions.cpp" />
+    <ClCompile Include="..\..\Core\UnitsConvertor.cpp" />
     <ClCompile Include="..\..\Core\VideoTracking.cpp" />
     <ClCompile Include="..\..\Core\WatershedSegmenter.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -95,6 +96,7 @@
     <ClInclude Include="..\..\Core\OpenCvDebugDraw.h" />
     <ClInclude Include="..\..\Core\SampleBase.h" />
     <ClInclude Include="..\..\Core\SampleOptions.h" />
+    <ClInclude Include="..\..\Core\UnitsConvertor.h" />
     <ClInclude Include="..\..\Core\VideoTracking.hpp" />
     <ClInclude Include="..\..\Core\WatershedSegmenter.h" />
   </ItemGroup>

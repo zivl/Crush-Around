@@ -3,6 +3,7 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <vector>
+#include "clipper.hpp"
 
 class LcObjectDetector
 {
@@ -11,5 +12,14 @@ public:
     ~LcObjectDetector(void);
 
     std::vector<std::vector<cv::Point>> getObjectContours(const cv::Mat &image);
+
+    ClipperLib::Paths LcObjectDetector::simplify(ClipperLib::Paths &polygons);
+
+    void setObjectSimplification(bool enabled);
+
+private: 
+    std::vector<ClipperLib::IntPoint> convertToClipperFormat(const std::vector<cv::Point> &poly);
+
+    bool m_simplifyObjects;
 };
 
