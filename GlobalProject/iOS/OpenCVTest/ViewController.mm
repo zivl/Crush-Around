@@ -37,7 +37,6 @@
 @synthesize timerPanelView;
 @synthesize timerTimeLeftLabel;
 @synthesize timerTitleLabel;
-@synthesize timer;
 @synthesize timeInSeconds;
 #define kMAX_TIME_SECONDS 3600
 #define kMIN_TIME_SECONDS 0
@@ -54,6 +53,7 @@
 
 BOOL isFirst = YES;
 BOOL imageForSegmentationHasBeenTaken = NO;
+UIActivityIndicatorView *activityView;
 
 Mat firstImage;
 VideoTracking *track;
@@ -64,10 +64,8 @@ std::vector<cv::Point> touchPoints;
 	[super viewDidLoad];
 
 	[self loadGameControls];
-
 	[self configureImageCameraAndImageProcessingObjects];
 	[self configureGestures];
-
 }
 
 -(void)configureImageCameraAndImageProcessingObjects{
@@ -82,12 +80,6 @@ std::vector<cv::Point> touchPoints;
 }
 
 -(void)configureGestures {
-	/*
-	UITapGestureRecognizer *gestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onTap:)];
-	[imageView addGestureRecognizer:gestureRecognizer];
-	gestureRecognizer.delegate = self;
-	 */
-
 	UIPanGestureRecognizer *gestureRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(onFingerPan:)];
 	[imageView addGestureRecognizer:gestureRecognizer];
 	gestureRecognizer.delegate = self;
@@ -152,22 +144,21 @@ std::vector<std::vector<cv::Point>> contours;
 {
 	Mat image_copy;
     cvtColor(image, image_copy, CV_BGRA2BGR);
-
 	if(imageForSegmentationHasBeenTaken){
 		if(isFirst){
-			isFirst = !isFirst;
 			firstImage = image_copy;
 			track = new VideoTracking();
-			track->setDebugDraw(true);
+			track->setDebugDraw(false);
 			track->setReferenceFrame(firstImage);
 			track->setObjectsToBeModeled(contours);
-			int numberOfObjects = contours.size();
+			track->prepareInPaintedScene(image_copy, contours);
+			int numberOfObjects = (int)contours.size();
 			double area = 0.0;
 			for(int i = 0; i < numberOfObjects; i++){
 				area += std::abs(cv::contourArea(cv::Mat(contours[i])));
 			}
 			[self calculateNecessaryTimeForArea: area andNumberOfObjects: numberOfObjects];
-			track->prapreInPaintedScene(image_copy, contours);
+			isFirst = !isFirst;
 		}
 		else {
 			track->processFrame(image_copy, image_copy);
@@ -175,7 +166,6 @@ std::vector<std::vector<cv::Point>> contours;
 		cvtColor(image_copy, image, CV_BGR2BGRA);
 	}
 	else{
-		//image = showWatershedSegmentation(image_copy);
 		contours = getLCDetection(image, image);
 	}
 }
@@ -195,13 +185,12 @@ Mat getWatershedSegmentation(Mat image)
 #endif
 
 -(void)calculateNecessaryTimeForArea:(double)area andNumberOfObjects:(int) numberOfObjects{
-
-	int time = area / numberOfObjects;
+	int time = area / 10 / numberOfObjects / 2;
 	self.timeInSeconds = time;
 }
 
 -(void)startTimer{
-	self.timer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(timerFireMethod:) userInfo:nil repeats:YES];
+	[NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(timerFireMethod:) userInfo:self repeats:YES];
 }
 
 -(IBAction)resetCameraFirstPositionButton:(id)sender {
@@ -211,7 +200,13 @@ Mat getWatershedSegmentation(Mat image)
 }
 
 - (void)timerFireMethod:(NSTimer *)timer {
-	self.timeInSeconds--;
+	if(!isFirst){
+		if(activityView.isAnimating){
+			[activityView stopAnimating];
+			[activityView removeFromSuperview];
+		}
+		self.timeInSeconds--;
+	}
 }
 
 -(void) updateCountdown {
@@ -224,9 +219,16 @@ Mat getWatershedSegmentation(Mat image)
 }
 
 -(IBAction)onBlowItUpButton:(id)sender {
-	imageForSegmentationHasBeenTaken = YES;
-
-	[self startTimer];
+	if(!imageForSegmentationHasBeenTaken){
+		imageForSegmentationHasBeenTaken = YES;
+		activityView = [[UIActivityIndicatorView alloc]     initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
+		activityView.hidesWhenStopped = YES;
+		[self.view addSubview:activityView];
+		activityView.center = self.view.center;
+		NSLog(@"center: %f, %f", self.view.center.x, self.view.center.y);
+		[activityView startAnimating];
+		[self startTimer];
+	}
 }
 
 -(void)onTap:(UITapGestureRecognizer *)recognizer {
@@ -243,20 +245,17 @@ Mat getWatershedSegmentation(Mat image)
 
 -(void)onFingerPan:(UIPanGestureRecognizer *)recognizer {
 	if(recognizer.state == UIGestureRecognizerStateEnded){
-		NSLog(@"panning UIGestureRecognizerStateEnded");
 		if(track){
 			track->onPanGestureEnded(touchPoints);
 		}
 	}
 	else {
 		CGPoint location = [recognizer locationInView:imageView];
-		NSLog(@"location: [%f, %f]", location.x, location.y);
 		touchPoints.push_back(cv::Point(location.x, location.y));
 	}
 }
 
-- (void)didReceiveMemoryWarning
-{
+- (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }

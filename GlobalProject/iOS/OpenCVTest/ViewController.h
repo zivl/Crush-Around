@@ -46,7 +46,6 @@ using namespace cv;
 @property (nonatomic, strong) UIFont * fontSmall;
 
 @property (nonatomic, assign) NSInteger score;
-@property (nonatomic, assign) NSTimer *timer;
 @property (nonatomic, assign) int timeInSeconds;
 
 
