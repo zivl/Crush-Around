@@ -544,6 +544,12 @@ void VideoTracking::calcHomographyAndTransformScene(cv::Mat& outputFrame)
     }
 }
 
+void VideoTracking::onPanGestureEnded(std::vector<cv::Point> touchPoints){
+	for (std::vector<cv::Point>::iterator it = touchPoints.begin() ; it != touchPoints.end(); ++it){
+		this->onMouse(CV_EVENT_LBUTTONDOWN, it->x, it->y, NULL, NULL);
+	}
+}
+
 // Handle mouse event adding a body to the worlds at the mouse/touch location.
 void VideoTracking::onMouse( int event, int x, int y, int, void* )
 {

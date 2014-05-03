@@ -37,6 +37,7 @@ BOOL imageForSegmentationHasBeenTaken = NO;
 
 Mat firstImage;
 VideoTracking *track;
+std::vector<cv::Point> touchPoints;
 
 - (void)viewDidLoad
 {
@@ -46,8 +47,6 @@ VideoTracking *track;
 
 	[self configureImageCameraAndImageProcessingObjects];
 	[self configureGestures];
-
-
 
 }
 
@@ -63,7 +62,13 @@ VideoTracking *track;
 }
 
 -(void)configureGestures {
+	/*
 	UITapGestureRecognizer *gestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onTap:)];
+	[imageView addGestureRecognizer:gestureRecognizer];
+	gestureRecognizer.delegate = self;
+	 */
+
+	UIPanGestureRecognizer *gestureRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(onFingerPan:)];
 	[imageView addGestureRecognizer:gestureRecognizer];
 	gestureRecognizer.delegate = self;
 }
@@ -123,7 +128,7 @@ std::vector<std::vector<cv::Point>> contours;
 			isFirst = !isFirst;
 			firstImage = image_copy;
 			track = new VideoTracking();
-//			track->setDebugDraw(true);
+			track->setDebugDraw(true);
 			track->setReferenceFrame(firstImage);
 			track->setObjectsToBeModeled(contours);
 			track->prapreInPaintedScene(image_copy, contours);
@@ -134,7 +139,6 @@ std::vector<std::vector<cv::Point>> contours;
 		cvtColor(image_copy, image, CV_BGR2BGRA);
 	}
 	else{
-
 		//image = showWatershedSegmentation(image_copy);
 		contours = getLCDetection(image, image);
 	}
@@ -168,6 +172,26 @@ Mat getWatershedSegmentation(Mat image)
 	if(track){
 		CGPoint location = [recognizer locationInView:imageView];
 		track->onMouse(1, location.x, location.y, nil, nil);
+	}
+}
+
+- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
+	[super touchesBegan:touches withEvent:event];
+	NSLog(@"panning began");
+	touchPoints.clear();
+}
+
+-(void)onFingerPan:(UIPanGestureRecognizer *)recognizer {
+	if(recognizer.state == UIGestureRecognizerStateEnded){
+		NSLog(@"panning UIGestureRecognizerStateEnded");
+		if(track){
+			track->onPanGestureEnded(touchPoints);
+		}
+	}
+	else {
+		CGPoint location = [recognizer locationInView:imageView];
+		NSLog(@"location: [%f, %f]", location.x, location.y);
+		touchPoints.push_back(cv::Point(location.x, location.y));
 	}
 }
 

@@ -58,6 +58,7 @@ using namespace cv;
 
 
 -(void)onTap:(UITapGestureRecognizer *)recognizer;
+-(void)onFingerPan:(UIPanGestureRecognizer *)recognizer;
 
 -(IBAction)resetCameraFirstPositionButton:(id)sender;
 
