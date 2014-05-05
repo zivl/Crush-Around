@@ -13,7 +13,7 @@ public:
 
     std::vector<std::vector<cv::Point>> getObjectContours(const cv::Mat &image);
 
-    ClipperLib::Paths LcObjectDetector::simplify(ClipperLib::Paths &polygons);
+    ClipperLib::Paths simplify(ClipperLib::Paths &polygons);
 
     void setObjectSimplification(bool enabled);
 

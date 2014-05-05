@@ -20,6 +20,12 @@
 
 #define PTM_RATIO 32.0
 
+
+
+enum {
+	BALL_HIT_EVENT = 0
+};
+
 class VideoTracking : public SampleBase
 {
 public:
@@ -55,7 +61,15 @@ public:
 
     void setDebugDraw(bool enabled);
 
+	// observer pattern methods for events
+
+	void attach(std::function<void(float x, float y)> func);
+    void detach(std::function<void(float x, float y)> func);
+    void notify(float x, float y);
 private:
+
+	std::vector<std::function<void(float x, float y)>> observersList;
+	
     int m_maxNumberOfPoints;
 
     cv::Mat m_prevImg;

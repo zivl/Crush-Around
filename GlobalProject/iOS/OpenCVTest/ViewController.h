@@ -32,6 +32,8 @@
 #endif
 
 #import <opencv2/highgui/cap_ios.h>
+#include "LCPoint.h"
+
 using namespace cv;
 
 @interface ViewController : UIViewController <CvVideoCameraDelegate, UIGestureRecognizerDelegate>
@@ -71,7 +73,7 @@ using namespace cv;
 
 -(IBAction)onBlowItUpButton:(id)sender;
 
-
+-(void)ballHitAtPoint:(LCPoint *)point;
 
 
 @end

@@ -10,6 +10,7 @@
 #import "VideoTracking.hpp"
 #include "WatershedSegmenter.h"
 #include "LcObjectDetector.h"
+#import "SpriteLayer.h"
 
 
 @interface ViewController ()
@@ -148,6 +149,12 @@ std::vector<std::vector<cv::Point>> contours;
 		if(isFirst){
 			firstImage = image_copy;
 			track = new VideoTracking();
+			track->attach((^(float x, float y) {
+				LCPoint *point = [[LCPoint alloc] init];
+				point.x = x;
+				point.y = y;
+				[self performSelectorOnMainThread:@selector(ballHitAtPoint:) withObject:point waitUntilDone:NO];
+			}));
 			track->setDebugDraw(false);
 			track->setReferenceFrame(firstImage);
 			track->setObjectsToBeModeled(contours);
@@ -183,6 +190,13 @@ Mat getWatershedSegmentation(Mat image)
 }
 
 #endif
+
+-(void)ballHitAtPoint:(LCPoint *) point {
+	NSLog(@"ball hit in Obj-C, [%f,%f]", point.x, point.y);
+	[self showExplosionAtPoint: [point getCGPoint]];
+	[self setScore:self.score + 1];
+	NSLog(@"Score: %ld", (long)self.score);
+}
 
 -(void)calculateNecessaryTimeForArea:(double)area andNumberOfObjects:(int) numberOfObjects{
 	int time = area / 10 / numberOfObjects / 2;
@@ -253,6 +267,33 @@ Mat getWatershedSegmentation(Mat image)
 		CGPoint location = [recognizer locationInView:imageView];
 		touchPoints.push_back(cv::Point(location.x, location.y));
 	}
+}
+
+- (void)showExplosionAtPoint:(CGPoint)point {
+    // (1) Create the explosion sprite
+    UIImage * explosionImageOrig = [UIImage imageNamed:@"explosion"];
+    CGImageRef explosionImageCopy = CGImageCreateCopy(explosionImageOrig.CGImage);
+    CGSize explosionSize = CGSizeMake(128, 128);
+    SpriteLayer * sprite = [SpriteLayer layerWithImage:explosionImageCopy spriteSize:explosionSize];
+    CFRelease(explosionImageCopy);
+
+    // (2) Position the explosion sprite
+    CGFloat xOffset = 0.0f;//-7.0f;
+	CGFloat yOffset = 0.0f;//-3.0f;
+    sprite.position = CGPointMake(point.x + xOffset, point.y + yOffset);
+
+    // (3) Add to the view
+    [self.view.layer addSublayer:sprite];
+
+    // (4) Configure and run the animation
+    CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"spriteIndex"];
+    animation.fromValue = @(1);
+    animation.toValue = @(12);
+    animation.duration = 0.45f;
+    animation.repeatCount = 1;
+    animation.delegate = sprite;
+
+    [sprite addAnimation:animation forKey:nil];
 }
 
 - (void)didReceiveMemoryWarning {

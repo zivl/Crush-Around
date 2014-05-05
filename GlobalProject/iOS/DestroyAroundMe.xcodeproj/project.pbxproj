@@ -10,6 +10,8 @@
 		C90C7DB6190D4D7600E5476F /* MyContactListener.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C90C7DB2190D4D7600E5476F /* MyContactListener.cpp */; };
 		C90C7DB7190D4D7600E5476F /* OpenCvDebugDraw.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C90C7DB4190D4D7600E5476F /* OpenCvDebugDraw.cpp */; };
 		C94F006A1913E5C300EBA9C9 /* GROBOLD.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C94F00691913E5C300EBA9C9 /* GROBOLD.ttf */; };
+		C95815051917BF3A00552030 /* SpriteLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = C95815041917BF3A00552030 /* SpriteLayer.m */; };
+		C95815081917C8AB00552030 /* LCPoint.m in Sources */ = {isa = PBXBuildFile; fileRef = C95815071917C8AB00552030 /* LCPoint.m */; };
 		C95BF521190BDBF7008D9497 /* WatershedSegmenter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C95BF51E190BDBF7008D9497 /* WatershedSegmenter.cpp */; };
 		C95BF524190C075D008D9497 /* LcObjectDetector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C95BF522190C075D008D9497 /* LcObjectDetector.cpp */; };
 		C991A3A419118D01000C8377 /* clipper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C991A3A219118D01000C8377 /* clipper.cpp */; };
@@ -110,6 +112,10 @@
 		C94F006519136B6700EBA9C9 /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
 		C94F006719136B7100EBA9C9 /* libgll.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libgll.dylib; path = usr/lib/libgll.dylib; sourceTree = SDKROOT; };
 		C94F00691913E5C300EBA9C9 /* GROBOLD.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = GROBOLD.ttf; sourceTree = "<group>"; };
+		C95815031917BF3A00552030 /* SpriteLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SpriteLayer.h; sourceTree = "<group>"; };
+		C95815041917BF3A00552030 /* SpriteLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SpriteLayer.m; sourceTree = "<group>"; };
+		C95815061917C8AB00552030 /* LCPoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LCPoint.h; sourceTree = "<group>"; };
+		C95815071917C8AB00552030 /* LCPoint.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LCPoint.m; sourceTree = "<group>"; };
 		C95BF51E190BDBF7008D9497 /* WatershedSegmenter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WatershedSegmenter.cpp; sourceTree = "<group>"; };
 		C95BF51F190BDBF7008D9497 /* WatershedSegmenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WatershedSegmenter.h; sourceTree = "<group>"; };
 		C95BF522190C075D008D9497 /* LcObjectDetector.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LcObjectDetector.cpp; sourceTree = "<group>"; };
@@ -530,6 +536,8 @@
 		C9F4CAC318C3C1BA0020D812 /* OpenCVTest */ = {
 			isa = PBXGroup;
 			children = (
+				C95815031917BF3A00552030 /* SpriteLayer.h */,
+				C95815041917BF3A00552030 /* SpriteLayer.m */,
 				C9F4CACC18C3C1BA0020D812 /* AppDelegate.h */,
 				C9F4CACD18C3C1BA0020D812 /* AppDelegate.m */,
 				C9F4CACF18C3C1BA0020D812 /* Main.storyboard */,
@@ -537,6 +545,8 @@
 				C9F4CAD318C3C1BA0020D812 /* ViewController.mm */,
 				C9F4CAD518C3C1BA0020D812 /* Images.xcassets */,
 				C9F4CAC418C3C1BA0020D812 /* Supporting Files */,
+				C95815061917C8AB00552030 /* LCPoint.h */,
+				C95815071917C8AB00552030 /* LCPoint.m */,
 			);
 			path = OpenCVTest;
 			sourceTree = "<group>";
@@ -703,10 +713,12 @@
 				C99B2011190BB0EC003F19C1 /* b2FrictionJoint.cpp in Sources */,
 				C90C7DB7190D4D7600E5476F /* OpenCvDebugDraw.cpp in Sources */,
 				C99B2019190BB0EC003F19C1 /* b2RopeJoint.cpp in Sources */,
+				C95815081917C8AB00552030 /* LCPoint.m in Sources */,
 				C99B201B190BB0EC003F19C1 /* b2WheelJoint.cpp in Sources */,
 				C99B2001190BB0EC003F19C1 /* b2Body.cpp in Sources */,
 				C99B2012190BB0EC003F19C1 /* b2GearJoint.cpp in Sources */,
 				C99B1FEF190BB0EC003F19C1 /* b2BroadPhase.cpp in Sources */,
+				C95815051917BF3A00552030 /* SpriteLayer.m in Sources */,
 				C9F4CACA18C3C1BA0020D812 /* main.m in Sources */,
 				C99B2003190BB0EC003F19C1 /* b2Fixture.cpp in Sources */,
 				C99B1FF7190BB0EC003F19C1 /* b2ChainShape.cpp in Sources */,
