@@ -4,6 +4,7 @@
 
 LcObjectDetector::LcObjectDetector(void)
 {
+	this->m_simplifyObjects = true;
 }
 
 
@@ -19,11 +20,11 @@ void LcObjectDetector::setObjectSimplification(bool enabled)
 
 // apply canny edge detector and threshold to find edges and tranform them to contours
 // then simplify the contours, merging overlapping/intersecting polygons to one
-std::vector<std::vector<cv::Point>> LcObjectDetector::getObjectContours(const cv::Mat &image)
+std::vector<std::vector<cv::Point> > LcObjectDetector::getObjectContours(const cv::Mat &image)
 {
-    std::vector<std::vector<cv::Point>> contours;  
+    std::vector<std::vector<cv::Point> > contours;
     
-    std::vector<std::vector<cv::Point>> objectContours;
+    std::vector<std::vector<cv::Point> > objectContours;
 
     cv::Mat output;
 
@@ -34,7 +35,7 @@ std::vector<std::vector<cv::Point>> LcObjectDetector::getObjectContours(const cv
     // try to find countors on the image
     cv::findContours(output, contours, CV_RETR_LIST, CV_CHAIN_APPROX_NONE);
 
-    std::vector<std::vector<ClipperLib::IntPoint>> polygons;
+    std::vector<std::vector<ClipperLib::IntPoint> > polygons;
 
     
     // Test each contour

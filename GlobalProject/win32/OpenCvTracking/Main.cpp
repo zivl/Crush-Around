@@ -152,7 +152,7 @@ int destroyAroundMeGame()
                 track->setObjectsToBeModeled(contours);
 
                 // prepare in-painted scene for later use
-                track->prapreInPaintedScene(frame, contours);
+                track->prepareInPaintedScene(frame, contours);
 
                 //imshow("inpainted", track->m_inpaintedScene);
                 //waitKey();
