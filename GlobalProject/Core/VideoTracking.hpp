@@ -17,10 +17,17 @@
 #include "OpenCvDebugDraw.h"
 #include "MyContactListener.h"
 #include "LcInPaint.h"
+#include "IBallHitObserver.h"
 
 #define PTM_RATIO 32.0
 
-class VideoTracking : public SampleBase
+
+
+enum {
+	BALL_HIT_EVENT = 0
+};
+
+class VideoTracking : public SampleBase, IBallHitObserver
 {
 public:
     VideoTracking();
@@ -55,7 +62,15 @@ public:
 
     void setDebugDraw(bool enabled);
 
+	// observer pattern methods for events
+
+	virtual void attachBallHitObserver(std::function<void(float x, float y)> func);
+    virtual void detachBallHitObserver(std::function<void(float x, float y)> func);
+    virtual void notifyBallHitObservers(float x, float y);
 private:
+
+	std::vector<std::function<void(float x, float y)>> observersList;
+	
     int m_maxNumberOfPoints;
 
     cv::Mat m_prevImg;
@@ -110,7 +125,7 @@ private:
 
     cv::Mat m_refFrame2CurrentHomography;
 
-    cv::vector<cv::Point2f*> m_destroyedPoints;
+    std::vector<cv::Point2f*> m_destroyedPoints;
 
     OpenCvDebugDraw* m_debugDraw;
 
@@ -125,6 +140,8 @@ private:
     std::vector<int> m_destroyedPolygonsPointCount;
 
     bool m_debugDrawEnabled;
+
+	std::vector<b2Body *>m_objectBodies;
 };
 
 

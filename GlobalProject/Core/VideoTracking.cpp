@@ -13,6 +13,7 @@ VideoTracking::VideoTracking()
 , m_fastDetector(cv::Ptr<cv::FeatureDetector>(new cv::FastFeatureDetector()), 500)
 //nfeatures=500, scaleFactor=1.2f, nlevels=8, edgeThreshold=31, firstLevel=0, WTA_K=2, scoreType=ORB::HARRIS_SCORE, patchSize=31
 , m_orbFeatureEngine(500, 1.2f, 8, 31, 0, 2, cv::ORB::HARRIS_SCORE, 31)
+, m_objectBodies()
 {
     m_maxNumberOfPoints = 50;
 
@@ -97,13 +98,14 @@ bool VideoTracking::processFrame(const cv::Mat& inputFrame, cv::Mat& outputFrame
             (contact.fixtureA->GetBody() != m_groundBody && contact.fixtureB->GetBody() != m_groundBody))
         {
             
-            std::cout << "Ball Contact with object at [" << contact.contactPoint->x << "," << contact.contactPoint->y << "]" << std::endl;
+//            std::cout << "Ball Contact with object at [" << contact.contactPoint->x << "," << contact.contactPoint->y << "]" << std::endl;
             b2Fixture* objectFixture = contact.fixtureA == this->m_ballFixture ? contact.fixtureB : contact.fixtureA;
             b2Body *objectBody = objectFixture->GetBody();
 
             if (objectFixture->GetType() == b2Shape::e_edge)
             {
-                // change the shape of the fixture                    
+				this->notifyBallHitObservers(contact.contactPoint->x * PTM_RATIO, contact.contactPoint->y * PTM_RATIO);
+                // change the shape of the fixture
                 // only go into processing if this body was not processed yet (possible ball hit two fixture of same body)
                 if (newBodyMap.find(objectBody) == newBodyMap.end())
                 {
@@ -154,7 +156,7 @@ bool VideoTracking::processFrame(const cv::Mat& inputFrame, cv::Mat& outputFrame
                         }
 
                         m_destroyedPolygons.push_back(points);   
-                        m_destroyedPolygonsPointCount.push_back(destroyedParts[i].size());
+                        m_destroyedPolygonsPointCount.push_back((int)destroyedParts[i].size());
                     }
 
                                      
@@ -182,24 +184,34 @@ bool VideoTracking::processFrame(const cv::Mat& inputFrame, cv::Mat& outputFrame
             objectBody->DestroyFixture( fixtureToDestroy );
         }       
 
-        for (int i = 0; i < newPolygons->size(); i++)
-        {
-            b2EdgeShape objectEdgeShape;
-            b2FixtureDef objectShapeDef;
-            objectShapeDef.shape = &objectEdgeShape;
+		if(newPolygons->size() == 0){
+			m_objectBodies.erase(std::find(m_objectBodies.begin(), m_objectBodies.end(), objectBody));
+		}
+		else{
 
-            ClipperLib::Path polygon = newPolygons->at(i);
-            int j;
-            for (j = 0; j < polygon.size() - 1; j++)
-            {
-                objectEdgeShape.Set(b2Vec2(polygon[j].X / PTM_RATIO, polygon[j].Y / PTM_RATIO), b2Vec2(polygon[j+1].X / PTM_RATIO, polygon[j+1].Y / PTM_RATIO));
-                objectBody->CreateFixture(&objectShapeDef);
-            }
+			for (int i = 0; i < newPolygons->size(); i++)
+			{
+				b2EdgeShape objectEdgeShape;
+				b2FixtureDef objectShapeDef;
+				objectShapeDef.shape = &objectEdgeShape;
 
-            objectEdgeShape.Set(b2Vec2(polygon[j].X / PTM_RATIO, polygon[j].Y / PTM_RATIO), b2Vec2(polygon[0].X / PTM_RATIO, polygon[0].Y / PTM_RATIO));
-            objectBody->CreateFixture(&objectShapeDef);
-        }
+				ClipperLib::Path polygon = newPolygons->at(i);
+				int j;
+				for (j = 0; j < polygon.size() - 1; j++)
+				{
+					objectEdgeShape.Set(b2Vec2(polygon[j].X / PTM_RATIO, polygon[j].Y / PTM_RATIO), b2Vec2(polygon[j+1].X / PTM_RATIO, polygon[j+1].Y / PTM_RATIO));
+					objectBody->CreateFixture(&objectShapeDef);
+				}
+
+				objectEdgeShape.Set(b2Vec2(polygon[j].X / PTM_RATIO, polygon[j].Y / PTM_RATIO), b2Vec2(polygon[0].X / PTM_RATIO, polygon[0].Y / PTM_RATIO));
+				objectBody->CreateFixture(&objectShapeDef);
+			}
+		}
     }
+
+	if(m_objectBodies.size() == 0){
+		std::cout << "No more objects" << std::endl;
+	}
 
     for (int i = 0; i < removeList.size(); i++){
         cv::Point2f* p = (cv::Point2f*)removeList[i]->GetUserData();
@@ -286,20 +298,20 @@ void VideoTracking::setReferenceFrame(const cv::Mat& reference)
     // Create ball body and shape
     b2BodyDef ballBodyDef;
     ballBodyDef.type = b2_dynamicBody;
-    ballBodyDef.position.Set(100/PTM_RATIO, 100/PTM_RATIO);
+    ballBodyDef.position.Set(100 / PTM_RATIO, 100 / PTM_RATIO);
     m_ballBody = m_world->CreateBody(&ballBodyDef);
 
     b2CircleShape circle;
-    circle.m_radius = 26.0/PTM_RATIO;
+    circle.m_radius = 20.0/PTM_RATIO;
 
     b2FixtureDef ballShapeDef;
     ballShapeDef.shape = &circle;
-    ballShapeDef.density = 2.5f;
+    ballShapeDef.density = 1.5f;
     ballShapeDef.friction = 0.0f;
     ballShapeDef.restitution = 1.0f;
     m_ballFixture = m_ballBody->CreateFixture(&ballShapeDef);
 
-    m_ballBody->ApplyLinearImpulse(b2Vec2(100, 100), m_ballBody->GetPosition(), true);
+    m_ballBody->ApplyLinearImpulse(b2Vec2(200, 200), m_ballBody->GetPosition(), true);
 
 }
 
@@ -315,12 +327,12 @@ void VideoTracking::calcHomographyAndTransformScene(cv::Mat& outputFrame)
         // create vector for matches and find matches between reference and new descriptors
         std::vector<cv::DMatch> matches;
 
-        std::cout << "There are " << m_refKeypoints.size() << " refs and " << m_nextKeypoints.size() << " new" << std::endl;
+        //std::cout << "There are " << m_refKeypoints.size() << " refs and " << m_nextKeypoints.size() << " new" << std::endl;
         // m_refDescriptors is keypoint descriptors from the first frame
         // m_nextDescriptors is keypoint descriptors from the current processed frame
         m_matcher->match(m_refDescriptors, m_nextDescriptors, matches);
 
-        std::cout << "Found " << matches.size() << " matches" << std::endl;
+//        std::cout << "Found " << matches.size() << " matches" << std::endl;
 
         double max_dist = 0; double min_dist = 100;
 
@@ -358,7 +370,7 @@ void VideoTracking::calcHomographyAndTransformScene(cv::Mat& outputFrame)
             newPoints.push_back( m_nextKeypoints[matches[i].trainIdx].pt);
         }
 
-        std::cout << refPoints.size() << " good matches" << std::endl;
+//        std::cout << refPoints.size() << " good matches" << std::endl;
 
         if (refPoints.size() > 3 && newPoints.size() > 3)
         {
@@ -391,8 +403,8 @@ void VideoTracking::calcHomographyAndTransformScene(cv::Mat& outputFrame)
             warpPerspective(transformedScene, transformedScene, this->m_refFrame2CurrentHomography, outputFrame.size(), CV_INTER_LINEAR);
 
             // add to the output
-//            outputFrame += transformedScene;
-			transformedScene.copyTo(outputFrame, transformedScene);
+            outputFrame += transformedScene;
+//			transformedScene.copyTo(outputFrame, transformedScene);
         }
     }
 }
@@ -421,7 +433,7 @@ void VideoTracking::onMouse( int event, int x, int y, int, void* )
     b2BodyDef bodyDef;
     bodyDef.type = b2_staticBody;
     bodyDef.position.Set(targetPoints[0].x/PTM_RATIO, targetPoints[0].y/PTM_RATIO);
-    std::cout << "[" << targetPoints[0].x/PTM_RATIO << "," <<targetPoints[0].y/PTM_RATIO << "]" << std::endl;
+//    std::cout << "[" << targetPoints[0].x/PTM_RATIO << "," <<targetPoints[0].y/PTM_RATIO << "]" << std::endl;
     b2Body *body = m_world->CreateBody(&bodyDef);
 
     b2CircleShape circle;
@@ -506,7 +518,7 @@ void VideoTracking::setObjectsToBeModeled(const std::vector<std::vector<cv::Poin
 
             objectEdgeShape.Set(vertices[numOfPoints - 1], vertices[0]);
             objectBody->CreateFixture(&objectShapeDef);
-
+			m_objectBodies.push_back(objectBody);
             delete[] vertices;
 #else
             p2t::CDT triangulation(polyPoints);
@@ -558,6 +570,26 @@ void VideoTracking::setDebugDraw(bool enabled)
     this->m_debugDrawEnabled = enabled;
 }
 
+
+void VideoTracking::attachBallHitObserver(std::function<void(float x, float y)> func)
+{
+    observersList.push_back(func);
+}
+void VideoTracking::detachBallHitObserver(std::function<void(float x, float y)> func)
+{
+    //observersList.erase(std::remove(observersList.begin(), observersList.end(), func), observersList.end());
+}
+
+void VideoTracking::notifyBallHitObservers(float x, float y)
+{
+    for(std::vector<std::function<void(float x, float y)>>::const_iterator iter = observersList.begin(); iter != observersList.end(); ++iter)
+    {
+        if(*iter != 0)
+        {
+			(*iter)(x, y);
+        }
+    }
+}
 
 
 

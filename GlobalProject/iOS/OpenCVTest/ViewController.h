@@ -32,6 +32,9 @@
 #endif
 
 #import <opencv2/highgui/cap_ios.h>
+#include "LCPoint.h"
+#include "NotificationView.h"
+
 using namespace cv;
 
 @interface ViewController : UIViewController <CvVideoCameraDelegate, UIGestureRecognizerDelegate>
@@ -48,7 +51,7 @@ using namespace cv;
 @property (nonatomic, assign) NSInteger score;
 @property (nonatomic, assign) int timeInSeconds;
 
-
+@property (nonatomic, strong) NotificationView *notificationView;
 // UI Elements
 @property (nonatomic, weak) IBOutlet UIView * scoringPanel;
 @property (nonatomic, weak) IBOutlet UIImageView * innerScorePanelBG;
@@ -63,15 +66,13 @@ using namespace cv;
 @property (nonatomic, weak) IBOutlet UIView * blowItUpPanel;
 @property (nonatomic, weak) IBOutlet UILabel * blowItUpLabel;
 
-
--(void)onTap:(UITapGestureRecognizer *)recognizer;
 -(void)onFingerPan:(UIPanGestureRecognizer *)recognizer;
 
 -(IBAction)resetCameraFirstPositionButton:(id)sender;
 
 -(IBAction)onBlowItUpButton:(id)sender;
 
-
+-(void)ballHitAtPoint:(LCPoint *)point;
 
 
 @end

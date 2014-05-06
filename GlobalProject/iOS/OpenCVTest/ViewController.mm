@@ -10,6 +10,7 @@
 #import "VideoTracking.hpp"
 #include "WatershedSegmenter.h"
 #include "LcObjectDetector.h"
+#import "SpriteLayer.h"
 
 
 @interface ViewController ()
@@ -21,6 +22,7 @@
 @synthesize videoCamera;
 @synthesize fontLarge;
 @synthesize fontSmall;
+@synthesize notificationView;
 @synthesize blowItUpLabel;
 @synthesize blowItUpPanel;
 @synthesize scoreLabel;
@@ -66,14 +68,17 @@ std::vector<cv::Point> touchPoints;
 	[self loadGameControls];
 	[self configureImageCameraAndImageProcessingObjects];
 	[self configureGestures];
+
+
 }
+
 
 -(void)configureImageCameraAndImageProcessingObjects{
     self.videoCamera = [[CvVideoCamera alloc] initWithParentView:imageView];
 	self.videoCamera.delegate = self;
     self.videoCamera.defaultAVCaptureDevicePosition = AVCaptureDevicePositionBack;
     self.videoCamera.defaultAVCaptureSessionPreset = AVCaptureSessionPreset352x288;
-    self.videoCamera.defaultAVCaptureVideoOrientation = AVCaptureVideoOrientationLandscapeLeft;
+    self.videoCamera.defaultAVCaptureVideoOrientation = AVCaptureVideoOrientationPortrait;
     self.videoCamera.defaultFPS = 30;
     self.videoCamera.grayscaleMode = NO;
 	[self.videoCamera start];
@@ -108,6 +113,19 @@ static const CGFloat kCornerRadius = 10.0f;
 	[self setScore:0];
 	[self updateCountdown];
 
+	[self createNotificationView];
+
+}
+
+-(void)createNotificationView{
+	self.notificationView = [[NotificationView alloc] init];
+	[notificationView.message setFont:self.fontSmall];
+	[notificationView.okButton.titleLabel setFont:self.fontLarge];
+	[notificationView.bg.layer setCornerRadius:kCornerRadius];
+    [notificationView.bg setClipsToBounds:YES];
+    [notificationView.bg setBackgroundColor:[UIColor clearColor]];
+	notificationView.center = self.view.center;
+	[self.view addSubview:notificationView];
 }
 
 #pragma mark - Protocol CvVideoCameraDelegate
@@ -148,6 +166,12 @@ std::vector<std::vector<cv::Point>> contours;
 		if(isFirst){
 			firstImage = image_copy;
 			track = new VideoTracking();
+			track->attachBallHitObserver((^(float x, float y) {
+				LCPoint *point = [[LCPoint alloc] init];
+				point.x = x;
+				point.y = y;
+				[self performSelectorOnMainThread:@selector(ballHitAtPoint:) withObject:point waitUntilDone:NO];
+			}));
 			track->setDebugDraw(false);
 			track->setReferenceFrame(firstImage);
 			track->setObjectsToBeModeled(contours);
@@ -184,6 +208,13 @@ Mat getWatershedSegmentation(Mat image)
 
 #endif
 
+-(void)ballHitAtPoint:(LCPoint *) point {
+	NSLog(@"ball hit in Obj-C, [%f,%f]", point.x, point.y);
+	[self showExplosionAtPoint: [point getCGPoint]];
+	[self setScore:self.score + 1];
+	NSLog(@"Score: %ld", (long)self.score);
+}
+
 -(void)calculateNecessaryTimeForArea:(double)area andNumberOfObjects:(int) numberOfObjects{
 	int time = area / 10 / numberOfObjects / 2;
 	self.timeInSeconds = time;
@@ -194,9 +225,16 @@ Mat getWatershedSegmentation(Mat image)
 }
 
 -(IBAction)resetCameraFirstPositionButton:(id)sender {
-	[self.videoCamera stop];
-	isFirst = YES;
-	[self.videoCamera start];
+//	[self.videoCamera stop];
+	isFirst = !isFirst;
+//	[self.videoCamera start];
+	if(isFirst){
+		[self.notificationView showNotificationWithMessage:@"Ziv"];
+	}
+	else {
+		[self.notificationView hideNotificationMessage];
+	}
+
 }
 
 - (void)timerFireMethod:(NSTimer *)timer {
@@ -231,13 +269,6 @@ Mat getWatershedSegmentation(Mat image)
 	}
 }
 
--(void)onTap:(UITapGestureRecognizer *)recognizer {
-	if(track){
-		CGPoint location = [recognizer locationInView:imageView];
-		track->onMouse(1, location.x, location.y, nil, nil);
-	}
-}
-
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
 	[super touchesBegan:touches withEvent:event];
 	touchPoints.clear();
@@ -253,6 +284,33 @@ Mat getWatershedSegmentation(Mat image)
 		CGPoint location = [recognizer locationInView:imageView];
 		touchPoints.push_back(cv::Point(location.x, location.y));
 	}
+}
+
+- (void)showExplosionAtPoint:(CGPoint)point {
+    // (1) Create the explosion sprite
+    UIImage * explosionImageOrig = [UIImage imageNamed:@"explosion"];
+    CGImageRef explosionImageCopy = CGImageCreateCopy(explosionImageOrig.CGImage);
+    CGSize explosionSize = CGSizeMake(128, 128);
+    SpriteLayer * sprite = [SpriteLayer layerWithImage:explosionImageCopy spriteSize:explosionSize];
+    CFRelease(explosionImageCopy);
+
+    // (2) Position the explosion sprite
+    CGFloat xOffset = 0.0f;//-7.0f;
+	CGFloat yOffset = 0.0f;//-3.0f;
+    sprite.position = CGPointMake(point.x + xOffset, point.y + yOffset);
+
+    // (3) Add to the view
+    [self.view.layer addSublayer:sprite];
+
+    // (4) Configure and run the animation
+    CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"spriteIndex"];
+    animation.fromValue = @(1);
+    animation.toValue = @(12);
+    animation.duration = 0.45f;
+    animation.repeatCount = 1;
+    animation.delegate = sprite;
+
+    [sprite addAnimation:animation forKey:nil];
 }
 
 - (void)didReceiveMemoryWarning {
