@@ -12,6 +12,8 @@
 		C94F006A1913E5C300EBA9C9 /* GROBOLD.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C94F00691913E5C300EBA9C9 /* GROBOLD.ttf */; };
 		C95815051917BF3A00552030 /* SpriteLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = C95815041917BF3A00552030 /* SpriteLayer.m */; };
 		C95815081917C8AB00552030 /* LCPoint.m in Sources */ = {isa = PBXBuildFile; fileRef = C95815071917C8AB00552030 /* LCPoint.m */; };
+		C958150A1917E0FF00552030 /* NotificationView.xib in Resources */ = {isa = PBXBuildFile; fileRef = C95815091917E0FF00552030 /* NotificationView.xib */; };
+		C958150D1917E36500552030 /* NotificationView.m in Sources */ = {isa = PBXBuildFile; fileRef = C958150C1917E36500552030 /* NotificationView.m */; };
 		C95BF521190BDBF7008D9497 /* WatershedSegmenter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C95BF51E190BDBF7008D9497 /* WatershedSegmenter.cpp */; };
 		C95BF524190C075D008D9497 /* LcObjectDetector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C95BF522190C075D008D9497 /* LcObjectDetector.cpp */; };
 		C991A3A419118D01000C8377 /* clipper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C991A3A219118D01000C8377 /* clipper.cpp */; };
@@ -116,6 +118,9 @@
 		C95815041917BF3A00552030 /* SpriteLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SpriteLayer.m; sourceTree = "<group>"; };
 		C95815061917C8AB00552030 /* LCPoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LCPoint.h; sourceTree = "<group>"; };
 		C95815071917C8AB00552030 /* LCPoint.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LCPoint.m; sourceTree = "<group>"; };
+		C95815091917E0FF00552030 /* NotificationView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NotificationView.xib; sourceTree = "<group>"; };
+		C958150B1917E36500552030 /* NotificationView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotificationView.h; sourceTree = "<group>"; };
+		C958150C1917E36500552030 /* NotificationView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotificationView.m; sourceTree = "<group>"; };
 		C95BF51E190BDBF7008D9497 /* WatershedSegmenter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WatershedSegmenter.cpp; sourceTree = "<group>"; };
 		C95BF51F190BDBF7008D9497 /* WatershedSegmenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WatershedSegmenter.h; sourceTree = "<group>"; };
 		C95BF522190C075D008D9497 /* LcObjectDetector.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LcObjectDetector.cpp; sourceTree = "<group>"; };
@@ -230,6 +235,7 @@
 		C99B1FED190BB0EC003F19C1 /* VideoTracking.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = VideoTracking.cpp; sourceTree = "<group>"; };
 		C99B1FEE190BB0EC003F19C1 /* VideoTracking.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = VideoTracking.hpp; sourceTree = "<group>"; };
 		C99B2023190BB14B003F19C1 /* opencv2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = opencv2.framework; sourceTree = "<group>"; };
+		C9DA6B181918D54E00530676 /* IBallHitObserver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IBallHitObserver.h; sourceTree = "<group>"; };
 		C9F4CABA18C3C1BA0020D812 /* DestroyAroundMe.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DestroyAroundMe.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C9F4CABD18C3C1BA0020D812 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		C9F4CABF18C3C1BA0020D812 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -484,6 +490,7 @@
 				C99B1FEE190BB0EC003F19C1 /* VideoTracking.hpp */,
 				C991A3A519119D3A000C8377 /* LcInPaint.cpp */,
 				C991A3A619119D3A000C8377 /* LcInPaint.h */,
+				C9DA6B181918D54E00530676 /* IBallHitObserver.h */,
 			);
 			name = Core;
 			path = ../Core;
@@ -547,6 +554,9 @@
 				C9F4CAC418C3C1BA0020D812 /* Supporting Files */,
 				C95815061917C8AB00552030 /* LCPoint.h */,
 				C95815071917C8AB00552030 /* LCPoint.m */,
+				C95815091917E0FF00552030 /* NotificationView.xib */,
+				C958150B1917E36500552030 /* NotificationView.h */,
+				C958150C1917E36500552030 /* NotificationView.m */,
 			);
 			path = OpenCVTest;
 			sourceTree = "<group>";
@@ -661,6 +671,7 @@
 				C9F4CAD618C3C1BA0020D812 /* Images.xcassets in Resources */,
 				C9F4CAC818C3C1BA0020D812 /* InfoPlist.strings in Resources */,
 				C9F4CAD118C3C1BA0020D812 /* Main.storyboard in Resources */,
+				C958150A1917E0FF00552030 /* NotificationView.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -726,6 +737,7 @@
 				C99B201D190BB0EC003F19C1 /* Globals.cpp in Sources */,
 				C99B2015190BB0EC003F19C1 /* b2MouseJoint.cpp in Sources */,
 				C99B2005190BB0EC003F19C1 /* b2World.cpp in Sources */,
+				C958150D1917E36500552030 /* NotificationView.m in Sources */,
 				C90C7DB6190D4D7600E5476F /* MyContactListener.cpp in Sources */,
 				C99B2021190BB0EC003F19C1 /* SampleOptions.cpp in Sources */,
 				C99B201F190BB0EC003F19C1 /* ObjectTrackingSample.cpp in Sources */,

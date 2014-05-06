@@ -22,6 +22,7 @@
 @synthesize videoCamera;
 @synthesize fontLarge;
 @synthesize fontSmall;
+@synthesize notificationView;
 @synthesize blowItUpLabel;
 @synthesize blowItUpPanel;
 @synthesize scoreLabel;
@@ -67,14 +68,17 @@ std::vector<cv::Point> touchPoints;
 	[self loadGameControls];
 	[self configureImageCameraAndImageProcessingObjects];
 	[self configureGestures];
+
+
 }
+
 
 -(void)configureImageCameraAndImageProcessingObjects{
     self.videoCamera = [[CvVideoCamera alloc] initWithParentView:imageView];
 	self.videoCamera.delegate = self;
     self.videoCamera.defaultAVCaptureDevicePosition = AVCaptureDevicePositionBack;
     self.videoCamera.defaultAVCaptureSessionPreset = AVCaptureSessionPreset352x288;
-    self.videoCamera.defaultAVCaptureVideoOrientation = AVCaptureVideoOrientationLandscapeLeft;
+    self.videoCamera.defaultAVCaptureVideoOrientation = AVCaptureVideoOrientationPortrait;
     self.videoCamera.defaultFPS = 30;
     self.videoCamera.grayscaleMode = NO;
 	[self.videoCamera start];
@@ -109,6 +113,19 @@ static const CGFloat kCornerRadius = 10.0f;
 	[self setScore:0];
 	[self updateCountdown];
 
+	[self createNotificationView];
+
+}
+
+-(void)createNotificationView{
+	self.notificationView = [[NotificationView alloc] init];
+	[notificationView.message setFont:self.fontSmall];
+	[notificationView.okButton.titleLabel setFont:self.fontLarge];
+	[notificationView.bg.layer setCornerRadius:kCornerRadius];
+    [notificationView.bg setClipsToBounds:YES];
+    [notificationView.bg setBackgroundColor:[UIColor clearColor]];
+	notificationView.center = self.view.center;
+	[self.view addSubview:notificationView];
 }
 
 #pragma mark - Protocol CvVideoCameraDelegate
@@ -149,7 +166,7 @@ std::vector<std::vector<cv::Point>> contours;
 		if(isFirst){
 			firstImage = image_copy;
 			track = new VideoTracking();
-			track->attach((^(float x, float y) {
+			track->attachBallHitObserver((^(float x, float y) {
 				LCPoint *point = [[LCPoint alloc] init];
 				point.x = x;
 				point.y = y;
@@ -208,9 +225,16 @@ Mat getWatershedSegmentation(Mat image)
 }
 
 -(IBAction)resetCameraFirstPositionButton:(id)sender {
-	[self.videoCamera stop];
-	isFirst = YES;
-	[self.videoCamera start];
+//	[self.videoCamera stop];
+	isFirst = !isFirst;
+//	[self.videoCamera start];
+	if(isFirst){
+		[self.notificationView showNotificationWithMessage:@"Ziv"];
+	}
+	else {
+		[self.notificationView hideNotificationMessage];
+	}
+
 }
 
 - (void)timerFireMethod:(NSTimer *)timer {
@@ -242,13 +266,6 @@ Mat getWatershedSegmentation(Mat image)
 		NSLog(@"center: %f, %f", self.view.center.x, self.view.center.y);
 		[activityView startAnimating];
 		[self startTimer];
-	}
-}
-
--(void)onTap:(UITapGestureRecognizer *)recognizer {
-	if(track){
-		CGPoint location = [recognizer locationInView:imageView];
-		track->onMouse(1, location.x, location.y, nil, nil);
 	}
 }
 
