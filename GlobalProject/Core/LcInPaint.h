@@ -11,10 +11,10 @@
 
 class LcInPaint {
 private:
-	std::vector<std::vector<cv::Point>> contours;
+	std::vector<std::vector<cv::Point> > contours;
 
 public:
-	void inpaint(const cv::Mat input, std::vector<std::vector<cv::Point>> contours, cv::Mat &output);
+	void inpaint(const cv::Mat input, std::vector<std::vector<cv::Point> > contours, cv::Mat &output);
 };
 
 #endif /* defined(__DestroyAroundMe__LcInPaint__) */
