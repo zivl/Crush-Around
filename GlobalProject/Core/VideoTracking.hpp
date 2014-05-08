@@ -6,10 +6,11 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/video/tracking.hpp>
-#include <opencv2/calib3d/calib3d.hpp> //for homography
-#include <opencv2/features2d/features2d.hpp>    //features (orb, brief and corresponding matcher/extractors)
+#include <opencv2/calib3d/calib3d.hpp>         //for homography
+#include <opencv2/features2d/features2d.hpp>   //features (orb, brief and corresponding matcher/extractors)
 #include <opencv2/highgui/highgui.hpp>
 #include <vector>
+#include <functional>
 #include <Box2D/Box2D.h>
 
 #include "clipper.hpp"
@@ -17,7 +18,8 @@
 #include "OpenCvDebugDraw.h"
 #include "MyContactListener.h"
 #include "LcInPaint.h"
-#include "IBallHitObserver.h"
+//#include "IBallHitObserver.h"
+
 
 #define PTM_RATIO 32.0
 
@@ -27,11 +29,13 @@ enum {
 	BALL_HIT_EVENT = 0
 };
 
-class VideoTracking : public SampleBase, IBallHitObserver
+class VideoTracking //: public SampleBase//, IBallHitObserver
 {
 public:
     VideoTracking();
     ~VideoTracking();
+
+    virtual void getGray(const cv::Mat& input, cv::Mat& gray);
 
     //! Gets a sample name
     virtual std::string getName() const;
@@ -56,9 +60,9 @@ public:
 
     static void mouseCallback(int event, int x, int y, int flags, void *param);
 
-    void setObjectsToBeModeled(const std::vector<std::vector<cv::Point>> contours);
+    void setObjectsToBeModeled(const std::vector<std::vector<cv::Point> > contours);
     
-    void prepareInPaintedScene(const cv::Mat scene, const std::vector<std::vector<cv::Point>> contours);
+    void prepareInPaintedScene(const cv::Mat scene, const std::vector<std::vector<cv::Point> > contours);
 
     void setDebugDraw(bool enabled);
 
