@@ -125,8 +125,6 @@
 		C95BF51F190BDBF7008D9497 /* WatershedSegmenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WatershedSegmenter.h; sourceTree = "<group>"; };
 		C95BF522190C075D008D9497 /* LcObjectDetector.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LcObjectDetector.cpp; sourceTree = "<group>"; };
 		C95BF523190C075D008D9497 /* LcObjectDetector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LcObjectDetector.h; sourceTree = "<group>"; };
-		C968BE33191BD62A00D06F42 /* IObjectsDestryedObserver.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = IObjectsDestryedObserver.h; path = ../IObjectsDestryedObserver.h; sourceTree = "<group>"; };
-		C968BE34191BD97700D06F42 /* IBallInSceneObserver.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = IBallInSceneObserver.h; path = ../IBallInSceneObserver.h; sourceTree = "<group>"; };
 		C968BE36191BDB7700D06F42 /* IBallHitObserver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IBallHitObserver.h; sourceTree = "<group>"; };
 		C968BE37191BDB7700D06F42 /* IBallInSceneObserver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IBallInSceneObserver.h; sourceTree = "<group>"; };
 		C968BE38191BDB7700D06F42 /* IObjectsDestryedObserver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IObjectsDestryedObserver.h; sourceTree = "<group>"; };
@@ -240,7 +238,6 @@
 		C99B1FED190BB0EC003F19C1 /* VideoTracking.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = VideoTracking.cpp; sourceTree = "<group>"; };
 		C99B1FEE190BB0EC003F19C1 /* VideoTracking.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = VideoTracking.hpp; sourceTree = "<group>"; };
 		C99B2023190BB14B003F19C1 /* opencv2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = opencv2.framework; sourceTree = "<group>"; };
-		C9DA6B181918D54E00530676 /* IBallHitObserver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IBallHitObserver.h; path = ../IBallHitObserver.h; sourceTree = "<group>"; };
 		C9F4CABA18C3C1BA0020D812 /* DestroyAroundMe.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DestroyAroundMe.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C9F4CABD18C3C1BA0020D812 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		C9F4CABF18C3C1BA0020D812 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -317,9 +314,6 @@
 				C968BE36191BDB7700D06F42 /* IBallHitObserver.h */,
 				C968BE37191BDB7700D06F42 /* IBallInSceneObserver.h */,
 				C968BE38191BDB7700D06F42 /* IObjectsDestryedObserver.h */,
-				C9DA6B181918D54E00530676 /* IBallHitObserver.h */,
-				C968BE33191BD62A00D06F42 /* IObjectsDestryedObserver.h */,
-				C968BE34191BD97700D06F42 /* IBallInSceneObserver.h */,
 			);
 			path = Observers;
 			sourceTree = "<group>";
