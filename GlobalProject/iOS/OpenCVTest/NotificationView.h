@@ -17,4 +17,5 @@
 -(void)showNotificationWithMessage:(NSString *)iMessgae;
 -(void)hideNotificationMessage;
 
+-(IBAction)onOKButtonPressed:(id)sender;
 @end

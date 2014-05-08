@@ -50,8 +50,10 @@
 			self.message.text = @"";
 		}
 	}];
+}
 
-
+-(IBAction)onOKButtonPressed:(id)sender {
+	[self hideNotificationMessage];
 }
 
 /*

@@ -172,6 +172,12 @@ std::vector<std::vector<cv::Point>> contours;
 				point.y = y;
 				[self performSelectorOnMainThread:@selector(ballHitAtPoint:) withObject:point waitUntilDone:NO];
 			}));
+			track->attachObjectsDestryedObserver((^(){
+				[self performSelectorOnMainThread:@selector(onAllObjectsHaveBeenDestroyed) withObject:nil waitUntilDone:NO];
+			}));
+			track->attachBallInSceneObserver((^(){
+				[self performSelectorOnMainThread:@selector(onBallNotInScene) withObject:nil waitUntilDone:NO];
+			}));
 			track->setDebugDraw(false);
 			track->setReferenceFrame(firstImage);
 			track->setObjectsToBeModeled(contours);
@@ -194,6 +200,10 @@ std::vector<std::vector<cv::Point>> contours;
 	}
 }
 
+void configureVideoTrackingWithFirstImage(Mat firstImage){
+
+}
+
 Mat getWatershedSegmentation(Mat image)
 {
     //Create watershed segmentation object
@@ -207,6 +217,14 @@ Mat getWatershedSegmentation(Mat image)
 }
 
 #endif
+
+-(void)onBallNotInScene {
+	[self.notificationView showNotificationWithMessage:@"Ball is no longer in the scene!"];
+}
+
+-(void)onAllObjectsHaveBeenDestroyed {
+	[self.notificationView showNotificationWithMessage:@"All Objects Have Been Destroyed!"];
+}
 
 -(void)ballHitAtPoint:(LCPoint *) point {
 	NSLog(@"ball hit in Obj-C, [%f,%f]", point.x, point.y);

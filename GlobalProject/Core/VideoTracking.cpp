@@ -233,7 +233,7 @@ bool VideoTracking::processFrame(const cv::Mat& inputFrame, cv::Mat& outputFrame
     }
 
 	if(m_objectBodies.size() == 0){
-		std::cout << "No more objects" << std::endl;
+		this->notifyObjectsDestryedObservers();
 	}
 
     for (int i = 0; i < removeList.size(); i++){
@@ -596,20 +596,62 @@ void VideoTracking::setDebugDraw(bool enabled)
 
 void VideoTracking::attachBallHitObserver(std::function<void(float x, float y)> func)
 {
-    observersList.push_back(func);
+    ballHitObserversList.push_back(func);
 }
 void VideoTracking::detachBallHitObserver(std::function<void(float x, float y)> func)
 {
-    //observersList.erase(std::remove(observersList.begin(), observersList.end(), func), observersList.end());
+    //ballHitObserversList.erase(std::remove(ballHitObserversList.begin(), ballHitObserversList.end(), func), ballHitObserversList.end());
 }
 
 void VideoTracking::notifyBallHitObservers(float x, float y)
 {
-    for(std::vector<std::function<void(float x, float y)>>::const_iterator iter = observersList.begin(); iter != observersList.end(); ++iter)
+    for(std::vector<std::function<void(float x, float y)>>::const_iterator iter = ballHitObserversList.begin(); iter != ballHitObserversList.end(); ++iter)
     {
         if(*iter != 0)
         {
 			(*iter)(x, y);
+        }
+    }
+}
+
+void VideoTracking::attachObjectsDestryedObserver(std::function<void()> func)
+{
+    objectsDestroyedObserversList.push_back(func);
+}
+
+void VideoTracking::detachObjectsDestryedObserver(std::function<void ()> func)
+{
+	//    objectsDestroyedObserversList.erase(std::remove(objectsDestroyedObserversList.begin(), objectsDestroyedObserversList.end(), func), objectsDestroyedObserversList.end());
+}
+
+void VideoTracking::notifyObjectsDestryedObservers()
+{
+    for(std::vector<std::function<void()>>::const_iterator iter = objectsDestroyedObserversList.begin(); iter != objectsDestroyedObserversList.end(); ++iter)
+    {
+        if(*iter != 0)
+        {
+			(*iter)();
+        }
+    }
+}
+
+void VideoTracking::attachBallInSceneObserver(std::function<void ()> func)
+{
+    ballInSceneObserversList.push_back(func);
+}
+
+void VideoTracking::detachBallInSceneObserver(std::function<void ()> func)
+{
+	//    ballInSceneObserversList.erase(std::remove(ballInSceneObserversList.begin(), ballInSceneObserversList.end(), func), ballInSceneObserversList.end());
+}
+
+void VideoTracking::notifyBallInSceneObservers()
+{
+    for(std::vector<std::function<void()>>::const_iterator iter = ballInSceneObserversList.begin(); iter != ballInSceneObserversList.end(); ++iter)
+    {
+        if(*iter != 0)
+        {
+			(*iter)();
         }
     }
 }

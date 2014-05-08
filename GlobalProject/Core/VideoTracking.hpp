@@ -18,7 +18,9 @@
 #include "OpenCvDebugDraw.h"
 #include "MyContactListener.h"
 #include "LcInPaint.h"
-//#include "IBallHitObserver.h"
+#include "Observers/IBallHitObserver.h"
+#include "Observers/IBallInSceneObserver.h"
+#include "Observers/IObjectsDestryedObserver.h"
 
 
 #define PTM_RATIO 32.0
@@ -66,14 +68,28 @@ public:
 
     void setDebugDraw(bool enabled);
 
-	// observer pattern methods for events
-
+	// IBallHitObserver observer pattern methods for events
 	virtual void attachBallHitObserver(std::function<void(float x, float y)> func);
     virtual void detachBallHitObserver(std::function<void(float x, float y)> func);
     virtual void notifyBallHitObservers(float x, float y);
+
+	// IObjectsDestroyedObserver observer pattern methods for events
+	virtual void attachObjectsDestryedObserver(std::function<void()> func);
+	virtual void detachObjectsDestryedObserver(std::function<void()> func);
+	virtual void notifyObjectsDestryedObservers();
+
+	// IBallInScenceObserver observer pattern methods for events
+	virtual void attachBallInSceneObserver(std::function<void()> func);
+	virtual void detachBallInSceneObserver(std::function<void()> func);
+	virtual void notifyBallInSceneObservers();
+
 private:
 
-	std::vector<std::function<void(float x, float y)>> observersList;
+	std::vector<std::function<void(float x, float y)>> ballHitObserversList;
+
+	std::vector<std::function<void()>> objectsDestroyedObserversList;
+
+	std::vector<std::function<void()>> ballInSceneObserversList;
 	
     int m_maxNumberOfPoints;
 
