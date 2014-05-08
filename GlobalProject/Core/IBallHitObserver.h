@@ -9,6 +9,8 @@
 #ifndef __DestroyAroundMe__IBallHitObserver__
 #define __DestroyAroundMe__IBallHitObserver__
 
+#include <functional>
+
 class IBallHitObserver {
 
 public:
