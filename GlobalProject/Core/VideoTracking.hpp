@@ -31,7 +31,7 @@ enum {
 	BALL_HIT_EVENT = 0
 };
 
-class VideoTracking //: public SampleBase//, IBallHitObserver
+class VideoTracking : IBallHitObserver, IBallInSceneObserver, IObjectsDestryedObserver
 {
 public:
     VideoTracking();

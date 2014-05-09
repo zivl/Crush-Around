@@ -77,8 +77,9 @@ std::vector<cv::Point> touchPoints;
     self.videoCamera = [[CvVideoCamera alloc] initWithParentView:imageView];
 	self.videoCamera.delegate = self;
     self.videoCamera.defaultAVCaptureDevicePosition = AVCaptureDevicePositionBack;
-    self.videoCamera.defaultAVCaptureSessionPreset = AVCaptureSessionPreset352x288;
-    self.videoCamera.defaultAVCaptureVideoOrientation = AVCaptureVideoOrientationPortrait;
+    self.videoCamera.defaultAVCaptureSessionPreset = AVCaptureSessionPresetLow;
+    self.videoCamera.defaultAVCaptureVideoOrientation = AVCaptureVideoOrientationLandscapeRight;
+	self.videoCamera.rotateVideo = YES;
     self.videoCamera.defaultFPS = 30;
     self.videoCamera.grayscaleMode = NO;
 	[self.videoCamera start];
@@ -243,16 +244,9 @@ Mat getWatershedSegmentation(Mat image)
 }
 
 -(IBAction)resetCameraFirstPositionButton:(id)sender {
-//	[self.videoCamera stop];
+	[self.videoCamera stop];
 	isFirst = !isFirst;
-//	[self.videoCamera start];
-	if(isFirst){
-		[self.notificationView showNotificationWithMessage:@"Ziv"];
-	}
-	else {
-		[self.notificationView hideNotificationMessage];
-	}
-
+	[self.videoCamera start];
 }
 
 - (void)timerFireMethod:(NSTimer *)timer {
@@ -296,12 +290,18 @@ Mat getWatershedSegmentation(Mat image)
 	if(recognizer.state == UIGestureRecognizerStateEnded){
 		if(track){
 			track->onPanGestureEnded(touchPoints);
+			int numberOfPointsToReduce = (int)touchPoints.size();
+			[self reduceScore:numberOfPointsToReduce];
 		}
 	}
 	else {
 		CGPoint location = [recognizer locationInView:imageView];
 		touchPoints.push_back(cv::Point(location.x, location.y));
 	}
+}
+
+-(void)reduceScore:(int) points {
+	[self setScore: self.score - points];
 }
 
 - (void)showExplosionAtPoint:(CGPoint)point {
