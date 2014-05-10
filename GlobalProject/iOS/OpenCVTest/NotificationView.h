@@ -12,7 +12,7 @@
 
 @property (nonatomic, weak) IBOutlet UIImageView *bg;
 @property (nonatomic, weak) IBOutlet UILabel *message;
-@property (nonatomic, weak) IBOutlet UIButton *okButton;
+@property (nonatomic, strong) IBOutlet UIButton *okButton;
 
 -(void)showNotificationWithMessage:(NSString *)iMessgae;
 -(void)hideNotificationMessage;

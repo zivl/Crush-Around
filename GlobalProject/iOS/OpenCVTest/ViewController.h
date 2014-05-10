@@ -37,6 +37,12 @@
 
 using namespace cv;
 
+typedef enum : NSUInteger {
+    GameEndedDueToTimesUp,
+    GameEndedDueToAllObjectsHasBeenDestroyed,
+    GameEndedDueToBallWentOutOfScene,
+} GameEnded;
+
 @interface ViewController : UIViewController <CvVideoCameraDelegate, UIGestureRecognizerDelegate>
 {
     IBOutlet UIImageView* imageView;
@@ -65,6 +71,9 @@ using namespace cv;
 
 @property (nonatomic, weak) IBOutlet UIView * blowItUpPanel;
 @property (nonatomic, weak) IBOutlet UILabel * blowItUpLabel;
+
+
+-(void)onFingerTap:(UITapGestureRecognizer *)recognizer;
 
 -(void)onFingerPan:(UIPanGestureRecognizer *)recognizer;
 

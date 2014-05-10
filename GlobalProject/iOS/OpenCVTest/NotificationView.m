@@ -21,7 +21,6 @@
 		NSArray *nibs = [[NSBundle mainBundle] loadNibNamed:@"NotificationView" owner:nil options:nil];
 		self = [nibs objectAtIndex:0];
 		self.alpha = 0.0f;
-		self.okButton.titleLabel.text = @"OK";
     }
     return self;
 }
@@ -40,6 +39,7 @@
 	[UIView animateWithDuration:0.5 animations:^{
 		self.alpha = 1.0f;
 	} completion:nil];
+	[self.superview bringSubviewToFront:self];
 }
 
 -(void)hideNotificationMessage {

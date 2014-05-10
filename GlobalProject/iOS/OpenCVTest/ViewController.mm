@@ -41,7 +41,7 @@
 @synthesize timerTitleLabel;
 @synthesize timeInSeconds;
 #define kMAX_TIME_SECONDS 3600
-#define kMIN_TIME_SECONDS 0
+#define kMIN_TIME_SECONDS -1
 -(void)setTimeInSeconds:(int)iTimeInSeconds{
 	if(kMIN_TIME_SECONDS < iTimeInSeconds && iTimeInSeconds < kMAX_TIME_SECONDS){
 		timeInSeconds = iTimeInSeconds;
@@ -55,11 +55,14 @@
 
 BOOL isFirst = YES;
 BOOL imageForSegmentationHasBeenTaken = NO;
+NSTimer *mainGameTimer;
 UIActivityIndicatorView *activityView;
-
 Mat firstImage;
 VideoTracking *track;
 std::vector<cv::Point> touchPoints;
+
+#define CAMERA_VIEW_CENTER CGPointMake(imageView.bounds.size.width / 2, imageView.bounds.size.height / 2)
+
 
 - (void)viewDidLoad
 {
@@ -67,9 +70,6 @@ std::vector<cv::Point> touchPoints;
 
 	[self loadGameControls];
 	[self configureImageCameraAndImageProcessingObjects];
-	[self configureGestures];
-
-
 }
 
 
@@ -77,7 +77,7 @@ std::vector<cv::Point> touchPoints;
     self.videoCamera = [[CvVideoCamera alloc] initWithParentView:imageView];
 	self.videoCamera.delegate = self;
     self.videoCamera.defaultAVCaptureDevicePosition = AVCaptureDevicePositionBack;
-    self.videoCamera.defaultAVCaptureSessionPreset = AVCaptureSessionPresetLow;
+    self.videoCamera.defaultAVCaptureSessionPreset = AVCaptureSessionPresetMedium;
     self.videoCamera.defaultAVCaptureVideoOrientation = AVCaptureVideoOrientationLandscapeRight;
 	self.videoCamera.rotateVideo = YES;
     self.videoCamera.defaultFPS = 30;
@@ -86,9 +86,13 @@ std::vector<cv::Point> touchPoints;
 }
 
 -(void)configureGestures {
-	UIPanGestureRecognizer *gestureRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(onFingerPan:)];
-	[imageView addGestureRecognizer:gestureRecognizer];
-	gestureRecognizer.delegate = self;
+	UIPanGestureRecognizer *panGestureRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(onFingerPan:)];
+	[imageView addGestureRecognizer:panGestureRecognizer];
+	panGestureRecognizer.delegate = self;
+
+	UITapGestureRecognizer *tapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onFingerTap:)];
+	[imageView addGestureRecognizer:tapGestureRecognizer];
+	tapGestureRecognizer.delegate = self;
 }
 
 static const CGFloat kCornerRadius = 10.0f;
@@ -120,13 +124,15 @@ static const CGFloat kCornerRadius = 10.0f;
 
 -(void)createNotificationView{
 	self.notificationView = [[NotificationView alloc] init];
-	[notificationView.message setFont:self.fontSmall];
-	[notificationView.okButton.titleLabel setFont:self.fontLarge];
-	[notificationView.bg.layer setCornerRadius:kCornerRadius];
-    [notificationView.bg setClipsToBounds:YES];
-    [notificationView.bg setBackgroundColor:[UIColor clearColor]];
-	notificationView.center = self.view.center;
-	[self.view addSubview:notificationView];
+	[self.notificationView.message setFont:self.fontSmall];
+	[self.notificationView.okButton.titleLabel setFont:self.fontLarge];
+	[self.notificationView.bg.layer setCornerRadius:kCornerRadius];
+    [self.notificationView.bg setClipsToBounds:YES];
+    [self.notificationView.bg setBackgroundColor:[UIColor clearColor]];
+
+	[imageView addSubview:self.notificationView];
+
+	self.notificationView.center = CAMERA_VIEW_CENTER;
 }
 
 #pragma mark - Protocol CvVideoCameraDelegate
@@ -167,19 +173,9 @@ std::vector<std::vector<cv::Point>> contours;
 		if(isFirst){
 			firstImage = image_copy;
 			track = new VideoTracking();
-			track->attachBallHitObserver((^(float x, float y) {
-				LCPoint *point = [[LCPoint alloc] init];
-				point.x = x;
-				point.y = y;
-				[self performSelectorOnMainThread:@selector(ballHitAtPoint:) withObject:point waitUntilDone:NO];
-			}));
-			track->attachObjectsDestryedObserver((^(){
-				[self performSelectorOnMainThread:@selector(onAllObjectsHaveBeenDestroyed) withObject:nil waitUntilDone:NO];
-			}));
-			track->attachBallInSceneObserver((^(){
-				[self performSelectorOnMainThread:@selector(onBallNotInScene) withObject:nil waitUntilDone:NO];
-			}));
+			[self assignListenersToVideoTracker];
 			track->setDebugDraw(false);
+			track->setRestrictBallInScene(true);
 			track->setReferenceFrame(firstImage);
 			track->setObjectsToBeModeled(contours);
 			track->prepareInPaintedScene(image_copy, contours);
@@ -201,8 +197,19 @@ std::vector<std::vector<cv::Point>> contours;
 	}
 }
 
-void configureVideoTrackingWithFirstImage(Mat firstImage){
-
+-(void) assignListenersToVideoTracker {
+	track->attachBallHitObserver((^(float x, float y) {
+		LCPoint *point = [[LCPoint alloc] init];
+		point.x = x;
+		point.y = y;
+		[self performSelectorOnMainThread:@selector(ballHitAtPoint:) withObject:point waitUntilDone:NO];
+	}));
+	track->attachObjectsDestryedObserver((^(){
+		[self performSelectorOnMainThread:@selector(onAllObjectsHaveBeenDestroyed) withObject:nil waitUntilDone:NO];
+	}));
+	track->attachBallInSceneObserver((^(){
+		[self performSelectorOnMainThread:@selector(onBallNotInScene) withObject:nil waitUntilDone:NO];
+	}));
 }
 
 Mat getWatershedSegmentation(Mat image)
@@ -220,27 +227,25 @@ Mat getWatershedSegmentation(Mat image)
 #endif
 
 -(void)onBallNotInScene {
-	[self.notificationView showNotificationWithMessage:@"Ball is no longer in the scene!"];
+	[self wrapUpAndFinishTheGame:GameEndedDueToBallWentOutOfScene];
 }
 
 -(void)onAllObjectsHaveBeenDestroyed {
-	[self.notificationView showNotificationWithMessage:@"All Objects Have Been Destroyed!"];
+	[self wrapUpAndFinishTheGame:GameEndedDueToAllObjectsHasBeenDestroyed];
 }
 
 -(void)ballHitAtPoint:(LCPoint *) point {
-	NSLog(@"ball hit in Obj-C, [%f,%f]", point.x, point.y);
 	[self showExplosionAtPoint: [point getCGPoint]];
-	[self setScore:self.score + 1];
-	NSLog(@"Score: %ld", (long)self.score);
+	[self setScore:self.score + 2];
 }
 
 -(void)calculateNecessaryTimeForArea:(double)area andNumberOfObjects:(int) numberOfObjects{
-	int time = area / 10 / numberOfObjects / 2;
+	int time = 60;//area / 10 / numberOfObjects / 2;
 	self.timeInSeconds = time;
 }
 
 -(void)startTimer{
-	[NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(timerFireMethod:) userInfo:self repeats:YES];
+	mainGameTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(timerFireMethod:) userInfo:self repeats:YES];
 }
 
 -(IBAction)resetCameraFirstPositionButton:(id)sender {
@@ -256,6 +261,27 @@ Mat getWatershedSegmentation(Mat image)
 			[activityView removeFromSuperview];
 		}
 		self.timeInSeconds--;
+		if(self.timeInSeconds == 0){
+			[self wrapUpAndFinishTheGame: GameEndedDueToTimesUp];
+		}
+	}
+}
+
+-(void)wrapUpAndFinishTheGame:(GameEnded)reason {
+	[mainGameTimer invalidate];
+	[self.videoCamera stop];
+	switch (reason) {
+		case GameEndedDueToTimesUp:
+			[self.notificationView showNotificationWithMessage: [NSString stringWithFormat:@"Your time is up! Total Score: %d", self.score]];
+			break;
+		case GameEndedDueToAllObjectsHasBeenDestroyed:
+			[self.notificationView showNotificationWithMessage:@"All Objects Have Been Destroyed!"];
+			break;
+		case GameEndedDueToBallWentOutOfScene:
+			[self.notificationView showNotificationWithMessage:@"Ball is no longer in the scene!"];
+			break;
+		default:
+			break;
 	}
 }
 
@@ -263,20 +289,17 @@ Mat getWatershedSegmentation(Mat image)
     int minutes = (self.timeInSeconds % 3600) / 60;
 	int seconds = (self.timeInSeconds % 3600) % 60;
     self.timerTimeLeftLabel.text = [NSString stringWithFormat:@"%02d:%02d", minutes, seconds];
-	if (minutes == 0 && seconds == 0) {
-		//TODO: raise event of time's up!
-	}
 }
 
 -(IBAction)onBlowItUpButton:(id)sender {
 	if(!imageForSegmentationHasBeenTaken){
 		imageForSegmentationHasBeenTaken = YES;
-		activityView = [[UIActivityIndicatorView alloc]     initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
+		activityView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
 		activityView.hidesWhenStopped = YES;
 		[self.view addSubview:activityView];
-		activityView.center = self.view.center;
-		NSLog(@"center: %f, %f", self.view.center.x, self.view.center.y);
+		activityView.center = CAMERA_VIEW_CENTER;
 		[activityView startAnimating];
+		[self configureGestures];
 		[self startTimer];
 	}
 }
@@ -284,6 +307,12 @@ Mat getWatershedSegmentation(Mat image)
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
 	[super touchesBegan:touches withEvent:event];
 	touchPoints.clear();
+}
+
+-(void)onFingerTap:(UITapGestureRecognizer *)recognizer {
+	CGPoint location = [recognizer locationInView:imageView];
+	track->onMouse(1, location.x, location.y, nil, nil);
+	[self reduceScore: 1];
 }
 
 -(void)onFingerPan:(UIPanGestureRecognizer *)recognizer {
@@ -313,8 +342,8 @@ Mat getWatershedSegmentation(Mat image)
     CFRelease(explosionImageCopy);
 
     // (2) Position the explosion sprite
-    CGFloat xOffset = 0.0f;//-7.0f;
-	CGFloat yOffset = 0.0f;//-3.0f;
+    CGFloat xOffset = 50.0f;
+	CGFloat yOffset = 20.0f;
     sprite.position = CGPointMake(point.x + xOffset, point.y + yOffset);
 
     // (3) Add to the view

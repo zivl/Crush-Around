@@ -2,7 +2,6 @@
 #ifndef OpenCV_Tutorial_VideoTracking_hpp
 #define OpenCV_Tutorial_VideoTracking_hpp
 
-#include "SampleBase.h"
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/video/tracking.hpp>
@@ -25,12 +24,6 @@
 
 #define PTM_RATIO 32.0
 
-
-
-enum {
-	BALL_HIT_EVENT = 0
-};
-
 class VideoTracking : IBallHitObserver, IBallInSceneObserver, IObjectsDestryedObserver
 {
 public:
@@ -39,22 +32,11 @@ public:
 
     virtual void getGray(const cv::Mat& input, cv::Mat& gray);
 
-    //! Gets a sample name
-    virtual std::string getName() const;
-
-    //! Returns a user-friendly name for displaying as description
-    virtual std::string getUserFriendlyName() const;
-
-    //! Returns a detailed sample description
-    virtual std::string getDescription() const;
-
-    //! Processes a frame and returns output image
+	//! Processes a frame and returns output image
     virtual bool processFrame(const cv::Mat& inputFrame, cv::Mat& outputFrame);
 
     //! Sets the reference frame for latter processing
     virtual void setReferenceFrame(const cv::Mat& reference);
-
-    virtual std::string getSampleIcon() const;
 
     virtual void onMouse(int event, int x, int y, int, void*);
 
@@ -67,6 +49,9 @@ public:
     void prepareInPaintedScene(const cv::Mat scene, const std::vector<std::vector<cv::Point> > contours);
 
     void setDebugDraw(bool enabled);
+
+	void setRestrictBallInScene(bool restricted);
+	bool isRestrictBallInScene();
 
 	// IBallHitObserver observer pattern methods for events
 	virtual void attachBallHitObserver(std::function<void(float x, float y)> func);
@@ -162,6 +147,8 @@ private:
     bool m_debugDrawEnabled;
 
 	std::vector<b2Body *>m_objectBodies;
+
+	bool m_restrictBallInScene;
 };
 
 

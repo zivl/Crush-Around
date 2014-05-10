@@ -59,12 +59,7 @@ void VideoTracking::getGray(const cv::Mat& input, cv::Mat& gray)
 
     if (numChannes == 4)
     {
-//#if TARGET_IPHONE_SIMULATOR
         cv::cvtColor(input, gray, CV_BGRA2GRAY);
-//#else
-//		cv::neon_cvtColorBGRA2GRAY(input, gray);
-//#endif
-
     }
     else if (numChannes == 3)
     {
@@ -76,29 +71,15 @@ void VideoTracking::getGray(const cv::Mat& input, cv::Mat& gray)
     }
 }
 
-//! Gets a sample name
-std::string VideoTracking::getName() const
-{
-    return "Video tracking";
-}
+cv::Point2f transformPoint(const cv::Point2f point, const cv::Mat homoMat){
 
-//! Returns a user-friendly name for displaying as description
-std::string VideoTracking::getUserFriendlyName() const
-{
-    std::stringstream s;
-    s << "Video tracking using ORB";
-    return  s.str();
-}
+	std::vector<cv::Point2f> sourcePoints;
+	sourcePoints.push_back(point);
 
-//! Returns a detailed sample description
-std::string VideoTracking::getDescription() const
-{
-    return "";
-}
+	std::vector<cv::Point2f> targetPoints;
 
-std::string VideoTracking::getSampleIcon() const
-{
-    return "VideoTrackingIcon.png";
+	cv::perspectiveTransform(sourcePoints, targetPoints, homoMat);
+	return cv::Point2f(targetPoints[0]);
 }
 
 //! Processes a frame and returns output image
@@ -127,7 +108,9 @@ bool VideoTracking::processFrame(const cv::Mat& inputFrame, cv::Mat& outputFrame
 
             if (objectFixture->GetType() == b2Shape::e_edge)
             {
-				this->notifyBallHitObservers(contact.contactPoint->x * PTM_RATIO, contact.contactPoint->y * PTM_RATIO);
+
+				cv::Point2f hitPoint = transformPoint(cv::Point2f(contact.contactPoint->x * PTM_RATIO, contact.contactPoint->y * PTM_RATIO), this->m_refFrame2CurrentHomography);
+				this->notifyBallHitObservers(hitPoint.x, hitPoint.y);
                 // change the shape of the fixture
                 // only go into processing if this body was not processed yet (possible ball hit two fixture of same body)
                 if (newBodyMap.find(objectBody) == newBodyMap.end())
@@ -288,35 +271,39 @@ void VideoTracking::setReferenceFrame(const cv::Mat& reference)
     line(m_scene, cvPoint(reference.cols - 20, reference.rows - 20), cvPoint(reference.cols - 20, 20), cv::Scalar(0, 255, 0), 2);
     line(m_scene, cvPoint(reference.cols - 20, 20), cvPoint(20, 20), cv::Scalar(0, 255, 0), 2);
 
-    // TC: following is box2d world/ball initialization
-    // Create edges around the entire screen
-    b2BodyDef groundBodyDef;
-    groundBodyDef.position.Set(0,0);
+    // following is box2d world/ball initialization
 
-    cv::Size visibleSize(reference.cols, reference.rows);
+	if(this->isRestrictBallInScene()){
 
-    this->m_groundBody = m_world->CreateBody(&groundBodyDef);
-    b2EdgeShape groundEdge;
-    b2FixtureDef boxShapeDef;
-    boxShapeDef.shape = &groundEdge;
+		// Create edges around the entire screen
+		b2BodyDef groundBodyDef;
+		groundBodyDef.position.Set(0,0);
 
-    // wall definitions - bottom
-    groundEdge.Set(b2Vec2(0,0), b2Vec2(visibleSize.width/PTM_RATIO, 0));
-    this->m_groundBody->CreateFixture(&boxShapeDef);
+		cv::Size visibleSize(reference.cols, reference.rows);
 
-    // left
-    groundEdge.Set(b2Vec2(0,0), b2Vec2(0, visibleSize.height/PTM_RATIO));
-    this->m_groundBody->CreateFixture(&boxShapeDef);
+		this->m_groundBody = m_world->CreateBody(&groundBodyDef);
+		b2EdgeShape groundEdge;
+		b2FixtureDef boxShapeDef;
+		boxShapeDef.shape = &groundEdge;
 
-    // top
-    groundEdge.Set(b2Vec2(0, visibleSize.height/PTM_RATIO),
-                   b2Vec2(visibleSize.width/PTM_RATIO, visibleSize.height/PTM_RATIO));
-    this->m_groundBody->CreateFixture(&boxShapeDef);
+		// wall definitions - bottom
+		groundEdge.Set(b2Vec2(0,0), b2Vec2(visibleSize.width/PTM_RATIO, 0));
+		this->m_groundBody->CreateFixture(&boxShapeDef);
 
-    // right
-    groundEdge.Set(b2Vec2(visibleSize.width/PTM_RATIO, visibleSize.height/PTM_RATIO),
-                   b2Vec2(visibleSize.width/PTM_RATIO, 0));
-    this->m_groundBody->CreateFixture(&boxShapeDef);
+		// left
+		groundEdge.Set(b2Vec2(0,0), b2Vec2(0, visibleSize.height/PTM_RATIO));
+		this->m_groundBody->CreateFixture(&boxShapeDef);
+
+		// top
+		groundEdge.Set(b2Vec2(0, visibleSize.height/PTM_RATIO),
+					   b2Vec2(visibleSize.width/PTM_RATIO, visibleSize.height/PTM_RATIO));
+		this->m_groundBody->CreateFixture(&boxShapeDef);
+
+		// right
+		groundEdge.Set(b2Vec2(visibleSize.width/PTM_RATIO, visibleSize.height/PTM_RATIO),
+					   b2Vec2(visibleSize.width/PTM_RATIO, 0));
+		this->m_groundBody->CreateFixture(&boxShapeDef);
+	}
 
     // Create ball body and shape
     b2BodyDef ballBodyDef;
@@ -329,13 +316,17 @@ void VideoTracking::setReferenceFrame(const cv::Mat& reference)
 
     b2FixtureDef ballShapeDef;
     ballShapeDef.shape = &circle;
-    ballShapeDef.density = 2.5f;
+    ballShapeDef.density = 3.5f;
     ballShapeDef.friction = 0.0f;
     ballShapeDef.restitution = 1.0f;
     m_ballFixture = m_ballBody->CreateFixture(&ballShapeDef);
 
-    m_ballBody->ApplyLinearImpulse(b2Vec2(100, 100), m_ballBody->GetPosition(), true);
+    m_ballBody->ApplyLinearImpulse(b2Vec2(80, 80), m_ballBody->GetPosition(), true);
 
+}
+
+bool isPointInScene (cv::Point2f point, int width, int height){
+	return 0 < point.x && point.x < width && 0 < point.y && point.y < height;
 }
 
 // calculate homography for keypoint/descriptors based tracking,
@@ -399,6 +390,15 @@ void VideoTracking::calcHomographyAndTransformScene(cv::Mat& outputFrame)
         {
             // finally, find the homography
             this->m_refFrame2CurrentHomography = findHomography(refPoints, newPoints, CV_RANSAC);
+			if(!this->isRestrictBallInScene()){
+
+				cv::Point2f pointToCheck = transformPoint(cv::Point2f(m_ballBody->GetPosition().x * PTM_RATIO, m_ballBody->GetPosition().y * PTM_RATIO), this->m_refFrame2CurrentHomography);
+
+				if(!isPointInScene(pointToCheck, outputFrame.cols, outputFrame.rows)){
+					this->notifyBallInSceneObservers();
+					return;
+				}
+			}
 
             // wrap/transform the scene
             cv::Mat transformedScene;
@@ -432,6 +432,9 @@ void VideoTracking::calcHomographyAndTransformScene(cv::Mat& outputFrame)
     }
 }
 
+
+
+
 void VideoTracking::onPanGestureEnded(std::vector<cv::Point> touchPoints){
 	for (std::vector<cv::Point>::iterator it = touchPoints.begin() ; it != touchPoints.end(); ++it){
 		this->onMouse(CV_EVENT_LBUTTONDOWN, it->x, it->y, NULL, NULL);
@@ -445,17 +448,12 @@ void VideoTracking::onMouse( int event, int x, int y, int, void* )
         return;
     }
 
-    std::vector<cv::Point2f> sourcePoints;
-    sourcePoints.push_back(cv::Point2f(x, y));
-
-    std::vector<cv::Point2f> targetPoints;
-
-    cv::perspectiveTransform(sourcePoints, targetPoints, this->m_refFrame2CurrentHomography.inv());
+    cv::Point2f targetPoint = transformPoint(cv::Point2f(x, y), this->m_refFrame2CurrentHomography.inv());
 
     // add to the world model
     b2BodyDef bodyDef;
     bodyDef.type = b2_staticBody;
-    bodyDef.position.Set(targetPoints[0].x/PTM_RATIO, targetPoints[0].y/PTM_RATIO);
+    bodyDef.position.Set(targetPoint.x/PTM_RATIO, targetPoint.y/PTM_RATIO);
 //    std::cout << "[" << targetPoints[0].x/PTM_RATIO << "," <<targetPoints[0].y/PTM_RATIO << "]" << std::endl;
     b2Body *body = m_world->CreateBody(&bodyDef);
 
@@ -469,7 +467,7 @@ void VideoTracking::onMouse( int event, int x, int y, int, void* )
     body->CreateFixture(&shapeDef);
 
     // add the target point to the list of blacked areas
-    cv::Point2f* p = new cv::Point2f(targetPoints[0]);
+    cv::Point2f* p = new cv::Point2f(targetPoint);
     m_destroyedPoints.push_back(p);
 
     body->SetUserData(p);
@@ -607,4 +605,12 @@ void VideoTracking::notifyBallInSceneObservers()
 			(*iter)();
         }
     }
+}
+
+void VideoTracking::setRestrictBallInScene(bool restricted){
+	this->m_restrictBallInScene = restricted;
+}
+
+bool VideoTracking::isRestrictBallInScene(){
+	return this->m_restrictBallInScene;
 }

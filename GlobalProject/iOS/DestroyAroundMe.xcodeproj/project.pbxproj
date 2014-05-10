@@ -65,10 +65,6 @@
 		C99B201B190BB0EC003F19C1 /* b2WheelJoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C99B1FDD190BB0EC003F19C1 /* b2WheelJoint.cpp */; };
 		C99B201C190BB0EC003F19C1 /* b2Rope.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C99B1FE0190BB0EC003F19C1 /* b2Rope.cpp */; };
 		C99B201D190BB0EC003F19C1 /* Globals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C99B1FE3190BB0EC003F19C1 /* Globals.cpp */; };
-		C99B201E190BB0EC003F19C1 /* ObjectTrackingClass.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C99B1FE5190BB0EC003F19C1 /* ObjectTrackingClass.cpp */; };
-		C99B201F190BB0EC003F19C1 /* ObjectTrackingSample.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C99B1FE7190BB0EC003F19C1 /* ObjectTrackingSample.cpp */; };
-		C99B2020190BB0EC003F19C1 /* SampleBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C99B1FE9190BB0EC003F19C1 /* SampleBase.cpp */; };
-		C99B2021190BB0EC003F19C1 /* SampleOptions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C99B1FEB190BB0EC003F19C1 /* SampleOptions.cpp */; };
 		C99B2022190BB0EC003F19C1 /* VideoTracking.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C99B1FED190BB0EC003F19C1 /* VideoTracking.cpp */; };
 		C99B2024190BB14B003F19C1 /* opencv2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C99B2023190BB14B003F19C1 /* opencv2.framework */; };
 		C9F4CABE18C3C1BA0020D812 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C9F4CABD18C3C1BA0020D812 /* Foundation.framework */; };
@@ -227,14 +223,6 @@
 		C99B1FE1190BB0EC003F19C1 /* b2Rope.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = b2Rope.h; sourceTree = "<group>"; };
 		C99B1FE3190BB0EC003F19C1 /* Globals.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Globals.cpp; sourceTree = "<group>"; };
 		C99B1FE4190BB0EC003F19C1 /* Globals.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Globals.h; sourceTree = "<group>"; };
-		C99B1FE5190BB0EC003F19C1 /* ObjectTrackingClass.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ObjectTrackingClass.cpp; sourceTree = "<group>"; };
-		C99B1FE6190BB0EC003F19C1 /* ObjectTrackingClass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ObjectTrackingClass.h; sourceTree = "<group>"; };
-		C99B1FE7190BB0EC003F19C1 /* ObjectTrackingSample.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ObjectTrackingSample.cpp; sourceTree = "<group>"; };
-		C99B1FE8190BB0EC003F19C1 /* ObjectTrackingSample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ObjectTrackingSample.h; sourceTree = "<group>"; };
-		C99B1FE9190BB0EC003F19C1 /* SampleBase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SampleBase.cpp; sourceTree = "<group>"; };
-		C99B1FEA190BB0EC003F19C1 /* SampleBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SampleBase.h; sourceTree = "<group>"; };
-		C99B1FEB190BB0EC003F19C1 /* SampleOptions.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SampleOptions.cpp; sourceTree = "<group>"; };
-		C99B1FEC190BB0EC003F19C1 /* SampleOptions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SampleOptions.h; sourceTree = "<group>"; };
 		C99B1FED190BB0EC003F19C1 /* VideoTracking.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = VideoTracking.cpp; sourceTree = "<group>"; };
 		C99B1FEE190BB0EC003F19C1 /* VideoTracking.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = VideoTracking.hpp; sourceTree = "<group>"; };
 		C99B2023190BB14B003F19C1 /* opencv2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = opencv2.framework; sourceTree = "<group>"; };
@@ -491,14 +479,6 @@
 				C95BF51F190BDBF7008D9497 /* WatershedSegmenter.h */,
 				C99B1FE3190BB0EC003F19C1 /* Globals.cpp */,
 				C99B1FE4190BB0EC003F19C1 /* Globals.h */,
-				C99B1FE5190BB0EC003F19C1 /* ObjectTrackingClass.cpp */,
-				C99B1FE6190BB0EC003F19C1 /* ObjectTrackingClass.h */,
-				C99B1FE7190BB0EC003F19C1 /* ObjectTrackingSample.cpp */,
-				C99B1FE8190BB0EC003F19C1 /* ObjectTrackingSample.h */,
-				C99B1FE9190BB0EC003F19C1 /* SampleBase.cpp */,
-				C99B1FEA190BB0EC003F19C1 /* SampleBase.h */,
-				C99B1FEB190BB0EC003F19C1 /* SampleOptions.cpp */,
-				C99B1FEC190BB0EC003F19C1 /* SampleOptions.h */,
 				C99B1FED190BB0EC003F19C1 /* VideoTracking.cpp */,
 				C99B1FEE190BB0EC003F19C1 /* VideoTracking.hpp */,
 				C991A3A519119D3A000C8377 /* LcInPaint.cpp */,
@@ -716,7 +696,6 @@
 				C99B1FF4190BB0EC003F19C1 /* b2Distance.cpp in Sources */,
 				C99B200A190BB0EC003F19C1 /* b2Contact.cpp in Sources */,
 				C99B2004190BB0EC003F19C1 /* b2Island.cpp in Sources */,
-				C99B2020190BB0EC003F19C1 /* SampleBase.cpp in Sources */,
 				C99B2006190BB0EC003F19C1 /* b2WorldCallbacks.cpp in Sources */,
 				C99B1FF5190BB0EC003F19C1 /* b2DynamicTree.cpp in Sources */,
 				C99B200C190BB0EC003F19C1 /* b2EdgeAndCircleContact.cpp in Sources */,
@@ -751,8 +730,6 @@
 				C99B2005190BB0EC003F19C1 /* b2World.cpp in Sources */,
 				C958150D1917E36500552030 /* NotificationView.m in Sources */,
 				C90C7DB6190D4D7600E5476F /* MyContactListener.cpp in Sources */,
-				C99B2021190BB0EC003F19C1 /* SampleOptions.cpp in Sources */,
-				C99B201F190BB0EC003F19C1 /* ObjectTrackingSample.cpp in Sources */,
 				C99B1FF2190BB0EC003F19C1 /* b2CollidePolygon.cpp in Sources */,
 				C99B2016190BB0EC003F19C1 /* b2PrismaticJoint.cpp in Sources */,
 				C991A3A419118D01000C8377 /* clipper.cpp in Sources */,
@@ -761,7 +738,6 @@
 				C99B1FFE190BB0EC003F19C1 /* b2Settings.cpp in Sources */,
 				C99B2014190BB0EC003F19C1 /* b2MotorJoint.cpp in Sources */,
 				C991A3A719119D3A000C8377 /* LcInPaint.cpp in Sources */,
-				C99B201E190BB0EC003F19C1 /* ObjectTrackingClass.cpp in Sources */,
 				C99B1FF9190BB0EC003F19C1 /* b2EdgeShape.cpp in Sources */,
 				C99B1FF1190BB0EC003F19C1 /* b2CollideEdge.cpp in Sources */,
 				C95BF521190BDBF7008D9497 /* WatershedSegmenter.cpp in Sources */,
