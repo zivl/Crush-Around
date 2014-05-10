@@ -329,12 +329,12 @@ void VideoTracking::setReferenceFrame(const cv::Mat& reference)
 
     b2FixtureDef ballShapeDef;
     ballShapeDef.shape = &circle;
-    ballShapeDef.density = 1.5f;
+    ballShapeDef.density = 2.5f;
     ballShapeDef.friction = 0.0f;
     ballShapeDef.restitution = 1.0f;
     m_ballFixture = m_ballBody->CreateFixture(&ballShapeDef);
 
-    m_ballBody->ApplyLinearImpulse(b2Vec2(200, 200), m_ballBody->GetPosition(), true);
+    m_ballBody->ApplyLinearImpulse(b2Vec2(100, 100), m_ballBody->GetPosition(), true);
 
 }
 
@@ -486,97 +486,50 @@ void VideoTracking::mouseCallback(int event, int x, int y, int flags, void *para
 void VideoTracking::setObjectsToBeModeled(const std::vector<std::vector<cv::Point>> contours) {
 
     int contourSize = (int)contours.size();
-    for(int i = 0; i < contourSize/*1*/; i++ )
+    for(int i = 0; i < contourSize; i++ )
     {
         std::vector<cv::Point> currentShape = contours[i];
         int numOfPoints = (int)currentShape.size();
 
-#if (!USE_EDGES_FOR_MODEL)
-        if(numOfPoints <= 8)
-        {
-#endif
+		b2Vec2 * vertices = new b2Vec2[numOfPoints];
+		ClipperLib::Paths* polygons = new ClipperLib::Paths();
+		ClipperLib::Path polygon;
 
-#if(USE_EDGES_FOR_MODEL)            
-            b2Vec2 * vertices = new b2Vec2[numOfPoints];
-            ClipperLib::Paths* polygons = new ClipperLib::Paths();
-            ClipperLib::Path polygon;
-            
-#endif
-//            std::vector<p2t::Point*> polyPoints;
+		for (int j = 0; j < numOfPoints; j++)
+		{
+			vertices[j].x = currentShape[j].x / PTM_RATIO;
+			vertices[j].y = currentShape[j].y / PTM_RATIO;
+
+			//cv::line(m_scene, currentShape[j], currentShape[(j + 1) % numOfPoints], cv::Scalar(0,0,255));
+			//std::cout << "[" << vertices[j].x << "," <<vertices[j].y << "]" << std::endl;
+
+			polygon.push_back(ClipperLib::IntPoint(currentShape[j].x, currentShape[j].y));
+		}
+
+		b2BodyDef objectBodyDef;
+		objectBodyDef.type = b2_staticBody;
+
+		b2Body *objectBody = m_world->CreateBody(&objectBodyDef);
+		objectBody->SetUserData(polygons);
 
 
-            for (int j = 0; j < numOfPoints; j++)
-            {
-                vertices[j].x = currentShape[j].x / PTM_RATIO;
-                vertices[j].y = currentShape[j].y / PTM_RATIO;
 
-                //cv::line(m_scene, currentShape[j], currentShape[(j + 1) % numOfPoints], cv::Scalar(0,0,255));
-                //std::cout << "[" << vertices[j].x << "," <<vertices[j].y << "]" << std::endl;
+		polygons->push_back(polygon);
 
-//                polyPoints.push_back(new p2t::Point(currentShape[j].x, currentShape[j].y));
-#if(USE_EDGES_FOR_MODEL)
-                polygon.push_back(ClipperLib::IntPoint(currentShape[j].x, currentShape[j].y));
-#endif
-            }
-                    
-            b2BodyDef objectBodyDef;
-            objectBodyDef.type = b2_staticBody;
-            
-            b2Body *objectBody = m_world->CreateBody(&objectBodyDef);
-            objectBody->SetUserData(polygons);
+		b2EdgeShape objectEdgeShape;
+		b2FixtureDef objectShapeDef;
+		objectShapeDef.shape = &objectEdgeShape;
 
-#if (USE_EDGES_FOR_MODEL)
+		for (int j = 0; j < numOfPoints - 1; j++)
+		{
+			objectEdgeShape.Set(vertices[j], vertices[j+1]);
+			objectBody->CreateFixture(&objectShapeDef);
+		}
 
-            polygons->push_back(polygon);
-
-            b2EdgeShape objectEdgeShape;
-            b2FixtureDef objectShapeDef;
-            objectShapeDef.shape = &objectEdgeShape;
-
-            for (int j = 0; j < numOfPoints - 1; j++)
-            {
-                objectEdgeShape.Set(vertices[j], vertices[j+1 %25]);
-                objectBody->CreateFixture(&objectShapeDef);
-            }
-
-            objectEdgeShape.Set(vertices[numOfPoints - 1], vertices[0]);
-            objectBody->CreateFixture(&objectShapeDef);
-			m_objectBodies.push_back(objectBody);
-            delete[] vertices;
-#else
-            p2t::CDT triangulation(polyPoints);
-            triangulation.Triangulate();
-            std::vector<p2t::Triangle*> triangles = triangulation.GetTriangles();
-
-            for(int idx = 0; idx < triangles.size(); idx++)
-            {
-                b2Vec2 vertices[3];
-                ClipperLib::Path* clippingPoints = new ClipperLib::Path();
-                for (int pIdx = 0; pIdx < 3; pIdx++)
-                {
-                    p2t::Point * p = triangles[idx]->GetPoint(pIdx);
-                    vertices[pIdx].x = p->x / PTM_RATIO;
-                    vertices[pIdx].y = p->y / PTM_RATIO;
-
-                    clippingPoints[0].push_back(ClipperLib::IntPoint(p->x, p->y));
-                }
-
-                b2PolygonShape polygon;
-                polygon.Set(vertices, 3);
-
-                b2FixtureDef objectShapeDef;
-                objectShapeDef.shape = &polygon;
-                objectShapeDef.density = 10.0f;
-                objectShapeDef.friction = 0.0f;
-                b2Fixture* fixture = objectBody->CreateFixture(&objectShapeDef);
-
-                // save the points in clipper formats (for clipping after collision)
-                fixture->SetUserData(clippingPoints);
-            }   
-#endif
-#if (!USE_EDGES_FOR_MODEL)
-        }
-#endif
+		objectEdgeShape.Set(vertices[numOfPoints - 1], vertices[0]);
+		objectBody->CreateFixture(&objectShapeDef);
+		m_objectBodies.push_back(objectBody);
+		delete[] vertices;
     }
 }
 
