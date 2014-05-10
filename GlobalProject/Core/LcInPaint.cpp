@@ -38,7 +38,6 @@ void LcInPaint::inpaint(const Mat input, std::vector<std::vector<cv::Point>> con
     std::vector<std::vector<cv::Point>> offsetContours;
 
     // translate the contours to clipper format 
-    
     for( size_t i = 0; i < contours.size(); i++ )
     {
         ClipperLib::Paths polygons;
@@ -50,7 +49,7 @@ void LcInPaint::inpaint(const Mat input, std::vector<std::vector<cv::Point>> con
 
         polygons.push_back(polygon);
 
-        // now offset them by a few pixels to ensure no black edges outside mask
+        // now offset them by a few pixels to ensure black edges outside mask
         ClipperLib::ClipperOffset clipperOffset;
         clipperOffset.AddPaths(polygons, ClipperLib::jtRound, ClipperLib::etClosedPolygon);
 
