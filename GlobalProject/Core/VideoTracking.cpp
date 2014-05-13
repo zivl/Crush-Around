@@ -24,7 +24,8 @@ VideoTracking::VideoTracking()
 
 VideoTracking::~VideoTracking()
 {
-    
+    delete this->m_matcher;
+    delete this->m_2DWorld;
 }
 
 void VideoTracking::getGray(const cv::Mat& input, cv::Mat& gray)

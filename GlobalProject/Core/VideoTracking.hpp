@@ -102,8 +102,8 @@ private:
     // transform scene and add to output frame
     void calcHomographyAndTransformScene(cv::Mat& outputFrame);
 
+    // the physical world simulation
     World *m_2DWorld;
-    
 
     // homograph from reference frame to current (last captured) frame
     cv::Mat m_refFrame2CurrentHomography;
@@ -114,6 +114,7 @@ private:
     // flag indicating whether the ball should be restricted to the scene or can exit
     bool m_restrictBallInScene;
 
+    // flag indicating whether the homography calculation should be based on "good points" only
     bool m_useGoodPointsOnly;
 };
 
