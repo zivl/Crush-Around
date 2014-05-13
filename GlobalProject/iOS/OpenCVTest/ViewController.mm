@@ -177,7 +177,7 @@ std::vector<std::vector<cv::Point>> contours;
 			//track->setDebugDraw(false);
 			track->setRestrictBallInScene(true);
 			track->setReferenceFrame(firstImage);
-			track->getWorld().setObjectsToBeModeled(contours);
+			track->getWorld()->setObjectsToBeModeled(contours);
 			track->prepareInPaintedScene(image_copy, contours);
 			int numberOfObjects = (int)contours.size();
 			double area = 0.0;

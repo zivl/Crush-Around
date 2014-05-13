@@ -8,7 +8,6 @@ VideoTracking::VideoTracking()
 : m_orbMatcher(cv::NORM_HAMMING, true)
 //nfeatures=500, scaleFactor=1.2f, nlevels=8, edgeThreshold=31, firstLevel=0, WTA_K=2, scoreType=ORB::HARRIS_SCORE, patchSize=31
 , m_orbFeatureEngine(500, 1.2f, 8, 31, 0, 2, cv::ORB::HARRIS_SCORE, 31)
-, m_2DWorld()
 // TODO: adjust parameters for object where applicable
 , m_surfDetector()
 , m_surfExtractor()
@@ -17,6 +16,8 @@ VideoTracking::VideoTracking()
 {
     // Instantiate a matcher for descriptor based correlation of features.
     m_matcher = new cv::FlannBasedMatcher(new cv::flann::LshIndexParams(5, 24, 2));
+	m_2DWorld = new World();
+	m_featureTypeForDetection = FeatureType::ORB;
 }
 
 VideoTracking::~VideoTracking()
@@ -42,16 +43,16 @@ void VideoTracking::getGray(const cv::Mat& input, cv::Mat& gray)
     }
 }
 
-World VideoTracking::getWorld(){
+World* VideoTracking::getWorld(){
 	return this->m_2DWorld;
 }
 
 //! Processes a frame and returns output image
 bool VideoTracking::processFrame(const cv::Mat& inputFrame, cv::Mat& outputFrame)
 {   
-	this->m_2DWorld.update(m_refFrame2CurrentHomography);
+	this->m_2DWorld->update(m_refFrame2CurrentHomography);
 
-	if(this->m_2DWorld.isAllObjectsDestroyed()){
+	if(this->m_2DWorld->isAllObjectsDestroyed()){
         this->notifyObjectsDestryedObservers();
     }
 
@@ -77,10 +78,10 @@ bool VideoTracking::processFrame(const cv::Mat& inputFrame, cv::Mat& outputFrame
     
     calcHomographyAndTransformScene(outputFrame);
 
-    if (this->m_2DWorld.isDebugDrawEnabled()){
+    if (this->m_2DWorld->isDebugDrawEnabled()){
         // add the debug drawing
-		this->m_2DWorld.getDebugDraw()->SetScene(outputFrame);
-		this->m_2DWorld.getWorld()->DrawDebugData();
+		this->m_2DWorld->getDebugDraw()->SetScene(outputFrame);
+		this->m_2DWorld->getWorld()->DrawDebugData();
     }
 
     return true;
@@ -125,7 +126,7 @@ void VideoTracking::setReferenceFrame(const cv::Mat& reference)
     line(m_scene, cvPoint(reference.cols - 20, reference.rows - 20), cvPoint(reference.cols - 20, 20), cv::Scalar(0, 255, 0), 2);
     line(m_scene, cvPoint(reference.cols - 20, 20), cvPoint(20, 20), cv::Scalar(0, 255, 0), 2);
 
-    this->m_2DWorld.initializeWorldOnFirstFrame(reference, this->isRestrictBallInScene());
+    this->m_2DWorld->initializeWorldOnFirstFrame(reference, this->isRestrictBallInScene());
 
 }
 
@@ -194,7 +195,7 @@ void VideoTracking::calcHomographyAndTransformScene(cv::Mat& outputFrame)
         {
             // finally, find the homography
             this->m_refFrame2CurrentHomography = findHomography(refPoints, newPoints, CV_RANSAC);
-			b2Vec2 ballPosition = this->m_2DWorld.getBallBody()->GetPosition();
+			b2Vec2 ballPosition = this->m_2DWorld->getBallBody()->GetPosition();
             if(!this->isRestrictBallInScene()){
 
                 cv::Point2f pointToCheck = CVUtils::transformPoint(cv::Point2f(ballPosition.x * PTM_RATIO, ballPosition.y * PTM_RATIO), this->m_refFrame2CurrentHomography);
@@ -208,15 +209,15 @@ void VideoTracking::calcHomographyAndTransformScene(cv::Mat& outputFrame)
             // wrap/transform the scene
             cv::Mat transformedScene;
             m_scene.copyTo(transformedScene);
-			std::vector<cv::Point2f*> guardLocations = this->m_2DWorld.getGuardLocations();
+			std::vector<cv::Point2f*> guardLocations = this->m_2DWorld->getGuardLocations();
             for (int i = 0; i < (int)guardLocations.size(); i++)
             {
                 cv::circle(transformedScene, *guardLocations[i], 5, cv::Scalar(200, 200, 200), -1);
             }
 
              cv::Mat mask_image(outputFrame.size(), CV_8U, cv::Scalar(0));
-			std::vector<cv::Point*> destroyedPolygons = this->m_2DWorld.getDestroyedPolygons();
-			std::vector<int> destroyedPolygonsPointCount = this->m_2DWorld.getDestroyedPolygonsPointCount();
+			std::vector<cv::Point*> destroyedPolygons = this->m_2DWorld->getDestroyedPolygons();
+			std::vector<int> destroyedPolygonsPointCount = this->m_2DWorld->getDestroyedPolygonsPointCount();
             for (int i = 0; i < destroyedPolygons.size(); i++)
             {
                 const cv::Point* ppt[1] = { destroyedPolygons[i] };
@@ -257,7 +258,7 @@ void VideoTracking::onMouse( int event, int x, int y, int, void* )
 
     cv::Point2f targetPoint = CVUtils::transformPoint(cv::Point2f(x, y), this->m_refFrame2CurrentHomography.inv());
 
-	this->m_2DWorld.createNewPhysicPointInWorld(targetPoint);
+	this->m_2DWorld->createNewPhysicPointInWorld(targetPoint);
     
 }
 
@@ -278,7 +279,7 @@ void VideoTracking::prepareInPaintedScene(const cv::Mat scene, const std::vector
 
 void VideoTracking::delegateBallHitObserver(std::function<void(float x, float y)> func)
 {
-	this->m_2DWorld.attachBallHitObserver(func);
+	this->m_2DWorld->attachBallHitObserver(func);
 }
 
 void VideoTracking::attachObjectsDestryedObserver(std::function<void()> func)

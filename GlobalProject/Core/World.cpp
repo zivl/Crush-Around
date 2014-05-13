@@ -68,7 +68,7 @@ std::vector<cv::Point2f*> World::getGuardLocations() {
 }
 
 bool World::isAllObjectsDestroyed(){
-	return this->m_guardLocations.size() == 0;
+	return this->m_objectBodies.size() == 0;
 }
 
 std::vector<cv::Point*> World::getDestroyedPolygons(){
