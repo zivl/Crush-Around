@@ -174,10 +174,10 @@ std::vector<std::vector<cv::Point>> contours;
 			firstImage = image_copy;
 			track = new VideoTracking();
 			[self assignListenersToVideoTracker];
-			track->setDebugDraw(false);
+			//track->setDebugDraw(false);
 			track->setRestrictBallInScene(true);
 			track->setReferenceFrame(firstImage);
-			track->setObjectsToBeModeled(contours);
+			track->getWorld().setObjectsToBeModeled(contours);
 			track->prepareInPaintedScene(image_copy, contours);
 			int numberOfObjects = (int)contours.size();
 			double area = 0.0;
@@ -198,7 +198,7 @@ std::vector<std::vector<cv::Point>> contours;
 }
 
 -(void) assignListenersToVideoTracker {
-	track->attachBallHitObserver((^(float x, float y) {
+	track->delegateBallHitObserver((^(float x, float y) {
 		LCPoint *point = [[LCPoint alloc] init];
 		point.x = x;
 		point.y = y;
@@ -272,7 +272,7 @@ Mat getWatershedSegmentation(Mat image)
 	[self.videoCamera stop];
 	switch (reason) {
 		case GameEndedDueToTimesUp:
-			[self.notificationView showNotificationWithMessage: [NSString stringWithFormat:@"Your time is up! Total Score: %d", self.score]];
+			[self.notificationView showNotificationWithMessage: [NSString stringWithFormat:@"Your time is up! Total Score: %ld", (long)self.score]];
 			break;
 		case GameEndedDueToAllObjectsHasBeenDestroyed:
 			[self.notificationView showNotificationWithMessage:@"All Objects Have Been Destroyed!"];
@@ -299,6 +299,11 @@ Mat getWatershedSegmentation(Mat image)
 		[self.view addSubview:activityView];
 		activityView.center = CAMERA_VIEW_CENTER;
 		[activityView startAnimating];
+		[UIView animateWithDuration:0.5 animations:^{
+			self.blowItUpPanel.alpha = 0.0;
+		} completion:^(BOOL finished) {
+			[self.blowItUpPanel removeFromSuperview];
+		}];
 		[self configureGestures];
 		[self startTimer];
 	}

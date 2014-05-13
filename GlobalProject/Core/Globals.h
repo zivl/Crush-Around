@@ -8,4 +8,6 @@ extern bool computeObject;
 extern bool detectObject;
 extern bool trackObject;
 
+#define PTM_RATIO 32.0
+
 #endif

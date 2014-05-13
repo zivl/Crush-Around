@@ -11,21 +11,14 @@
 #include "opencv2/nonfree/nonfree.hpp"         // SURF detector 
 #include <vector>
 #include <functional>
-#include <Box2D/Box2D.h>
-
-#include "clipper.hpp"
-
-#include "OpenCvDebugDraw.h"
-#include "MyContactListener.h"
+#include "World.h"
+#include "Globals.h"
 #include "LcInPaint.h"
-#include "Observers/IBallHitObserver.h"
 #include "Observers/IBallInSceneObserver.h"
 #include "Observers/IObjectsDestryedObserver.h"
+#include "CVUtils.h"
 
-
-#define PTM_RATIO 32.0
-
-class VideoTracking : IBallHitObserver, IBallInSceneObserver, IObjectsDestryedObserver
+class VideoTracking : IBallInSceneObserver, IObjectsDestryedObserver
 {
 public:
     enum FeatureType { ORB, SIFT, SURF };
@@ -39,6 +32,8 @@ public:
     // set the feature type to use for detection
     void setFeatureType(FeatureType feat_type);
 
+	World getWorld();
+
     //! Processes a frame and returns output image
     virtual bool processFrame(const cv::Mat& inputFrame, cv::Mat& outputFrame);
 
@@ -50,20 +45,13 @@ public:
     virtual void onPanGestureEnded(std::vector<cv::Point> touchPoints);
 
     static void mouseCallback(int event, int x, int y, int flags, void *param);
-
-    void setObjectsToBeModeled(const std::vector<std::vector<cv::Point> > contours);
     
     void prepareInPaintedScene(const cv::Mat scene, const std::vector<std::vector<cv::Point> > contours);
-
-    void setDebugDraw(bool enabled);
 
     void setRestrictBallInScene(bool restricted);
     bool isRestrictBallInScene();
 
-    // IBallHitObserver observer pattern methods for events
-    virtual void attachBallHitObserver(std::function<void(float x, float y)> func);
-    virtual void detachBallHitObserver(std::function<void(float x, float y)> func);
-    virtual void notifyBallHitObservers(float x, float y);
+    virtual void delegateBallHitObserver(std::function<void(float x, float y)> func);
 
     // IObjectsDestroyedObserver observer pattern methods for events
     virtual void attachObjectsDestryedObserver(std::function<void()> func);
@@ -76,8 +64,6 @@ public:
     virtual void notifyBallInSceneObservers();
 
 private:
-
-    std::vector<std::function<void(float x, float y)>> ballHitObserversList;
 
     std::vector<std::function<void()>> objectsDestroyedObserversList;
 
@@ -116,41 +102,15 @@ private:
     // transform scene and add to output frame
     void calcHomographyAndTransformScene(cv::Mat& outputFrame);
 
-    void updateWorld();
-
-    // box2d "world" objects
-    b2World * m_world;
-    b2Body * m_ballBody;
-    b2Fixture * m_ballFixture;
-    b2Body * m_groundBody;
-    b2Fixture * m_groundFixture;
-
-    float dt;
+	World m_2DWorld;
+	
 
     // homograph from reference frame to current (last captured) frame
     cv::Mat m_refFrame2CurrentHomography;
 
-    // list of "guards" position
-    std::vector<cv::Point2f*> m_guardLocations;
-
-    // debug draw
-    OpenCvDebugDraw* m_debugDraw;
-
-     // Contact listener for colision response
-    MyContactListener *m_contactListener;   
-
     // inpainted scene used to fill over "destroyed" parts of the image
     cv::Mat m_inpaintedScene;
 
-    // a list of destroyed regions
-    std::vector<cv::Point*> m_destroyedPolygons;
-    std::vector<int> m_destroyedPolygonsPointCount;
-
-    // flag indicating whether debug draw is enabled and should be used.
-    bool m_debugDrawEnabled;
-
-    // the bodies of the object to be destroyed.
-    std::vector<b2Body *>m_objectBodies;
 
     // flag indicating whether the ball should be restricted to the scene or can exit
     bool m_restrictBallInScene;
