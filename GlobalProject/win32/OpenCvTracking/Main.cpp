@@ -66,7 +66,7 @@ int main( int argc, char** argv )
 
 int destroyAroundMeGame()
 {
-    VideoCapture cap(0); // open the default camera
+    VideoCapture cap(1); // open the default camera
     if(!cap.isOpened())  // check if we succeeded
     {  
         return -1;
@@ -85,7 +85,7 @@ int destroyAroundMeGame()
     namedWindow("input", 2);
 
     VideoTracking *track = new VideoTracking();
-    track->setDebugDraw(false);
+    track->getWorld()->setDebugDrawEnabled(false);
 
     setMouseCallback("output", VideoTracking::mouseCallback, track);
 
@@ -149,7 +149,7 @@ int destroyAroundMeGame()
                 track->setReferenceFrame(frame);
 
                 // set the objects according to last found contours
-                track->setObjectsToBeModeled(contours);
+                track->getWorld()->setObjectsToBeModeled(contours);
 
                 // prepare in-painted scene for later use
                 track->prepareInPaintedScene(frame, contours);

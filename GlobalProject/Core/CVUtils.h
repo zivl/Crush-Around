@@ -9,6 +9,8 @@
 #ifndef __DestroyAroundMe__CVUtils__
 #define __DestroyAroundMe__CVUtils__
 
+#include <opencv2/core/core.hpp>
+
 class CVUtils {
 
 public:
