@@ -32,7 +32,7 @@ public:
     // set the feature type to use for detection
     void setFeatureType(FeatureType feat_type);
 
-	World* getWorld();
+    World* getWorld();
 
     //! Processes a frame and returns output image
     virtual bool processFrame(const cv::Mat& inputFrame, cv::Mat& outputFrame);
@@ -102,8 +102,8 @@ private:
     // transform scene and add to output frame
     void calcHomographyAndTransformScene(cv::Mat& outputFrame);
 
-	World *m_2DWorld;
-	
+    World *m_2DWorld;
+    
 
     // homograph from reference frame to current (last captured) frame
     cv::Mat m_refFrame2CurrentHomography;
@@ -111,9 +111,10 @@ private:
     // inpainted scene used to fill over "destroyed" parts of the image
     cv::Mat m_inpaintedScene;
 
-
     // flag indicating whether the ball should be restricted to the scene or can exit
     bool m_restrictBallInScene;
+
+    bool m_useGoodPointsOnly;
 };
 
 

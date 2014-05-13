@@ -21,18 +21,6 @@
     <ClCompile Include="..\..\Core\Globals.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Core\ObjectTrackingClass.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Core\ObjectTrackingSample.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Core\SampleBase.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Core\SampleOptions.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Core\VideoTracking.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -66,18 +54,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Core\Globals.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Core\ObjectTrackingClass.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Core\ObjectTrackingSample.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Core\SampleBase.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Core\SampleOptions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Core\VideoTracking.hpp">

@@ -86,6 +86,7 @@ int destroyAroundMeGame()
 
     VideoTracking *track = new VideoTracking();
     track->getWorld()->setDebugDrawEnabled(false);
+    track->setFeatureType(VideoTracking::FeatureType::SIFT);
 
     setMouseCallback("output", VideoTracking::mouseCallback, track);
 
