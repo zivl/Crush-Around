@@ -10,16 +10,16 @@
 
 VideoTracking::VideoTracking()
 : m_orbMatcher(cv::NORM_HAMMING, true)
-, m_fastDetector(cv::Ptr<cv::FeatureDetector>(new cv::FastFeatureDetector()), 500)
 //nfeatures=500, scaleFactor=1.2f, nlevels=8, edgeThreshold=31, firstLevel=0, WTA_K=2, scoreType=ORB::HARRIS_SCORE, patchSize=31
 , m_orbFeatureEngine(500, 1.2f, 8, 31, 0, 2, cv::ORB::HARRIS_SCORE, 31)
 , m_objectBodies()
+// TODO: adjust parameters for object where applicable
+, m_surfDetector()
+, m_surfExtractor()
+, m_surfMatcher()
+, m_siftEngine()
 {
-    m_maxNumberOfPoints = 50;
-
-    //registerOption("Points count", "ORB", &m_maxNumberOfPoints, 1, 100);
-
-    // TC: instantiate a matcher for descriptor based correlation of features.
+    // Instantiate a matcher for descriptor based correlation of features.
     m_matcher = new cv::FlannBasedMatcher(new cv::flann::LshIndexParams(5, 24, 2));
 
     dt = 1.0f/60.0f;
@@ -48,7 +48,7 @@ VideoTracking::~VideoTracking()
     delete m_debugDraw;
     delete m_contactListener;
 
-    m_destroyedPoints.clear();
+    m_guardLocations.clear();
     m_destroyedPolygons.clear();
     m_destroyedPolygonsPointCount.clear();
 }
@@ -73,19 +73,18 @@ void VideoTracking::getGray(const cv::Mat& input, cv::Mat& gray)
 
 cv::Point2f transformPoint(const cv::Point2f point, const cv::Mat homoMat){
 
-	std::vector<cv::Point2f> sourcePoints;
-	sourcePoints.push_back(point);
+    std::vector<cv::Point2f> sourcePoints;
+    sourcePoints.push_back(point);
 
-	std::vector<cv::Point2f> targetPoints;
+    std::vector<cv::Point2f> targetPoints;
 
-	cv::perspectiveTransform(sourcePoints, targetPoints, homoMat);
-	return cv::Point2f(targetPoints[0]);
+    cv::perspectiveTransform(sourcePoints, targetPoints, homoMat);
+    return cv::Point2f(targetPoints[0]);
 }
 
-//! Processes a frame and returns output image
-bool VideoTracking::processFrame(const cv::Mat& inputFrame, cv::Mat& outputFrame)
+void VideoTracking::updateWorld()
 {
-    this->m_world->Step(dt, 10, 10);
+        this->m_world->Step(dt, 10, 10);
 
     //check contacts
     std::vector<MyContact>::iterator pos;
@@ -93,24 +92,22 @@ bool VideoTracking::processFrame(const cv::Mat& inputFrame, cv::Mat& outputFrame
     std::vector<b2Body*> removeList;
 
     for(pos = this->m_contactListener->m_contacts.begin(); 
-      pos != this->m_contactListener->m_contacts.end(); 
-      ++pos) 
+        pos != this->m_contactListener->m_contacts.end(); 
+        ++pos) 
     {
         MyContact contact = *pos;
 
         if ((contact.fixtureA == this->m_ballFixture || contact.fixtureB == this->m_ballFixture) &&
             (contact.fixtureA->GetBody() != m_groundBody && contact.fixtureB->GetBody() != m_groundBody))
-        {
-            
-//            std::cout << "Ball Contact with object at [" << contact.contactPoint->x << "," << contact.contactPoint->y << "]" << std::endl;
+        {           
             b2Fixture* objectFixture = contact.fixtureA == this->m_ballFixture ? contact.fixtureB : contact.fixtureA;
             b2Body *objectBody = objectFixture->GetBody();
 
             if (objectFixture->GetType() == b2Shape::e_edge)
             {
-
-				cv::Point2f hitPoint = transformPoint(cv::Point2f(contact.contactPoint->x * PTM_RATIO, contact.contactPoint->y * PTM_RATIO), this->m_refFrame2CurrentHomography);
-				this->notifyBallHitObservers(hitPoint.x, hitPoint.y);
+                cv::Point2f hitPoint = transformPoint(cv::Point2f(contact.contactPoint->x * PTM_RATIO, contact.contactPoint->y * PTM_RATIO), this->m_refFrame2CurrentHomography);
+                this->notifyBallHitObservers(hitPoint.x, hitPoint.y);
+                
                 // change the shape of the fixture
                 // only go into processing if this body was not processed yet (possible ball hit two fixture of same body)
                 if (newBodyMap.find(objectBody) == newBodyMap.end())
@@ -163,9 +160,7 @@ bool VideoTracking::processFrame(const cv::Mat& inputFrame, cv::Mat& outputFrame
 
                         m_destroyedPolygons.push_back(points);   
                         m_destroyedPolygonsPointCount.push_back((int)destroyedParts[i].size());
-                    }
-
-                                     
+                    }                                 
                 }               
             }
             else if (objectFixture->GetType() == b2Shape::e_circle)
@@ -190,52 +185,76 @@ bool VideoTracking::processFrame(const cv::Mat& inputFrame, cv::Mat& outputFrame
             objectBody->DestroyFixture( fixtureToDestroy );
         }       
 
-		if(newPolygons->size() == 0){
-			m_objectBodies.erase(std::find(m_objectBodies.begin(), m_objectBodies.end(), objectBody));
-		}
-		else{
+        if(newPolygons->size() == 0)
+        {
+            // there is no more pieces of the object left so remove it from list and world
+            m_objectBodies.erase(std::find(m_objectBodies.begin(), m_objectBodies.end(), objectBody));
+            m_world->DestroyBody(objectBody);   // TODO: better physics world cleanup
+        }
+        else
+        {
+            for (int i = 0; i < newPolygons->size(); i++)
+            {
+                b2EdgeShape objectEdgeShape;
+                b2FixtureDef objectShapeDef;
+                objectShapeDef.shape = &objectEdgeShape;
 
-			for (int i = 0; i < newPolygons->size(); i++)
-			{
-				b2EdgeShape objectEdgeShape;
-				b2FixtureDef objectShapeDef;
-				objectShapeDef.shape = &objectEdgeShape;
+                ClipperLib::Path polygon = newPolygons->at(i);
+                int j;
+                for (j = 0; j < polygon.size() - 1; j++)
+                {
+                    objectEdgeShape.Set(b2Vec2(polygon[j].X / PTM_RATIO, polygon[j].Y / PTM_RATIO), b2Vec2(polygon[j+1].X / PTM_RATIO, polygon[j+1].Y / PTM_RATIO));
+                    objectBody->CreateFixture(&objectShapeDef);
+                }
 
-				ClipperLib::Path polygon = newPolygons->at(i);
-				int j;
-				for (j = 0; j < polygon.size() - 1; j++)
-				{
-					objectEdgeShape.Set(b2Vec2(polygon[j].X / PTM_RATIO, polygon[j].Y / PTM_RATIO), b2Vec2(polygon[j+1].X / PTM_RATIO, polygon[j+1].Y / PTM_RATIO));
-					objectBody->CreateFixture(&objectShapeDef);
-				}
-
-				objectEdgeShape.Set(b2Vec2(polygon[j].X / PTM_RATIO, polygon[j].Y / PTM_RATIO), b2Vec2(polygon[0].X / PTM_RATIO, polygon[0].Y / PTM_RATIO));
-				objectBody->CreateFixture(&objectShapeDef);
-			}
-		}
+                objectEdgeShape.Set(b2Vec2(polygon[j].X / PTM_RATIO, polygon[j].Y / PTM_RATIO), b2Vec2(polygon[0].X / PTM_RATIO, polygon[0].Y / PTM_RATIO));
+                objectBody->CreateFixture(&objectShapeDef);
+            }
+        }
     }
 
-	if(m_objectBodies.size() == 0){
-		this->notifyObjectsDestryedObservers();
-	}
+    if(m_objectBodies.size() == 0){
+        this->notifyObjectsDestryedObservers();
+    }
 
     for (int i = 0; i < removeList.size(); i++){
         cv::Point2f* p = (cv::Point2f*)removeList[i]->GetUserData();
 
-        std::vector<cv::Point2f*>::iterator position = std::find(m_destroyedPoints.begin(), m_destroyedPoints.end(), p);
-        if (position != m_destroyedPoints.end()){ // == vector.end() means the element was not found
-            m_destroyedPoints.erase(position);
+        std::vector<cv::Point2f*>::iterator position = std::find(m_guardLocations.begin(), m_guardLocations.end(), p);
+        if (position != m_guardLocations.end()){ // == vector.end() means the element was not found
+            m_guardLocations.erase(position);
         }
 
         removeList[i]->GetWorld()->DestroyBody(removeList[i]);
     }
-   
+}
+
+//! Processes a frame and returns output image
+bool VideoTracking::processFrame(const cv::Mat& inputFrame, cv::Mat& outputFrame)
+{   
+    updateWorld();
+
     inputFrame.copyTo(outputFrame);
 
     getGray(inputFrame, m_nextImg);
 
-	m_orbFeatureEngine(m_nextImg, cv::Mat(), m_nextKeypoints, m_nextDescriptors);
-	calcHomographyAndTransformScene(outputFrame);
+    switch (m_featureTypeForDetection)
+    {
+        case FeatureType::SIFT:
+            m_siftEngine(m_refFrame, cv::Mat(), m_nextKeypoints, m_nextDescriptors);
+            break;
+        case FeatureType::SURF:
+            // detect key points
+            m_surfDetector.detect(m_refFrame, m_nextKeypoints);
+            // extract features corresponding to the key points
+            m_surfExtractor.compute(m_refFrame, m_refKeypoints, m_nextDescriptors);
+            break;
+        case FeatureType::ORB:
+            m_orbFeatureEngine(m_nextImg, cv::Mat(), m_nextKeypoints, m_nextDescriptors);
+            break;
+    }
+    
+    calcHomographyAndTransformScene(outputFrame);
 
     if (m_debugDrawEnabled) {
         // add the debug drawing
@@ -255,8 +274,22 @@ void VideoTracking::setReferenceFrame(const cv::Mat& reference)
     // get a gray image
     getGray(m_refFrame, m_refFrame);
 
-	// detect key points and generate descriptors for the reference frame
-	m_orbFeatureEngine(m_refFrame, cv::Mat(), m_refKeypoints, m_refDescriptors);
+    // detect key points and generate descriptors for the reference frame
+    switch (m_featureTypeForDetection)
+    {
+        case FeatureType::SIFT:
+            m_siftEngine(m_refFrame, cv::Mat(), m_refKeypoints, m_refDescriptors);
+            break;
+        case FeatureType::SURF:
+            // detect key points
+            m_surfDetector.detect(m_refFrame, m_refKeypoints);
+            // extract features corresponding to the key points
+            m_surfExtractor.compute(m_refFrame, m_refKeypoints, m_refDescriptors);
+            break;
+        case FeatureType::ORB:
+            m_orbFeatureEngine(m_refFrame, cv::Mat(), m_refKeypoints, m_refDescriptors);
+            break;
+    }
 
     // create the scene and draw square and borders in it
     m_scene.create(reference.rows, reference.cols, CV_8UC3);
@@ -273,37 +306,37 @@ void VideoTracking::setReferenceFrame(const cv::Mat& reference)
 
     // following is box2d world/ball initialization
 
-	if(this->isRestrictBallInScene()){
+    if(this->isRestrictBallInScene()){
 
-		// Create edges around the entire screen
-		b2BodyDef groundBodyDef;
-		groundBodyDef.position.Set(0,0);
+        // Create edges around the entire screen
+        b2BodyDef groundBodyDef;
+        groundBodyDef.position.Set(0,0);
 
-		cv::Size visibleSize(reference.cols, reference.rows);
+        cv::Size visibleSize(reference.cols, reference.rows);
 
-		this->m_groundBody = m_world->CreateBody(&groundBodyDef);
-		b2EdgeShape groundEdge;
-		b2FixtureDef boxShapeDef;
-		boxShapeDef.shape = &groundEdge;
+        this->m_groundBody = m_world->CreateBody(&groundBodyDef);
+        b2EdgeShape groundEdge;
+        b2FixtureDef boxShapeDef;
+        boxShapeDef.shape = &groundEdge;
 
-		// wall definitions - bottom
-		groundEdge.Set(b2Vec2(0,0), b2Vec2(visibleSize.width/PTM_RATIO, 0));
-		this->m_groundBody->CreateFixture(&boxShapeDef);
+        // wall definitions - bottom
+        groundEdge.Set(b2Vec2(0,0), b2Vec2(visibleSize.width/PTM_RATIO, 0));
+        this->m_groundBody->CreateFixture(&boxShapeDef);
 
-		// left
-		groundEdge.Set(b2Vec2(0,0), b2Vec2(0, visibleSize.height/PTM_RATIO));
-		this->m_groundBody->CreateFixture(&boxShapeDef);
+        // left
+        groundEdge.Set(b2Vec2(0,0), b2Vec2(0, visibleSize.height/PTM_RATIO));
+        this->m_groundBody->CreateFixture(&boxShapeDef);
 
-		// top
-		groundEdge.Set(b2Vec2(0, visibleSize.height/PTM_RATIO),
-					   b2Vec2(visibleSize.width/PTM_RATIO, visibleSize.height/PTM_RATIO));
-		this->m_groundBody->CreateFixture(&boxShapeDef);
+        // top
+        groundEdge.Set(b2Vec2(0, visibleSize.height/PTM_RATIO),
+                       b2Vec2(visibleSize.width/PTM_RATIO, visibleSize.height/PTM_RATIO));
+        this->m_groundBody->CreateFixture(&boxShapeDef);
 
-		// right
-		groundEdge.Set(b2Vec2(visibleSize.width/PTM_RATIO, visibleSize.height/PTM_RATIO),
-					   b2Vec2(visibleSize.width/PTM_RATIO, 0));
-		this->m_groundBody->CreateFixture(&boxShapeDef);
-	}
+        // right
+        groundEdge.Set(b2Vec2(visibleSize.width/PTM_RATIO, visibleSize.height/PTM_RATIO),
+                       b2Vec2(visibleSize.width/PTM_RATIO, 0));
+        this->m_groundBody->CreateFixture(&boxShapeDef);
+    }
 
     // Create ball body and shape
     b2BodyDef ballBodyDef;
@@ -326,7 +359,7 @@ void VideoTracking::setReferenceFrame(const cv::Mat& reference)
 }
 
 bool isPointInScene (cv::Point2f point, int width, int height){
-	return 0 < point.x && point.x < width && 0 < point.y && point.y < height;
+    return 0 < point.x && point.x < width && 0 < point.y && point.y < height;
 }
 
 // calculate homography for keypoint/descriptors based tracking,
@@ -390,23 +423,23 @@ void VideoTracking::calcHomographyAndTransformScene(cv::Mat& outputFrame)
         {
             // finally, find the homography
             this->m_refFrame2CurrentHomography = findHomography(refPoints, newPoints, CV_RANSAC);
-			if(!this->isRestrictBallInScene()){
+            if(!this->isRestrictBallInScene()){
 
-				cv::Point2f pointToCheck = transformPoint(cv::Point2f(m_ballBody->GetPosition().x * PTM_RATIO, m_ballBody->GetPosition().y * PTM_RATIO), this->m_refFrame2CurrentHomography);
+                cv::Point2f pointToCheck = transformPoint(cv::Point2f(m_ballBody->GetPosition().x * PTM_RATIO, m_ballBody->GetPosition().y * PTM_RATIO), this->m_refFrame2CurrentHomography);
 
-				if(!isPointInScene(pointToCheck, outputFrame.cols, outputFrame.rows)){
-					this->notifyBallInSceneObservers();
-					return;
-				}
-			}
+                if(!isPointInScene(pointToCheck, outputFrame.cols, outputFrame.rows)){
+                    this->notifyBallInSceneObservers();
+                    return;
+                }
+            }
 
             // wrap/transform the scene
             cv::Mat transformedScene;
             m_scene.copyTo(transformedScene);
 
-            for (int i = 0; i < this->m_destroyedPoints.size(); i++)
+            for (int i = 0; i < this->m_guardLocations.size(); i++)
             {
-                cv::circle(transformedScene, *this->m_destroyedPoints[i], 5, cv::Scalar(200, 200, 200), -1);
+                cv::circle(transformedScene, *this->m_guardLocations[i], 5, cv::Scalar(200, 200, 200), -1);
             }
 
              cv::Mat mask_image(outputFrame.size(), CV_8U, cv::Scalar(0));
@@ -436,9 +469,9 @@ void VideoTracking::calcHomographyAndTransformScene(cv::Mat& outputFrame)
 
 
 void VideoTracking::onPanGestureEnded(std::vector<cv::Point> touchPoints){
-	for (std::vector<cv::Point>::iterator it = touchPoints.begin() ; it != touchPoints.end(); ++it){
-		this->onMouse(CV_EVENT_LBUTTONDOWN, it->x, it->y, NULL, NULL);
-	}
+    for (std::vector<cv::Point>::iterator it = touchPoints.begin() ; it != touchPoints.end(); ++it){
+        this->onMouse(CV_EVENT_LBUTTONDOWN, it->x, it->y, NULL, NULL);
+    }
 }
 
 // Handle mouse event adding a body to the worlds at the mouse/touch location.
@@ -468,7 +501,7 @@ void VideoTracking::onMouse( int event, int x, int y, int, void* )
 
     // add the target point to the list of blacked areas
     cv::Point2f* p = new cv::Point2f(targetPoint);
-    m_destroyedPoints.push_back(p);
+    m_guardLocations.push_back(p);
 
     body->SetUserData(p);
 }
@@ -489,45 +522,45 @@ void VideoTracking::setObjectsToBeModeled(const std::vector<std::vector<cv::Poin
         std::vector<cv::Point> currentShape = contours[i];
         int numOfPoints = (int)currentShape.size();
 
-		b2Vec2 * vertices = new b2Vec2[numOfPoints];
-		ClipperLib::Paths* polygons = new ClipperLib::Paths();
-		ClipperLib::Path polygon;
+        b2Vec2 * vertices = new b2Vec2[numOfPoints];
+        ClipperLib::Paths* polygons = new ClipperLib::Paths();
+        ClipperLib::Path polygon;
 
-		for (int j = 0; j < numOfPoints; j++)
-		{
-			vertices[j].x = currentShape[j].x / PTM_RATIO;
-			vertices[j].y = currentShape[j].y / PTM_RATIO;
+        for (int j = 0; j < numOfPoints; j++)
+        {
+            vertices[j].x = currentShape[j].x / PTM_RATIO;
+            vertices[j].y = currentShape[j].y / PTM_RATIO;
 
-			//cv::line(m_scene, currentShape[j], currentShape[(j + 1) % numOfPoints], cv::Scalar(0,0,255));
-			//std::cout << "[" << vertices[j].x << "," <<vertices[j].y << "]" << std::endl;
+            //cv::line(m_scene, currentShape[j], currentShape[(j + 1) % numOfPoints], cv::Scalar(0,0,255));
+            //std::cout << "[" << vertices[j].x << "," <<vertices[j].y << "]" << std::endl;
 
-			polygon.push_back(ClipperLib::IntPoint(currentShape[j].x, currentShape[j].y));
-		}
+            polygon.push_back(ClipperLib::IntPoint(currentShape[j].x, currentShape[j].y));
+        }
 
-		b2BodyDef objectBodyDef;
-		objectBodyDef.type = b2_staticBody;
+        b2BodyDef objectBodyDef;
+        objectBodyDef.type = b2_staticBody;
 
-		b2Body *objectBody = m_world->CreateBody(&objectBodyDef);
-		objectBody->SetUserData(polygons);
+        b2Body *objectBody = m_world->CreateBody(&objectBodyDef);
+        objectBody->SetUserData(polygons);
 
 
 
-		polygons->push_back(polygon);
+        polygons->push_back(polygon);
 
-		b2EdgeShape objectEdgeShape;
-		b2FixtureDef objectShapeDef;
-		objectShapeDef.shape = &objectEdgeShape;
+        b2EdgeShape objectEdgeShape;
+        b2FixtureDef objectShapeDef;
+        objectShapeDef.shape = &objectEdgeShape;
 
-		for (int j = 0; j < numOfPoints - 1; j++)
-		{
-			objectEdgeShape.Set(vertices[j], vertices[j+1]);
-			objectBody->CreateFixture(&objectShapeDef);
-		}
+        for (int j = 0; j < numOfPoints - 1; j++)
+        {
+            objectEdgeShape.Set(vertices[j], vertices[j+1]);
+            objectBody->CreateFixture(&objectShapeDef);
+        }
 
-		objectEdgeShape.Set(vertices[numOfPoints - 1], vertices[0]);
-		objectBody->CreateFixture(&objectShapeDef);
-		m_objectBodies.push_back(objectBody);
-		delete[] vertices;
+        objectEdgeShape.Set(vertices[numOfPoints - 1], vertices[0]);
+        objectBody->CreateFixture(&objectShapeDef);
+        m_objectBodies.push_back(objectBody);
+        delete[] vertices;
     }
 }
 
@@ -560,7 +593,7 @@ void VideoTracking::notifyBallHitObservers(float x, float y)
     {
         if(*iter != 0)
         {
-			(*iter)(x, y);
+            (*iter)(x, y);
         }
     }
 }
@@ -572,7 +605,7 @@ void VideoTracking::attachObjectsDestryedObserver(std::function<void()> func)
 
 void VideoTracking::detachObjectsDestryedObserver(std::function<void ()> func)
 {
-	//    objectsDestroyedObserversList.erase(std::remove(objectsDestroyedObserversList.begin(), objectsDestroyedObserversList.end(), func), objectsDestroyedObserversList.end());
+    //    objectsDestroyedObserversList.erase(std::remove(objectsDestroyedObserversList.begin(), objectsDestroyedObserversList.end(), func), objectsDestroyedObserversList.end());
 }
 
 void VideoTracking::notifyObjectsDestryedObservers()
@@ -581,7 +614,7 @@ void VideoTracking::notifyObjectsDestryedObservers()
     {
         if(*iter != 0)
         {
-			(*iter)();
+            (*iter)();
         }
     }
 }
@@ -593,7 +626,7 @@ void VideoTracking::attachBallInSceneObserver(std::function<void ()> func)
 
 void VideoTracking::detachBallInSceneObserver(std::function<void ()> func)
 {
-	//    ballInSceneObserversList.erase(std::remove(ballInSceneObserversList.begin(), ballInSceneObserversList.end(), func), ballInSceneObserversList.end());
+    //    ballInSceneObserversList.erase(std::remove(ballInSceneObserversList.begin(), ballInSceneObserversList.end(), func), ballInSceneObserversList.end());
 }
 
 void VideoTracking::notifyBallInSceneObservers()
@@ -602,15 +635,15 @@ void VideoTracking::notifyBallInSceneObservers()
     {
         if(*iter != 0)
         {
-			(*iter)();
+            (*iter)();
         }
     }
 }
 
 void VideoTracking::setRestrictBallInScene(bool restricted){
-	this->m_restrictBallInScene = restricted;
+    this->m_restrictBallInScene = restricted;
 }
 
 bool VideoTracking::isRestrictBallInScene(){
-	return this->m_restrictBallInScene;
+    return this->m_restrictBallInScene;
 }

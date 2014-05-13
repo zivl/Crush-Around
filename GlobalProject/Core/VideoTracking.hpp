@@ -8,6 +8,7 @@
 #include <opencv2/calib3d/calib3d.hpp>         //for homography
 #include <opencv2/features2d/features2d.hpp>   //features (orb, brief and corresponding matcher/extractors)
 #include <opencv2/highgui/highgui.hpp>
+#include "opencv2/nonfree/nonfree.hpp"         // SURF detector 
 #include <vector>
 #include <functional>
 #include <Box2D/Box2D.h>
@@ -27,12 +28,18 @@
 class VideoTracking : IBallHitObserver, IBallInSceneObserver, IObjectsDestryedObserver
 {
 public:
+    enum FeatureType { ORB, SIFT, SURF };
+
     VideoTracking();
     ~VideoTracking();
 
-    virtual void getGray(const cv::Mat& input, cv::Mat& gray);
+    // get the martix as grayscale 
+    void getGray(const cv::Mat& input, cv::Mat& gray);
 
-	//! Processes a frame and returns output image
+    // set the feature type to use for detection
+    void setFeatureType(FeatureType feat_type);
+
+    //! Processes a frame and returns output image
     virtual bool processFrame(const cv::Mat& inputFrame, cv::Mat& outputFrame);
 
     //! Sets the reference frame for latter processing
@@ -40,7 +47,7 @@ public:
 
     virtual void onMouse(int event, int x, int y, int, void*);
 
-	virtual void onPanGestureEnded(std::vector<cv::Point> touchPoints);
+    virtual void onPanGestureEnded(std::vector<cv::Point> touchPoints);
 
     static void mouseCallback(int event, int x, int y, int flags, void *param);
 
@@ -50,54 +57,50 @@ public:
 
     void setDebugDraw(bool enabled);
 
-	void setRestrictBallInScene(bool restricted);
-	bool isRestrictBallInScene();
+    void setRestrictBallInScene(bool restricted);
+    bool isRestrictBallInScene();
 
-	// IBallHitObserver observer pattern methods for events
-	virtual void attachBallHitObserver(std::function<void(float x, float y)> func);
+    // IBallHitObserver observer pattern methods for events
+    virtual void attachBallHitObserver(std::function<void(float x, float y)> func);
     virtual void detachBallHitObserver(std::function<void(float x, float y)> func);
     virtual void notifyBallHitObservers(float x, float y);
 
-	// IObjectsDestroyedObserver observer pattern methods for events
-	virtual void attachObjectsDestryedObserver(std::function<void()> func);
-	virtual void detachObjectsDestryedObserver(std::function<void()> func);
-	virtual void notifyObjectsDestryedObservers();
+    // IObjectsDestroyedObserver observer pattern methods for events
+    virtual void attachObjectsDestryedObserver(std::function<void()> func);
+    virtual void detachObjectsDestryedObserver(std::function<void()> func);
+    virtual void notifyObjectsDestryedObservers();
 
-	// IBallInScenceObserver observer pattern methods for events
-	virtual void attachBallInSceneObserver(std::function<void()> func);
-	virtual void detachBallInSceneObserver(std::function<void()> func);
-	virtual void notifyBallInSceneObservers();
+    // IBallInScenceObserver observer pattern methods for events
+    virtual void attachBallInSceneObserver(std::function<void()> func);
+    virtual void detachBallInSceneObserver(std::function<void()> func);
+    virtual void notifyBallInSceneObservers();
 
 private:
 
-	std::vector<std::function<void(float x, float y)>> ballHitObserversList;
+    std::vector<std::function<void(float x, float y)>> ballHitObserversList;
 
-	std::vector<std::function<void()>> objectsDestroyedObserversList;
+    std::vector<std::function<void()>> objectsDestroyedObserversList;
 
-	std::vector<std::function<void()>> ballInSceneObserversList;
-	
-    int m_maxNumberOfPoints;
+    std::vector<std::function<void()>> ballInSceneObserversList;    
 
-    cv::Mat m_prevImg;
     cv::Mat m_nextImg;
     cv::Mat m_mask;
 
-    std::vector<cv::Point2f>  m_prevPts;
-    std::vector<cv::Point2f>  m_nextPts;
-
-    std::vector<cv::KeyPoint> m_prevKeypoints;
     std::vector<cv::KeyPoint> m_nextKeypoints;
-
-    cv::Mat                   m_prevDescriptors;
     cv::Mat                   m_nextDescriptors;
 
-    std::vector<unsigned char> m_status;
-    std::vector<float>         m_error;
+    FeatureType m_featureTypeForDetection;
 
-    cv::ORB       m_orbFeatureEngine;
-    cv::BFMatcher m_orbMatcher;
+    cv::ORB                 m_orbFeatureEngine;
+    cv::BFMatcher           m_orbMatcher;
+    cv::FlannBasedMatcher * m_matcher;
 
-    cv::GridAdaptedFeatureDetector m_fastDetector;
+    cv::SurfFeatureDetector m_surfDetector;
+    cv::SurfDescriptorExtractor m_surfExtractor;
+    cv::FlannBasedMatcher m_surfMatcher;
+
+    cv::SIFT m_siftEngine;
+
 
     // the original (first) frame.
     cv::Mat m_refFrame;
@@ -105,19 +108,15 @@ private:
     std::vector<cv::KeyPoint> m_refKeypoints;
     // descriptors of keypoints in the original frame (for feature/descriptors based tracking)
     cv::Mat m_refDescriptors;
-
-    cv::FlannBasedMatcher * m_matcher;
-    cv::OrbDescriptorExtractor m_orbExtractor;
-
-    // reference points for optical flow/KLT tracking
-    std::vector<cv::Point2f>  m_refPoints;
-
+   
     // the actual scene corresponding to original frame
     cv::Mat m_scene;
 
     // Calculate homography for reference and new features,
     // transform scene and add to output frame
     void calcHomographyAndTransformScene(cv::Mat& outputFrame);
+
+    void updateWorld();
 
     // box2d "world" objects
     b2World * m_world;
@@ -128,10 +127,13 @@ private:
 
     float dt;
 
+    // homograph from reference frame to current (last captured) frame
     cv::Mat m_refFrame2CurrentHomography;
 
-    std::vector<cv::Point2f*> m_destroyedPoints;
+    // list of "guards" position
+    std::vector<cv::Point2f*> m_guardLocations;
 
+    // debug draw
     OpenCvDebugDraw* m_debugDraw;
 
      // Contact listener for colision response
@@ -144,11 +146,14 @@ private:
     std::vector<cv::Point*> m_destroyedPolygons;
     std::vector<int> m_destroyedPolygonsPointCount;
 
+    // flag indicating whether debug draw is enabled and should be used.
     bool m_debugDrawEnabled;
 
-	std::vector<b2Body *>m_objectBodies;
+    // the bodies of the object to be destroyed.
+    std::vector<b2Body *>m_objectBodies;
 
-	bool m_restrictBallInScene;
+    // flag indicating whether the ball should be restricted to the scene or can exit
+    bool m_restrictBallInScene;
 };
 
 
