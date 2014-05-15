@@ -7,6 +7,7 @@
 //
 
 #import "HomeViewController.h"
+#import "GameConfiguration.h"
 
 @interface HomeViewController ()
 
@@ -15,8 +16,9 @@
 @implementation HomeViewController
 
 @synthesize startGameButton;
-@synthesize scoreTitle;
+@synthesize gameOptionsButton;
 @synthesize scoreValue;
+
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -32,9 +34,9 @@
     [super viewDidLoad];
 
 	UIFont *font = [UIFont fontWithName:@"GROBOLD" size:18.0f];
-	[self.startGameButton.titleLabel setFont: font];
-	[self.scoreTitle setFont: font];
 	[self.scoreValue setFont: font];
+	NSUserDefaults *storage = [NSUserDefaults standardUserDefaults];
+	self.scoreValue.text = [NSString stringWithFormat:@"%ld", (long)[storage integerForKey:SCORE_KEY]];
 
 }
 

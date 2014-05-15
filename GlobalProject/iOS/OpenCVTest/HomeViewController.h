@@ -11,7 +11,8 @@
 @interface HomeViewController : UIViewController
 
 @property (nonatomic, weak) IBOutlet UIButton *startGameButton;
-@property (nonatomic, weak) IBOutlet UILabel *scoreTitle;
+@property (nonatomic, weak) IBOutlet UIButton *gameOptionsButton;
+
 @property (nonatomic, weak) IBOutlet UILabel *scoreValue;
 
 -(IBAction)onStartGameButtonPressed:(id)sender;

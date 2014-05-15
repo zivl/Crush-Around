@@ -42,6 +42,15 @@
 	[self.superview bringSubviewToFront:self];
 }
 
+-(void)showNotificationWithMessage:(NSString *)iMessgae withTarget:(id)target withAction:(SEL)action {
+	[self showNotificationWithMessage:iMessgae];
+	[self.okButton addTarget:target action:action forControlEvents:UIControlEventTouchUpInside];
+}
+
+-(void)removeHandlerWithTarget:(id)target withAction:(SEL)action {
+	[self.okButton removeTarget:target action:action forControlEvents:UIControlEventTouchUpInside];
+}
+
 -(void)hideNotificationMessage {
 	[UIView animateWithDuration:0.5 animations:^{
 		self.alpha = 0.0f;

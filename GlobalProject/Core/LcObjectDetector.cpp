@@ -92,7 +92,7 @@ std::vector<std::vector<cv::Point> > LcObjectDetector::getObjectContours(const c
             std::vector<cv::Point> poly;
             for (size_t p = 0; p < polygons[i].size(); p++)
             {
-                poly.push_back(cv::Point(polygons[i][p].X, polygons[i][p].Y)); 
+                poly.push_back(cv::Point((int)polygons[i][p].X, (int)polygons[i][p].Y));
             }
 
             objectContours.push_back(poly);

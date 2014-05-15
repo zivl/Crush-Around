@@ -83,5 +83,6 @@ typedef enum : NSUInteger {
 
 -(void)ballHitAtPoint:(LCPoint *)point;
 
+-(void)onGameOverOKButton;
 
 @end

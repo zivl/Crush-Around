@@ -11,6 +11,7 @@
 #include "WatershedSegmenter.h"
 #include "LcObjectDetector.h"
 #import "SpriteLayer.h"
+#import "GameConfiguration.h"
 
 
 @interface ViewController ()
@@ -69,6 +70,7 @@ std::vector<cv::Point> touchPoints;
 	[super viewDidLoad];
 
 	[self loadGameControls];
+//	[self.notificationView showNotificationWithMessage:@"Find an object to blow up :)"];
 	[self configureImageCameraAndImageProcessingObjects];
 }
 
@@ -240,7 +242,7 @@ Mat getWatershedSegmentation(Mat image)
 }
 
 -(void)calculateNecessaryTimeForArea:(double)area andNumberOfObjects:(int) numberOfObjects{
-	int time = 60;//area / 10 / numberOfObjects / 2;
+	int time = 5;//area / 10 / numberOfObjects / 2;
 	self.timeInSeconds = time;
 }
 
@@ -270,19 +272,35 @@ Mat getWatershedSegmentation(Mat image)
 -(void)wrapUpAndFinishTheGame:(GameEnded)reason {
 	[mainGameTimer invalidate];
 	[self.videoCamera stop];
+	self.videoCamera = nil;
+	imageView.opaque = NO;
+	UIImageView *bg = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"home_bg"]];
+	[self.view insertSubview:bg belowSubview:imageView];
+
+	[[NSUserDefaults standardUserDefaults] setInteger:self.score forKey:SCORE_KEY];
+	NSString *finalMsg;
+	NSString *totalScore = [NSString stringWithFormat:@"Total Score: %ld", (long)self.score];
 	switch (reason) {
 		case GameEndedDueToTimesUp:
-			[self.notificationView showNotificationWithMessage: [NSString stringWithFormat:@"Your time is up! Total Score: %ld", (long)self.score]];
+			finalMsg = [NSString stringWithFormat:@"Your time is up! %@", totalScore];
 			break;
 		case GameEndedDueToAllObjectsHasBeenDestroyed:
-			[self.notificationView showNotificationWithMessage:@"All Objects Have Been Destroyed!"];
+			finalMsg = [NSString stringWithFormat:@"All Objects Have Been Destroyed! %@", totalScore];
 			break;
 		case GameEndedDueToBallWentOutOfScene:
-			[self.notificationView showNotificationWithMessage:@"Ball is no longer in the scene!"];
+			finalMsg = [NSString stringWithFormat:@"Ball is no longer in the scene! %@", totalScore];
 			break;
 		default:
+			finalMsg = [NSString stringWithFormat:@"Game Over! %@", totalScore];
 			break;
 	}
+	[self.notificationView showNotificationWithMessage:finalMsg withTarget:self withAction:@selector(onGameOverOKButton)];
+}
+
+
+-(void)onGameOverOKButton {
+	[self.notificationView removeHandlerWithTarget:self withAction:@selector(onGameOverOKButton)];
+	[self dismissViewControllerAnimated:YES completion:nil];
 }
 
 -(void) updateCountdown {
