@@ -4,18 +4,11 @@
 
 LcObjectDetector::LcObjectDetector(void)
 {
-	this->m_simplifyObjects = true;
 }
 
 
 LcObjectDetector::~LcObjectDetector(void)
 {
-}
-
-// set flag indicating if simplification should be performed when finding contours.
-void LcObjectDetector::setObjectSimplification(bool enabled)
-{
-    this->m_simplifyObjects = enabled;
 }
 
 // apply canny edge detector and threshold to find edges and tranform them to contours
@@ -77,27 +70,32 @@ std::vector<std::vector<cv::Point> > LcObjectDetector::getObjectContours(const c
         }       
     }
 
-    if (this->m_simplifyObjects)
-    {
-        polygons = this->simplify(polygons);
+	polygons = this->simplify(polygons);
 
-        //std::cout << "Detected " << objectContours.size() << " simplified " << polygons.size() << std::endl;
-        
-        // clear the original list
-        objectContours.clear();
+	// now offset them by a few pixels to ensure black edges outside mask
+	ClipperLib::ClipperOffset clipperOffset;
+	clipperOffset.AddPaths(polygons, ClipperLib::jtRound, ClipperLib::etClosedPolygon);
 
-        // convert back to the open cv coordinates
-        for(size_t i = 0; i < polygons.size(); i++)
-        {
-            std::vector<cv::Point> poly;
-            for (size_t p = 0; p < polygons[i].size(); p++)
-            {
-                poly.push_back(cv::Point(polygons[i][p].X, polygons[i][p].Y)); 
-            }
+	ClipperLib::Paths offsetPolygons;
+	clipperOffset.Execute(offsetPolygons, 1);
 
-            objectContours.push_back(poly);
-        }
-    }
+	//std::cout << "Detected " << objectContours.size() << " simplified " << polygons.size() << std::endl;
+
+	// clear the original list
+	objectContours.clear();
+
+	// convert back to the open cv coordinates
+	for(size_t i = 0; i < offsetPolygons.size(); i++)
+	{
+		std::vector<cv::Point> poly;
+		for (size_t p = 0; p < offsetPolygons[i].size(); p++)
+		{
+			poly.push_back(cv::Point((int)offsetPolygons[i][p].X, (int)offsetPolygons[i][p].Y));
+		}
+
+		objectContours.push_back(poly);
+	}
+
 
     return objectContours;
 }

@@ -15,6 +15,8 @@
 @property (nonatomic, strong) IBOutlet UIButton *okButton;
 
 -(void)showNotificationWithMessage:(NSString *)iMessgae;
+-(void)showNotificationWithMessage:(NSString *)iMessgae withTarget:(id)target withAction:(SEL)action;
+-(void)removeHandlerWithTarget:(id)target withAction:(SEL)action;
 -(void)hideNotificationMessage;
 
 -(IBAction)onOKButtonPressed:(id)sender;

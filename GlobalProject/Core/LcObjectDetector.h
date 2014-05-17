@@ -15,11 +15,7 @@ public:
 
     ClipperLib::Paths simplify(ClipperLib::Paths &polygons);
 
-    void setObjectSimplification(bool enabled);
-
 private: 
     std::vector<ClipperLib::IntPoint> convertToClipperFormat(const std::vector<cv::Point> &poly);
-
-    bool m_simplifyObjects;
 };
 

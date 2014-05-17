@@ -70,6 +70,8 @@
 		C99B201D190BB0EC003F19C1 /* Globals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C99B1FE3190BB0EC003F19C1 /* Globals.cpp */; };
 		C99B2022190BB0EC003F19C1 /* VideoTracking.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C99B1FED190BB0EC003F19C1 /* VideoTracking.cpp */; };
 		C99B2024190BB14B003F19C1 /* opencv2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C99B2023190BB14B003F19C1 /* opencv2.framework */; };
+		C9D7B7B71925203B0083C690 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = C9D7B7B51925203B0083C690 /* Default-568h@2x.png */; };
+		C9D7B7B81925203B0083C690 /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = C9D7B7B61925203B0083C690 /* Default@2x.png */; };
 		C9F4CABE18C3C1BA0020D812 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C9F4CABD18C3C1BA0020D812 /* Foundation.framework */; };
 		C9F4CAC018C3C1BA0020D812 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C9F4CABF18C3C1BA0020D812 /* CoreGraphics.framework */; };
 		C9F4CAC218C3C1BA0020D812 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C9F4CAC118C3C1BA0020D812 /* UIKit.framework */; };
@@ -115,6 +117,7 @@
 		C92817FF1922607100C4C523 /* World.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = World.h; sourceTree = "<group>"; };
 		C92818011922B24C00C4C523 /* CVUtils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CVUtils.cpp; sourceTree = "<group>"; };
 		C92818021922B24C00C4C523 /* CVUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CVUtils.h; sourceTree = "<group>"; };
+		C92BF5651924D5370048010B /* GameConfiguration.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GameConfiguration.h; sourceTree = "<group>"; };
 		C94F006319136B5500EBA9C9 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
 		C94F006519136B6700EBA9C9 /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
 		C94F006719136B7100EBA9C9 /* libgll.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libgll.dylib; path = usr/lib/libgll.dylib; sourceTree = SDKROOT; };
@@ -235,6 +238,8 @@
 		C99B1FED190BB0EC003F19C1 /* VideoTracking.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = VideoTracking.cpp; sourceTree = "<group>"; };
 		C99B1FEE190BB0EC003F19C1 /* VideoTracking.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = VideoTracking.hpp; sourceTree = "<group>"; };
 		C99B2023190BB14B003F19C1 /* opencv2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = opencv2.framework; sourceTree = "<group>"; };
+		C9D7B7B51925203B0083C690 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
+		C9D7B7B61925203B0083C690 /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
 		C9F4CABA18C3C1BA0020D812 /* DestroyAroundMe.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DestroyAroundMe.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C9F4CABD18C3C1BA0020D812 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		C9F4CABF18C3C1BA0020D812 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -501,6 +506,15 @@
 			path = ../Core;
 			sourceTree = "<group>";
 		};
+		C9D7B7B9192520420083C690 /* Images */ = {
+			isa = PBXGroup;
+			children = (
+				C9D7B7B51925203B0083C690 /* Default-568h@2x.png */,
+				C9D7B7B61925203B0083C690 /* Default@2x.png */,
+			);
+			name = Images;
+			sourceTree = "<group>";
+		};
 		C9F4CAB118C3C1BA0020D812 = {
 			isa = PBXGroup;
 			children = (
@@ -564,6 +578,7 @@
 				C958150C1917E36500552030 /* NotificationView.m */,
 				C92817FB192203BE00C4C523 /* HomeViewController.h */,
 				C92817FC192203BE00C4C523 /* HomeViewController.m */,
+				C92BF5651924D5370048010B /* GameConfiguration.h */,
 			);
 			path = OpenCVTest;
 			sourceTree = "<group>";
@@ -571,6 +586,7 @@
 		C9F4CAC418C3C1BA0020D812 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				C9D7B7B9192520420083C690 /* Images */,
 				C94F006B1913E5C700EBA9C9 /* Fonts */,
 				C9F4CAC518C3C1BA0020D812 /* DestroyAroundMe-Info.plist */,
 				C9F4CAC618C3C1BA0020D812 /* InfoPlist.strings */,
@@ -679,6 +695,8 @@
 				C9F4CAC818C3C1BA0020D812 /* InfoPlist.strings in Resources */,
 				C9F4CAD118C3C1BA0020D812 /* Main.storyboard in Resources */,
 				C958150A1917E0FF00552030 /* NotificationView.xib in Resources */,
+				C9D7B7B81925203B0083C690 /* Default@2x.png in Resources */,
+				C9D7B7B71925203B0083C690 /* Default-568h@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -885,7 +903,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					/Users/zivl/Downloads,
@@ -909,7 +926,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					/Users/zivl/Downloads,

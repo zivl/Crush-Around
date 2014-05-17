@@ -184,7 +184,7 @@ void World::setObjectsToBeModeled(const std::vector<std::vector<cv::Point>> cont
     }
 }
 
-void World::update(cv::Mat &refFrame)
+void World::update(cv::Mat &homography)
 {
 	this->m_world->Step(dt, 10, 10);
 
@@ -207,7 +207,7 @@ void World::update(cv::Mat &refFrame)
 
             if (objectFixture->GetType() == b2Shape::e_edge)
             {
-                cv::Point2f hitPoint = CVUtils::transformPoint(cv::Point2f(contact.contactPoint->x * PTM_RATIO, contact.contactPoint->y * PTM_RATIO), refFrame);
+                cv::Point2f hitPoint = CVUtils::transformPoint(cv::Point2f(contact.contactPoint->x * PTM_RATIO, contact.contactPoint->y * PTM_RATIO), homography);
                 this->notifyBallHitObservers(hitPoint.x, hitPoint.y);
 
                 // change the shape of the fixture
