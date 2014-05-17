@@ -124,16 +124,16 @@ void VideoTracking::setReferenceFrame(const cv::Mat& reference)
 
     // create the scene and draw square and borders in it
     m_scene.create(reference.rows, reference.cols, CV_8UC3);
-    m_scene = cv::Scalar(0,0,0);
+    m_scene = BLACK_COLOR;
 
     // draw a square in the center
-    rectangle(m_scene, cvPoint(reference.cols/2 - 20, reference.rows/2 + 10), cvPoint(reference.cols/2 + 20, reference.rows /2 - 10), cv::Scalar(0,255,255), -1);
+    rectangle(m_scene, cvPoint(reference.cols/2 - SCENE_OFFSET, reference.rows/2 + 10), cvPoint(reference.cols/2 + SCENE_OFFSET, reference.rows /2 - 10), cv::Scalar(0,255,255), -1);
 
-    // draw a border 20 pixels into the image
-    line(m_scene, cvPoint(20, 20), cvPoint(20, reference.rows - 20), cv::Scalar(0, 255, 0), 2);
-    line(m_scene, cvPoint(20, reference.rows - 20), cvPoint(reference.cols - 20, reference.rows - 20), cv::Scalar(0, 255, 0), 2);
-    line(m_scene, cvPoint(reference.cols - 20, reference.rows - 20), cvPoint(reference.cols - 20, 20), cv::Scalar(0, 255, 0), 2);
-    line(m_scene, cvPoint(reference.cols - 20, 20), cvPoint(20, 20), cv::Scalar(0, 255, 0), 2);
+    // draw a border SCENE_OFFSET pixels into the image
+    line(m_scene, cvPoint(SCENE_OFFSET, SCENE_OFFSET), cvPoint(SCENE_OFFSET, reference.rows - SCENE_OFFSET), GREEN_COLOR, 2);
+    line(m_scene, cvPoint(SCENE_OFFSET, reference.rows - SCENE_OFFSET), cvPoint(reference.cols - SCENE_OFFSET, reference.rows - SCENE_OFFSET), GREEN_COLOR, 2);
+    line(m_scene, cvPoint(reference.cols - SCENE_OFFSET, reference.rows - SCENE_OFFSET), cvPoint(reference.cols - SCENE_OFFSET, SCENE_OFFSET), GREEN_COLOR, 2);
+    line(m_scene, cvPoint(reference.cols - SCENE_OFFSET, SCENE_OFFSET), cvPoint(SCENE_OFFSET, SCENE_OFFSET), GREEN_COLOR, 2);
 
     this->m_2DWorld->initializeWorldOnFirstFrame(reference, this->isRestrictBallInScene());
 
@@ -240,14 +240,14 @@ void VideoTracking::calcHomographyAndTransformScene(cv::Mat& outputFrame)
                 cv::circle(transformedScene, *guardLocations[i], 5, cv::Scalar(200, 200, 200), -1);
             }
 
-            cv::Mat mask_image(outputFrame.size(), CV_8U, cv::Scalar(0));
+            cv::Mat mask_image(outputFrame.size(), CV_8U, BLACK_COLOR);
             std::vector<cv::Point*> destroyedPolygons = this->m_2DWorld->getDestroyedPolygons();
             std::vector<int> destroyedPolygonsPointCount = this->m_2DWorld->getDestroyedPolygonsPointCount();
             for (int i = 0; i < destroyedPolygons.size(); i++)
             {
                 const cv::Point* ppt[1] = { destroyedPolygons[i] };
                 int npt[] = { destroyedPolygonsPointCount[i] };
-                fillPoly(mask_image, ppt, npt, 1, cv::Scalar(255, 255, 255));
+                fillPoly(mask_image, ppt, npt, 1, WHITE_COLOR);
             }
 
             // now that the mask is prepared, copy the points from the inpainted to the scene
@@ -255,13 +255,13 @@ void VideoTracking::calcHomographyAndTransformScene(cv::Mat& outputFrame)
             
             cv::circle(transformedScene,
                        cv::Point2f(ballPosition.x * PTM_RATIO, ballPosition.y * PTM_RATIO),
-                       26, cv::Scalar(255, 0, 0), -1);
+                       26, BLUE_COLOR, -1);
             
             warpPerspective(transformedScene, transformedScene, this->m_refFrame2CurrentHomography, outputFrame.size(), CV_INTER_LINEAR);
 
             // add to the output
-            outputFrame += transformedScene;
-//            transformedScene.copyTo(outputFrame, transformedScene);
+//            outputFrame += transformedScene;
+            transformedScene.copyTo(outputFrame, transformedScene);
         }
     }
 }

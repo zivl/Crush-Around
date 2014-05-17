@@ -175,8 +175,9 @@ std::vector<std::vector<cv::Point>> contours;
 		if(isFirst){
 			firstImage = image_copy;
 			track = new VideoTracking();
+//			track->setFeatureType(VideoTracking::FeatureType::SIFT);
 			[self assignListenersToVideoTracker];
-			//track->setDebugDraw(false);
+			track->getWorld()->setDebugDrawEnabled(false);
 			track->setRestrictBallInScene(true);
 			track->setReferenceFrame(firstImage);
 			track->getWorld()->setObjectsToBeModeled(contours);
@@ -242,7 +243,7 @@ Mat getWatershedSegmentation(Mat image)
 }
 
 -(void)calculateNecessaryTimeForArea:(double)area andNumberOfObjects:(int) numberOfObjects{
-	int time = 5;//area / 10 / numberOfObjects / 2;
+	int time = 25;//area / 10 / numberOfObjects / 2;
 	self.timeInSeconds = time;
 }
 

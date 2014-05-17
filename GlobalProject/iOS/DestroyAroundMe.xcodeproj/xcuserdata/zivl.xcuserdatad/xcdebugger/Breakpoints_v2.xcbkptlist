@@ -10,11 +10,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "OpenCVTest/ViewController.mm"
-            timestampString = "421847455.54958"
+            timestampString = "421926142.584301"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "213"
-            endingLineNumber = "213"
+            startingLineNumber = "214"
+            endingLineNumber = "214"
             landmarkName = "-assignListenersToVideoTracker"
             landmarkType = "5">
          </BreakpointContent>
@@ -41,156 +41,12 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "../Core/World.cpp"
-            timestampString = "421709040.870921"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "328"
-            endingLineNumber = "328"
-            landmarkName = "World::update(cv::Mat &amp;refFrame)"
-            landmarkType = "5">
-            <Locations>
-               <Location
-                  shouldBeEnabled = "No"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "World::update(cv::Mat&amp;)"
-                  moduleName = "DestroyAroundMe"
-                  urlString = "file:///Users/zivl/git/Destroy-Around-Me/GlobalProject/Core/World.cpp"
-                  timestampString = "421709118.219751"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "328"
-                  endingLineNumber = "328"
-                  offsetFromSymbolStart = "4282">
-               </Location>
-               <Location
-                  shouldBeEnabled = "No"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "World::update(cv::Mat&amp;)"
-                  moduleName = "DestroyAroundMe"
-                  urlString = "file:///Users/zivl/git/Destroy-Around-Me/GlobalProject/Core/World.cpp"
-                  timestampString = "421709118.219937"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "328"
-                  endingLineNumber = "328"
-                  offsetFromSymbolStart = "7156">
-               </Location>
-               <Location
-                  shouldBeEnabled = "No"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "World::update(cv::Mat&amp;)"
-                  moduleName = "DestroyAroundMe"
-                  urlString = "file:///Users/zivl/git/Destroy-Around-Me/GlobalProject/Core/World.cpp"
-                  timestampString = "421709118.220157"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "328"
-                  endingLineNumber = "328"
-                  offsetFromSymbolStart = "8568">
-               </Location>
-               <Location
-                  shouldBeEnabled = "No"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "World::update(cv::Mat&amp;)"
-                  moduleName = "DestroyAroundMe"
-                  urlString = "file:///Users/zivl/git/Destroy-Around-Me/GlobalProject/Core/World.cpp"
-                  timestampString = "421709118.220386"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "328"
-                  endingLineNumber = "328"
-                  offsetFromSymbolStart = "8748">
-               </Location>
-               <Location
-                  shouldBeEnabled = "No"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "World::update(cv::Mat&amp;)"
-                  moduleName = "DestroyAroundMe"
-                  urlString = "file:///Users/zivl/git/Destroy-Around-Me/GlobalProject/Core/World.cpp"
-                  timestampString = "421709118.220645"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "328"
-                  endingLineNumber = "328"
-                  offsetFromSymbolStart = "8778">
-               </Location>
-               <Location
-                  shouldBeEnabled = "No"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "World::update(cv::Mat&amp;)"
-                  moduleName = "DestroyAroundMe"
-                  urlString = "file:///Users/zivl/git/Destroy-Around-Me/GlobalProject/Core/World.cpp"
-                  timestampString = "421709118.220808"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "328"
-                  endingLineNumber = "328"
-                  offsetFromSymbolStart = "8802">
-               </Location>
-               <Location
-                  shouldBeEnabled = "No"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "World::update(cv::Mat&amp;)"
-                  moduleName = "DestroyAroundMe"
-                  urlString = "file:///Users/zivl/git/Destroy-Around-Me/GlobalProject/Core/World.cpp"
-                  timestampString = "421709118.220958"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "328"
-                  endingLineNumber = "328"
-                  offsetFromSymbolStart = "8832">
-               </Location>
-               <Location
-                  shouldBeEnabled = "No"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "World::update(cv::Mat&amp;)"
-                  moduleName = "DestroyAroundMe"
-                  urlString = "file:///Users/zivl/git/Destroy-Around-Me/GlobalProject/Core/World.cpp"
-                  timestampString = "421709118.221132"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "328"
-                  endingLineNumber = "328"
-                  offsetFromSymbolStart = "8920">
-               </Location>
-               <Location
-                  shouldBeEnabled = "No"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "World::update(cv::Mat&amp;)"
-                  moduleName = "DestroyAroundMe"
-                  urlString = "file:///Users/zivl/git/Destroy-Around-Me/GlobalProject/Core/World.cpp"
-                  timestampString = "421709118.22132"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "328"
-                  endingLineNumber = "328"
-                  offsetFromSymbolStart = "8946">
-               </Location>
-            </Locations>
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
             filePath = "OpenCVTest/ViewController.mm"
-            timestampString = "421862687.21893"
+            timestampString = "421926142.584301"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "302"
-            endingLineNumber = "302"
+            startingLineNumber = "303"
+            endingLineNumber = "303"
             landmarkName = "-onGameOverOKButton"
             landmarkType = "5">
          </BreakpointContent>
