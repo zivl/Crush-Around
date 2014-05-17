@@ -22,9 +22,9 @@
 #include "Core/WatershedSegmenter.h"
 #include "Core/LcObjectDetector.h"
 
-#include "Poly2Tri/poly2tri.h"
+//#include "Poly2Tri/poly2tri.h"
 
-#include "Poly2Tri/sweep/cdt.h"
+//#include "Poly2Tri/sweep/cdt.h"
 
 #include "Core/clipper.hpp"
 #include "Core/LcInPaint.h"
@@ -45,13 +45,73 @@ int clipping();
 int simplify();
 int triangulation();
 
+int test()
+{
+    cv::Mat s1(240, 240, CV_8UC3);
+    s1 = cv::Scalar(255);
+
+    imshow("s1", s1);
+
+    cv:Mat s2(240, 240, CV_8UC3);
+    s2 = cv::Scalar(0, 0, 255);
+
+    imshow("s2", s2);
+
+    cv::Mat mask(240, 240, CV_8UC1);
+    mask = 0;
+
+    cv::Point points[4];
+    points[0] = cv::Point(90, 90);
+    points[1] = cv::Point(150, 90);
+    points[2] = cv::Point(150, 150);
+    points[3] = cv::Point(90, 150);
+
+    const cv::Point* ppt[1] = { points };
+    int npt[] = { 4 };
+    fillPoly(mask, ppt, npt, 1, cv::Scalar(255));
+
+    imshow("mask", mask);
+
+    s2.copyTo(s1, mask);
+
+    imshow("copyTo", s1);
+    
+    cv::Mat s3(240, 240, CV_8UC3);
+    s3 = cv::Scalar(255);
+
+    s3 += s2;
+
+    imshow("+=", s3);
+
+    waitKey();
+
+    return 0;
+}
 /**
 * @function main
 * @brief Main function
 */
 int main( int argc, char** argv )
 {
-    destroyAroundMeGame();
+    /*test();
+    return 1;*/
+
+    try
+    {
+        destroyAroundMeGame();
+    }
+    catch (cv::Exception& ex)
+    {
+        std::cout << ex.msg << std::endl;
+    }
+    catch (std::exception& stdEx)
+    {
+        std::cout << stdEx.what() << std::endl;
+    }
+    catch (...)
+    {
+        std::cerr << "Caught unknown exception" << std::endl;
+    }
 
     // some tests functions
     //return simpleTrack();
@@ -64,9 +124,11 @@ int main( int argc, char** argv )
 }
 
 
+
+
 int destroyAroundMeGame()
 {
-    VideoCapture cap(1); // open the default camera
+    VideoCapture cap(0); // open the default camera
     if(!cap.isOpened())  // check if we succeeded
     {  
         return -1;
@@ -86,7 +148,7 @@ int destroyAroundMeGame()
 
     VideoTracking *track = new VideoTracking();
     track->getWorld()->setDebugDrawEnabled(false);
-    track->setFeatureType(VideoTracking::FeatureType::SIFT);
+    track->setFeatureType(VideoTracking::FeatureType::ORB);
 
     setMouseCallback("output", VideoTracking::mouseCallback, track);
 
@@ -146,29 +208,44 @@ int destroyAroundMeGame()
                 // mark as initialized
                 initialized = true;
 
-                // set the reference from
-                track->setReferenceFrame(frame);
+                try
+                {
+                    // set the reference from
+                    track->setReferenceFrame(frame);
 
-                // set the objects according to last found contours
-                track->getWorld()->setObjectsToBeModeled(contours);
+                    // set the objects according to last found contours
+                    track->getWorld()->setObjectsToBeModeled(contours);
 
-                // prepare in-painted scene for later use
-                track->prepareInPaintedScene(frame, contours);
+                    // prepare in-painted scene for later use
+                    track->prepareInPaintedScene(frame, contours);
+                }
+                catch (Exception ex)
+                {
+                    std::cout << ex.msg << std::endl;
+                }
 
                 //imshow("inpainted", track->m_inpaintedScene);
                 //waitKey();
             }
         }
         else
-        {        
-            Mat image_copy;
-            cvtColor(frame, image_copy, CV_BGRA2BGR);
+        {     
+            try
 
-            track->processFrame(image_copy, image_copy);
+            {
+                Mat image_copy;
+                cvtColor(frame, image_copy, CV_BGRA2BGR);
 
-            cvtColor(image_copy, frame, CV_BGR2BGRA);
+                track->processFrame(image_copy, image_copy);
 
-            imshow("output", frame);
+                cvtColor(image_copy, frame, CV_BGR2BGRA);
+
+                imshow("output", frame);
+            }
+            catch (Exception ex)
+            {
+                std::cout << ex.msg << std::endl;
+            }
         }
 
         /* frame rate calculation
@@ -452,6 +529,7 @@ int inPaint()
 
 int triangulation()
 {
+    /*
     VideoCapture cap(0); // open the default camera
     if(!cap.isOpened())  // check if we succeeded
         return -1;
@@ -528,5 +606,7 @@ int triangulation()
             break;
         }
     }    
+    */
+    return 1;
 }
 
