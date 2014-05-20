@@ -243,7 +243,7 @@ Mat getWatershedSegmentation(Mat image)
 }
 
 -(void)calculateNecessaryTimeForArea:(double)area andNumberOfObjects:(int) numberOfObjects{
-	int time = 25;//area / 10 / numberOfObjects / 2;
+	int time = 60;//area / 10 / numberOfObjects / 2;
 	self.timeInSeconds = time;
 }
 

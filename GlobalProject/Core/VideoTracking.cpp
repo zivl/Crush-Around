@@ -250,6 +250,7 @@ void VideoTracking::calcHomographyAndTransformScene(cv::Mat& outputFrame)
                 fillPoly(mask_image, ppt, npt, 1, WHITE_COLOR);
             }
 
+			cv::threshold(mask_image, mask_image, 0, 255, cv::THRESH_BINARY);
             // now that the mask is prepared, copy the points from the inpainted to the scene
             m_inpaintedScene.copyTo(transformedScene, mask_image);
             
@@ -257,7 +258,7 @@ void VideoTracking::calcHomographyAndTransformScene(cv::Mat& outputFrame)
                        cv::Point2f(ballPosition.x * PTM_RATIO, ballPosition.y * PTM_RATIO),
                        26, BLUE_COLOR, -1);
             
-            warpPerspective(transformedScene, transformedScene, this->m_refFrame2CurrentHomography, outputFrame.size(), CV_INTER_LINEAR);
+            warpPerspective(transformedScene, transformedScene, this->m_refFrame2CurrentHomography, outputFrame.size(), CV_INTER_NN);
 
             // add to the output
 //            outputFrame += transformedScene;
