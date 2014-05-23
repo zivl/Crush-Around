@@ -127,14 +127,14 @@ void VideoTracking::setReferenceFrame(const cv::Mat& reference)
     m_scene = BLACK_COLOR;
 
     // draw a square in the center
-    rectangle(m_scene, cvPoint(reference.cols/2 - SCENE_OFFSET, reference.rows/2 + 10), cvPoint(reference.cols/2 + SCENE_OFFSET, reference.rows /2 - 10), cv::Scalar(0,255,255), -1);
+//    rectangle(m_scene, cvPoint(reference.cols/2 - SCENE_OFFSET, reference.rows/2 + 10), cvPoint(reference.cols/2 + SCENE_OFFSET, reference.rows /2 - 10), cv::Scalar(0,255,255), -1);
 
     // draw a border SCENE_OFFSET pixels into the image
-    line(m_scene, cvPoint(SCENE_OFFSET, SCENE_OFFSET), cvPoint(SCENE_OFFSET, reference.rows - SCENE_OFFSET), GREEN_COLOR, 2);
+    /*line(m_scene, cvPoint(SCENE_OFFSET, SCENE_OFFSET), cvPoint(SCENE_OFFSET, reference.rows - SCENE_OFFSET), GREEN_COLOR, 2);
     line(m_scene, cvPoint(SCENE_OFFSET, reference.rows - SCENE_OFFSET), cvPoint(reference.cols - SCENE_OFFSET, reference.rows - SCENE_OFFSET), GREEN_COLOR, 2);
     line(m_scene, cvPoint(reference.cols - SCENE_OFFSET, reference.rows - SCENE_OFFSET), cvPoint(reference.cols - SCENE_OFFSET, SCENE_OFFSET), GREEN_COLOR, 2);
     line(m_scene, cvPoint(reference.cols - SCENE_OFFSET, SCENE_OFFSET), cvPoint(SCENE_OFFSET, SCENE_OFFSET), GREEN_COLOR, 2);
-
+	 */
     this->m_2DWorld->initializeWorldOnFirstFrame(reference, this->isRestrictBallInScene());
 
 }
@@ -237,7 +237,7 @@ void VideoTracking::calcHomographyAndTransformScene(cv::Mat& outputFrame)
             std::vector<cv::Point2f*> guardLocations = this->m_2DWorld->getGuardLocations();
             for (int i = 0; i < (int)guardLocations.size(); i++)
             {
-                cv::circle(transformedScene, *guardLocations[i], 5, cv::Scalar(200, 200, 200), -1);
+                cv::circle(transformedScene, *guardLocations[i], 5, RED_COLOR, -1);
             }
 
             cv::Mat mask_image(outputFrame.size(), CV_8U, BLACK_COLOR);
@@ -256,7 +256,7 @@ void VideoTracking::calcHomographyAndTransformScene(cv::Mat& outputFrame)
             
             cv::circle(transformedScene,
                        cv::Point2f(ballPosition.x * PTM_RATIO, ballPosition.y * PTM_RATIO),
-                       26, BLUE_COLOR, -1);
+                       26, cv::Scalar(255, 0, 0, 255), -1);
             
             warpPerspective(transformedScene, transformedScene, this->m_refFrame2CurrentHomography, outputFrame.size(), CV_INTER_NN);
 
@@ -266,9 +266,6 @@ void VideoTracking::calcHomographyAndTransformScene(cv::Mat& outputFrame)
         }
     }
 }
-
-
-
 
 void VideoTracking::onPanGestureEnded(std::vector<cv::Point> touchPoints){
     for (std::vector<cv::Point>::iterator it = touchPoints.begin() ; it != touchPoints.end(); ++it){

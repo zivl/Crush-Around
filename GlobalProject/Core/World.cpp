@@ -121,16 +121,16 @@ void World::initializeWorldOnFirstFrame(const cv::Mat& reference, const bool res
     m_ballBody = m_world->CreateBody(&ballBodyDef);
 
     b2CircleShape circle;
-    circle.m_radius = 20.0/PTM_RATIO;
+    circle.m_radius = 15.0 / PTM_RATIO;
 
     b2FixtureDef ballShapeDef;
     ballShapeDef.shape = &circle;
-    ballShapeDef.density = 3.5f;
+    ballShapeDef.density = 2.5f;
     ballShapeDef.friction = 0.0f;
     ballShapeDef.restitution = 1.0f;
     m_ballFixture = m_ballBody->CreateFixture(&ballShapeDef);
 
-    m_ballBody->ApplyLinearImpulse(b2Vec2(80, 80), m_ballBody->GetPosition(), true);
+    m_ballBody->ApplyLinearImpulse(b2Vec2(100, 100), m_ballBody->GetPosition(), true);
 }
 
 // Set the objects (defined by contour points) to be models in the world and scene.
@@ -162,8 +162,6 @@ void World::setObjectsToBeModeled(const std::vector<std::vector<cv::Point>> cont
 
         b2Body *objectBody = m_world->CreateBody(&objectBodyDef);
         objectBody->SetUserData(polygons);
-
-
 
         polygons->push_back(polygon);
 

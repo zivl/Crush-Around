@@ -77,8 +77,6 @@ typedef enum : NSUInteger {
 
 -(void)onFingerPan:(UIPanGestureRecognizer *)recognizer;
 
--(IBAction)resetCameraFirstPositionButton:(id)sender;
-
 -(IBAction)onBlowItUpButton:(id)sender;
 
 -(void)ballHitAtPoint:(LCPoint *)point;

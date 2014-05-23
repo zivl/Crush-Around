@@ -239,7 +239,7 @@ Mat getWatershedSegmentation(Mat image)
 
 -(void)ballHitAtPoint:(LCPoint *) point {
 	[self showExplosionAtPoint: [point getCGPoint]];
-	[self setScore:self.score + 2];
+	[self setScore:self.score + 12];
 }
 
 -(void)calculateNecessaryTimeForArea:(double)area andNumberOfObjects:(int) numberOfObjects{
@@ -249,12 +249,6 @@ Mat getWatershedSegmentation(Mat image)
 
 -(void)startTimer{
 	mainGameTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(timerFireMethod:) userInfo:self repeats:YES];
-}
-
--(IBAction)resetCameraFirstPositionButton:(id)sender {
-	[self.videoCamera stop];
-	isFirst = !isFirst;
-	[self.videoCamera start];
 }
 
 - (void)timerFireMethod:(NSTimer *)timer {
