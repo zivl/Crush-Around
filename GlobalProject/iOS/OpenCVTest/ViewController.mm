@@ -75,6 +75,8 @@ std::vector<cv::Point> touchPoints;
 }
 
 
+
+
 -(void)configureImageCameraAndImageProcessingObjects{
     self.videoCamera = [[CvVideoCamera alloc] initWithParentView:imageView];
 	self.videoCamera.delegate = self;
@@ -157,7 +159,7 @@ std::vector<std::vector<cv::Point>> getLCDetection(const cv::Mat &image, cv::Mat
 
 		const cv::Point* ppt[1] = { pnts };
 		int npt[] = { (int)contours[i].size() };
-		fillPoly(output, ppt, npt, 1, cv::Scalar(120, 250, 50));
+		fillPoly(output, ppt, npt, 1, cv::Scalar(120, 250, 50, 150));
 		delete pnts;
 	}
 
@@ -169,31 +171,31 @@ std::vector<std::vector<cv::Point>> contours;
 
 - (void)processImage:(Mat&)image;
 {
-	Mat image_copy;
-    cvtColor(image, image_copy, CV_BGRA2BGR);
+	//Mat image_copy;
+	//image.copyTo(image_copy);
+    //cvtColor(image, image_copy, CV_BGRA2BGR);
 	if(imageForSegmentationHasBeenTaken){
 		if(isFirst){
-			firstImage = image_copy;
-			track = new VideoTracking();
-//			track->setFeatureType(VideoTracking::FeatureType::SIFT);
-			[self assignListenersToVideoTracker];
-			track->getWorld()->setDebugDrawEnabled(false);
-			track->setRestrictBallInScene(true);
-			track->setReferenceFrame(firstImage);
-			track->getWorld()->setObjectsToBeModeled(contours);
-			track->prepareInPaintedScene(image_copy, contours);
+			isFirst = !isFirst;
+			firstImage = image;
 			int numberOfObjects = (int)contours.size();
 			double area = 0.0;
 			for(int i = 0; i < numberOfObjects; i++){
 				area += std::abs(cv::contourArea(cv::Mat(contours[i])));
 			}
 			[self calculateNecessaryTimeForArea: area andNumberOfObjects: numberOfObjects];
-			isFirst = !isFirst;
+			track = new VideoTracking();
+			track->prepareInPaintedScene(firstImage, contours);
+			[self assignListenersToVideoTracker];
+			track->getWorld()->setDebugDrawEnabled(false);
+			track->setRestrictBallInScene(true);
+			track->setReferenceFrame(firstImage);
+			track->getWorld()->setObjectsToBeModeled(contours);
 		}
 		else {
-			track->processFrame(image_copy, image_copy);
+			track->processFrame(image, image);
 		}
-		image = image_copy;
+		//image = image_copy;
 		//cvtColor(image_copy, image, CV_BGR2BGRA);
 	}
 	else{

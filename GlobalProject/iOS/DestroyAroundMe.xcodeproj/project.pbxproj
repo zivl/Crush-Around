@@ -118,6 +118,7 @@
 		C92818011922B24C00C4C523 /* CVUtils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CVUtils.cpp; sourceTree = "<group>"; };
 		C92818021922B24C00C4C523 /* CVUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CVUtils.h; sourceTree = "<group>"; };
 		C92BF5651924D5370048010B /* GameConfiguration.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GameConfiguration.h; sourceTree = "<group>"; };
+		C93F47E71930B77200A7AE04 /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = System/Library/Frameworks/CoreMotion.framework; sourceTree = SDKROOT; };
 		C94F006319136B5500EBA9C9 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
 		C94F006519136B6700EBA9C9 /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
 		C94F006719136B7100EBA9C9 /* libgll.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libgll.dylib; path = usr/lib/libgll.dylib; sourceTree = SDKROOT; };
@@ -539,6 +540,7 @@
 		C9F4CABC18C3C1BA0020D812 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				C93F47E71930B77200A7AE04 /* CoreMotion.framework */,
 				C94F006719136B7100EBA9C9 /* libgll.dylib */,
 				C94F006519136B6700EBA9C9 /* GLKit.framework */,
 				C94F006319136B5500EBA9C9 /* OpenGLES.framework */,

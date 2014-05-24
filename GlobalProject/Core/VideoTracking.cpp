@@ -65,9 +65,12 @@ bool VideoTracking::processFrame(const cv::Mat& inputFrame, cv::Mat& outputFrame
         this->notifyObjectsDestryedObservers();
     }
 
-    inputFrame.copyTo(outputFrame);
 
-    getGray(inputFrame, m_nextImg);
+    inputFrame.copyTo(outputFrame);
+	cv::Mat tempInputFrame;
+	cv::cvtColor(inputFrame, tempInputFrame, CV_BGRA2BGR);
+
+    getGray(tempInputFrame, m_nextImg);
 
     switch (m_featureTypeForDetection)
     {
@@ -99,8 +102,10 @@ bool VideoTracking::processFrame(const cv::Mat& inputFrame, cv::Mat& outputFrame
 // Sets the reference frame for latter processing
 void VideoTracking::setReferenceFrame(const cv::Mat& reference)
 {
+	cv::Mat tempRefFrame;
+	cv::cvtColor(reference, tempRefFrame, CV_BGRA2BGR);
     // save the reference frame
-    reference.copyTo(m_refFrame);
+    tempRefFrame.copyTo(m_refFrame);
 
     // get a gray image
     getGray(m_refFrame, m_refFrame);
@@ -123,24 +128,28 @@ void VideoTracking::setReferenceFrame(const cv::Mat& reference)
     }
 
     // create the scene and draw square and borders in it
-    m_scene.create(reference.rows, reference.cols, CV_8UC3);
-    m_scene = BLACK_COLOR;
+    m_scene.create(reference.rows, reference.cols, CV_8UC4);
+    m_scene = cv::Scalar(0, 0, 0, 255);
 
     // draw a square in the center
-//    rectangle(m_scene, cvPoint(reference.cols/2 - SCENE_OFFSET, reference.rows/2 + 10), cvPoint(reference.cols/2 + SCENE_OFFSET, reference.rows /2 - 10), cv::Scalar(0,255,255), -1);
+    rectangle(m_scene, cvPoint(reference.cols/2 - SCENE_OFFSET, reference.rows/2 + 10), cvPoint(reference.cols/2 + SCENE_OFFSET, reference.rows /2 - 10), cv::Scalar(0, 255, 255), -1);
 
     // draw a border SCENE_OFFSET pixels into the image
-    /*line(m_scene, cvPoint(SCENE_OFFSET, SCENE_OFFSET), cvPoint(SCENE_OFFSET, reference.rows - SCENE_OFFSET), GREEN_COLOR, 2);
+    line(m_scene, cvPoint(SCENE_OFFSET, SCENE_OFFSET), cvPoint(SCENE_OFFSET, reference.rows - SCENE_OFFSET), GREEN_COLOR, 2);
     line(m_scene, cvPoint(SCENE_OFFSET, reference.rows - SCENE_OFFSET), cvPoint(reference.cols - SCENE_OFFSET, reference.rows - SCENE_OFFSET), GREEN_COLOR, 2);
     line(m_scene, cvPoint(reference.cols - SCENE_OFFSET, reference.rows - SCENE_OFFSET), cvPoint(reference.cols - SCENE_OFFSET, SCENE_OFFSET), GREEN_COLOR, 2);
     line(m_scene, cvPoint(reference.cols - SCENE_OFFSET, SCENE_OFFSET), cvPoint(SCENE_OFFSET, SCENE_OFFSET), GREEN_COLOR, 2);
-	 */
+
     this->m_2DWorld->initializeWorldOnFirstFrame(reference, this->isRestrictBallInScene());
 
 }
 
 bool isPointInScene (cv::Point2f point, int width, int height){
     return 0 < point.x && point.x < width && 0 < point.y && point.y < height;
+}
+
+void VideoTracking::smoothHomography(){
+	this->m_refFrame2CurrentHomography = this->m_refFrame2CurrentHomography * 0.9 + this->m_lastHomography * 0.1;
 }
 
 // calculate homography for keypoint/descriptors based tracking,
@@ -220,6 +229,11 @@ void VideoTracking::calcHomographyAndTransformScene(cv::Mat& outputFrame)
         {
             // finally, find the homography
             this->m_refFrame2CurrentHomography = findHomography(refPoints, newPoints, CV_RANSAC);
+			if(!this->m_lastHomography.empty()){
+				smoothHomography();
+			}
+			this->m_refFrame2CurrentHomography.copyTo(this->m_lastHomography);
+
             b2Vec2 ballPosition = this->m_2DWorld->getBallBody()->GetPosition();
             if(!this->isRestrictBallInScene()){
 
@@ -232,12 +246,12 @@ void VideoTracking::calcHomographyAndTransformScene(cv::Mat& outputFrame)
             }
 
             // wrap/transform the scene
-            cv::Mat transformedScene;
+            cv::Mat transformedScene(m_scene.size(), m_scene.type());
             m_scene.copyTo(transformedScene);
             std::vector<cv::Point2f*> guardLocations = this->m_2DWorld->getGuardLocations();
             for (int i = 0; i < (int)guardLocations.size(); i++)
             {
-                cv::circle(transformedScene, *guardLocations[i], 5, RED_COLOR, -1);
+                cv::circle(transformedScene, *guardLocations[i], 5, cv::Scalar(0, 0, 255, 255), -1);
             }
 
             cv::Mat mask_image(outputFrame.size(), CV_8U, BLACK_COLOR);
@@ -250,35 +264,26 @@ void VideoTracking::calcHomographyAndTransformScene(cv::Mat& outputFrame)
                 fillPoly(mask_image, ppt, npt, 1, WHITE_COLOR);
             }
 
-
-			uchar white = (uchar)255;
-			uchar black = (uchar)0;
-
-			//cv::threshold(mask_image, outputFrame, 100, 255, cv::THRESH_BINARY);
-			for(int i = 0; i < mask_image.rows; i++)
-			{
-				for(int j = 0; j < mask_image.cols; j++)
-				{
-					uchar color = mask_image.data[i * mask_image.cols + j];
-
-					if(color != white && color != black){
-						mask_image.data[i * mask_image.cols + j] = white;
-					}
-				}
-			}
-			mask_image.copyTo(outputFrame);
             // now that the mask is prepared, copy the points from the inpainted to the scene
-            /*m_inpaintedScene.copyTo(transformedScene, mask_image);
+            m_inpaintedScene.copyTo(transformedScene, mask_image);
             
             cv::circle(transformedScene,
                        cv::Point2f(ballPosition.x * PTM_RATIO, ballPosition.y * PTM_RATIO),
-                       26, BLUE_COLOR, -1);
-            
-            warpPerspective(transformedScene, transformedScene, this->m_refFrame2CurrentHomography, outputFrame.size(), CV_INTER_NN);
+                       26, cv::Scalar(255, 0, 0, 255), -1);
 
-            // add to the output
-//            outputFrame += transformedScene;
-            transformedScene.copyTo(outputFrame, transformedScene);*/
+            warpPerspective(transformedScene, transformedScene, this->m_refFrame2CurrentHomography, outputFrame.size(), CV_INTER_NN);
+			int channels = transformedScene.channels();
+			mask_image = cv::Scalar(0);
+			for(int i = 0; i < transformedScene.rows; i++){
+				for(int j = 0; j < transformedScene.cols; j++){
+					int index = channels * (transformedScene.cols * i + j);
+					if(transformedScene.data[index] > 0 || transformedScene.data[index + 1] > 0 || transformedScene.data[index + 2] > 0){
+						mask_image.data[i * mask_image.cols + j] = 255;
+					}
+				}
+			}
+
+            transformedScene.copyTo(outputFrame, mask_image);
         }
     }
 }

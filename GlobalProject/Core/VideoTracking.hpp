@@ -101,12 +101,16 @@ private:
     // Calculate homography for reference and new features,
     // transform scene and add to output frame
     void calcHomographyAndTransformScene(cv::Mat& outputFrame);
+	void smoothHomography();
 
     // the physical world simulation
     World *m_2DWorld;
 
     // homograph from reference frame to current (last captured) frame
     cv::Mat m_refFrame2CurrentHomography;
+
+	// last homography to smooth homographies and mitigate vibrations between them
+	cv::Mat m_lastHomography;
 
     // inpainted scene used to fill over "destroyed" parts of the image
     cv::Mat m_inpaintedScene;

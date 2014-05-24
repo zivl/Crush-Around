@@ -57,11 +57,16 @@ void LcInPaint::inpaint(const Mat input, std::vector<std::vector<cv::Point>> con
 
         const Point* ppt[1] = { pnts };
         int npt[] = { static_cast<int>(offsetContours[i].size()) };
-        fillPoly(mask, ppt, npt, 1, Scalar(255, 255, 255));
+        fillPoly(mask, ppt, npt, 1, Scalar(255));
 
         delete[] pnts;
     }
 
     // finally, do the inpaint
-    cv::inpaint(input, mask, output, 15, INPAINT_TELEA);
+	//cv::Mat tempInput, tempOutput;
+	cv::Mat temp;
+	cv::cvtColor(input, temp, CV_BGRA2BGR);
+	//cvtColor(input, input, CV_BGRA2BGR);
+    cv::inpaint(temp, mask, output, 15, INPAINT_TELEA);
+	cvtColor(output, output, CV_BGR2BGRA);
 }
