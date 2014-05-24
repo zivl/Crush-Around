@@ -193,7 +193,8 @@ std::vector<std::vector<cv::Point>> contours;
 		else {
 			track->processFrame(image_copy, image_copy);
 		}
-		cvtColor(image_copy, image, CV_BGR2BGRA);
+		image = image_copy;
+		//cvtColor(image_copy, image, CV_BGR2BGRA);
 	}
 	else{
 		contours = getLCDetection(image, image);
@@ -215,8 +216,7 @@ std::vector<std::vector<cv::Point>> contours;
 	}));
 }
 
-Mat getWatershedSegmentation(Mat image)
-{
+Mat getWatershedSegmentation(Mat image) {
     //Create watershed segmentation object
     WatershedSegmenter segmenter;
     segmenter.createMarkersFromImage(image);
