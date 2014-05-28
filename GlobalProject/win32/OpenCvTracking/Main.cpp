@@ -134,8 +134,8 @@ int destroyAroundMeGame()
         return -1;
     }
 
-    cap.set(CV_CAP_PROP_FRAME_WIDTH, 352);
-    cap.set(CV_CAP_PROP_FRAME_HEIGHT, 288);
+    cap.set(CV_CAP_PROP_FRAME_WIDTH, 640);//352);
+    cap.set(CV_CAP_PROP_FRAME_HEIGHT, 480);//288);
 
     Mat testFrame;
     while(testFrame.empty())
@@ -157,7 +157,6 @@ int destroyAroundMeGame()
     time_t start = time(0);
     long frames = 0;
     LcObjectDetector objDetector;
-    objDetector.setObjectSimplification(true);
     bool initialized = false;
     int key = 0;
     bool isFirst = false;
