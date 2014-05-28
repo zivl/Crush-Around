@@ -69,4 +69,8 @@ void LcInPaint::inpaint(const Mat input, std::vector<std::vector<cv::Point>> con
 	//cvtColor(input, input, CV_BGRA2BGR);
     cv::inpaint(temp, mask, output, 15, INPAINT_TELEA);
 	cvtColor(output, output, CV_BGR2BGRA);
+
+#if defined  _MSC_VER
+    cv::imshow("transformed", output);
+#endif
 }

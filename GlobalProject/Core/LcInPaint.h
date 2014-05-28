@@ -6,6 +6,7 @@
 #include <vector>
 #include <opencv2/core/core.hpp>
 #include <opencv2/photo/photo.hpp>
+#include <opencv2/highgui/highgui.hpp>
 
 #include "clipper.hpp"
 
