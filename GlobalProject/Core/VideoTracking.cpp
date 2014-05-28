@@ -164,8 +164,6 @@ void VideoTracking::calcHomographyAndTransformScene(cv::Mat& outputFrame)
         // create vector for matches and find matches between reference and new descriptors
         std::vector<cv::DMatch> matches;
 
-        //std::cout << "There are " << m_refKeypoints.size() << " refs and " << m_nextKeypoints.size() << " new" << std::endl;
-
         // m_refDescriptors is keypoint descriptors from the first (reference) frame
         // m_nextDescriptors is keypoint descriptors from the current processed frame
         switch (this->m_featureTypeForDetection)
@@ -180,8 +178,6 @@ void VideoTracking::calcHomographyAndTransformScene(cv::Mat& outputFrame)
                 break;
         }
         
-        // std::cout << "Found " << matches.size() << " matches" << std::endl;
-
         if (this->m_useGoodPointsOnly)
         {            
             double max_dist = 0; double min_dist = 100;
@@ -193,9 +189,6 @@ void VideoTracking::calcHomographyAndTransformScene(cv::Mat& outputFrame)
                 if( dist < min_dist ) min_dist = dist;
                 if( dist > max_dist ) max_dist = dist;
             }
-
-            // std::cout << "-- Max dist : " << max_dist << std::endl;
-            // std::cout << "-- Min dist : " << min_dist << std::endl;
 
             // Draw only "good" matches (i.e. whose distance is less than 3*min_dist )
             std::vector< cv::DMatch > good_matches;
@@ -222,8 +215,6 @@ void VideoTracking::calcHomographyAndTransformScene(cv::Mat& outputFrame)
             refPoints.push_back(m_refKeypoints[matches[i].queryIdx].pt);
             newPoints.push_back(m_nextKeypoints[matches[i].trainIdx].pt);
         }
-
-        // std::cout << refPoints.size() << " good matches" << std::endl;
 
         if (refPoints.size() > 3 && newPoints.size() > 3)
         {
