@@ -67,8 +67,8 @@ bool VideoTracking::processFrame(const cv::Mat& inputFrame, cv::Mat& outputFrame
 
 
     inputFrame.copyTo(outputFrame);
-	cv::Mat tempInputFrame;
-	cv::cvtColor(inputFrame, tempInputFrame, CV_BGRA2BGR);
+    cv::Mat tempInputFrame;
+    cv::cvtColor(inputFrame, tempInputFrame, CV_BGRA2BGR);
 
     getGray(tempInputFrame, m_nextImg);
 
@@ -102,8 +102,8 @@ bool VideoTracking::processFrame(const cv::Mat& inputFrame, cv::Mat& outputFrame
 // Sets the reference frame for latter processing
 void VideoTracking::setReferenceFrame(const cv::Mat& reference)
 {
-	cv::Mat tempRefFrame;
-	cv::cvtColor(reference, tempRefFrame, CV_BGRA2BGR);
+    cv::Mat tempRefFrame;
+    cv::cvtColor(reference, tempRefFrame, CV_BGRA2BGR);
     // save the reference frame
     tempRefFrame.copyTo(m_refFrame);
 
@@ -149,7 +149,7 @@ bool isPointInScene (cv::Point2f point, int width, int height){
 }
 
 void VideoTracking::smoothHomography(){
-	this->m_refFrame2CurrentHomography = this->m_refFrame2CurrentHomography * 0.9 + this->m_lastHomography * 0.1;
+    this->m_refFrame2CurrentHomography = this->m_refFrame2CurrentHomography * 0.9 + this->m_lastHomography * 0.1;
 }
 
 // calculate homography for keypoint/descriptors based tracking,
@@ -229,10 +229,10 @@ void VideoTracking::calcHomographyAndTransformScene(cv::Mat& outputFrame)
         {
             // finally, find the homography
             this->m_refFrame2CurrentHomography = findHomography(refPoints, newPoints, CV_RANSAC);
-			if(!this->m_lastHomography.empty()){
-				smoothHomography();
-			}
-			this->m_refFrame2CurrentHomography.copyTo(this->m_lastHomography);
+            if(!this->m_lastHomography.empty()){
+                smoothHomography();
+            }
+            this->m_refFrame2CurrentHomography.copyTo(this->m_lastHomography);
 
             b2Vec2 ballPosition = this->m_2DWorld->getBallBody()->GetPosition();
             if(!this->isRestrictBallInScene()){
@@ -266,22 +266,35 @@ void VideoTracking::calcHomographyAndTransformScene(cv::Mat& outputFrame)
 
             // now that the mask is prepared, copy the points from the inpainted to the scene
             m_inpaintedScene.copyTo(transformedScene, mask_image);
-            
+
+
             cv::circle(transformedScene,
                        cv::Point2f(ballPosition.x * PTM_RATIO, ballPosition.y * PTM_RATIO),
                        26, cv::Scalar(255, 0, 0, 255), -1);
+#if defined  _MSC_VER
+            cv::imshow("mask", mask_image);
+            cv::imshow("scene", transformedScene);
+            cv::imshow("transformed", transformedScene);
+#endif
 
             warpPerspective(transformedScene, transformedScene, this->m_refFrame2CurrentHomography, outputFrame.size(), CV_INTER_NN);
-			int channels = transformedScene.channels();
-			mask_image = cv::Scalar(0);
-			for(int i = 0; i < transformedScene.rows; i++){
-				for(int j = 0; j < transformedScene.cols; j++){
-					int index = channels * (transformedScene.cols * i + j);
-					if(transformedScene.data[index] > 0 || transformedScene.data[index + 1] > 0 || transformedScene.data[index + 2] > 0){
-						mask_image.data[i * mask_image.cols + j] = 255;
-					}
-				}
-			}
+
+#if defined  _MSC_VER
+            cv::imshow("transformed", transformedScene);
+#endif
+
+            // create a 1-channel mask with black background and white where the is an object
+            // (ball, destroyed points, barriers)
+            int channels = transformedScene.channels();
+            mask_image = cv::Scalar(0);
+            for(int i = 0; i < transformedScene.rows; i++){
+                for(int j = 0; j < transformedScene.cols; j++){
+                    int index = channels * (transformedScene.cols * i + j);
+                    if(transformedScene.data[index] > 0 || transformedScene.data[index + 1] > 0 || transformedScene.data[index + 2] > 0){
+                        mask_image.data[i * mask_image.cols + j] = 255;
+                    }
+                }
+            }
 
             transformedScene.copyTo(outputFrame, mask_image);
         }
