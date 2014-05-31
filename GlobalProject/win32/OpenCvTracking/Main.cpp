@@ -8,7 +8,6 @@
 #include <iostream>
 #include <chrono>
 #include <thread>
-//#include "opencv2/opencv.hpp"
 #include "opencv2/core/core.hpp"
 #include "opencv2/features2d/features2d.hpp"
 #include "opencv2/highgui/highgui.hpp"
@@ -21,10 +20,6 @@
 #include "Core/VideoTracking.hpp"
 #include "Core/WatershedSegmenter.h"
 #include "Core/LcObjectDetector.h"
-
-//#include "Poly2Tri/poly2tri.h"
-
-//#include "Poly2Tri/sweep/cdt.h"
 
 #include "Core/clipper.hpp"
 #include "Core/LcInPaint.h"
@@ -134,8 +129,8 @@ int destroyAroundMeGame()
         return -1;
     }
 
-    cap.set(CV_CAP_PROP_FRAME_WIDTH, 640);//352);
-    cap.set(CV_CAP_PROP_FRAME_HEIGHT, 480);//288);
+    cap.set(CV_CAP_PROP_FRAME_WIDTH, 352); //1024); //
+    cap.set(CV_CAP_PROP_FRAME_HEIGHT, 288); //768); //
 
     Mat testFrame;
     while(testFrame.empty())
@@ -143,8 +138,8 @@ int destroyAroundMeGame()
         cap >> testFrame;
     }
 
-    namedWindow("output", 1);
-    namedWindow("input", 2);
+    //namedWindow("output", 1);
+    //namedWindow("input", 2);
 
     VideoTracking *track = new VideoTracking();
     track->getWorld()->setDebugDrawEnabled(false);
@@ -166,6 +161,8 @@ int destroyAroundMeGame()
     {        
         Mat frame;
         cap >> frame; // get a new frame from camera
+
+        cvtColor(frame, frame, CV_BGR2BGRA);
 
         // if not initialize - show object detected for the user to choose (until presses i)
         if (!initialized)
@@ -230,14 +227,10 @@ int destroyAroundMeGame()
         else
         {     
             try
-
             {
                 Mat image_copy;
-                cvtColor(frame, image_copy, CV_BGRA2BGR);
 
-                track->processFrame(image_copy, image_copy);
-
-                cvtColor(image_copy, frame, CV_BGR2BGRA);
+                track->processFrame(frame, frame);
 
                 imshow("output", frame);
             }
