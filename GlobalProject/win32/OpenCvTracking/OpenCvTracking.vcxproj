@@ -79,7 +79,6 @@
     <ClCompile Include="..\..\Core\OpenCvDebugDraw.cpp" />
     <ClCompile Include="..\..\Core\UnitsConvertor.cpp" />
     <ClCompile Include="..\..\Core\VideoTracking.cpp" />
-    <ClCompile Include="..\..\Core\WatershedSegmenter.cpp" />
     <ClCompile Include="..\..\Core\World.cpp" />
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
@@ -93,7 +92,6 @@
     <ClInclude Include="..\..\Core\OpenCvDebugDraw.h" />
     <ClInclude Include="..\..\Core\UnitsConvertor.h" />
     <ClInclude Include="..\..\Core\VideoTracking.hpp" />
-    <ClInclude Include="..\..\Core\WatershedSegmenter.h" />
     <ClInclude Include="..\..\Core\World.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
