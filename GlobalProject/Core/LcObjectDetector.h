@@ -5,6 +5,11 @@
 #include <vector>
 #include "clipper.hpp"
 
+#if defined _MSC_VER
+#include <opencv2/highgui/highgui.hpp>
+#include "Core/Globals.h"
+#endif
+
 class LcObjectDetector
 {
 public:
