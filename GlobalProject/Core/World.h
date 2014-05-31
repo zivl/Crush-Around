@@ -36,8 +36,8 @@ public:
 
     void updatePaddlesLocations(std::vector<cv::Point2f> points);
 
-    void setBallRadius(int radius);
-    int getBallRadius();
+    void setBallRadius(double radius);
+    double getBallRadius();
 
     OpenCvDebugDraw * getDebugDraw();
 
@@ -58,7 +58,7 @@ public:
     
 private:
 
-    int m_ballRadius;
+    double m_ballRadius;
 
     float dt;
     

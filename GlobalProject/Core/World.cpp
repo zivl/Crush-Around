@@ -44,7 +44,7 @@ World::~World(){
     m_destroyedPolygonsPointCount.clear();
 }
 
-void World::setBallRadius(int radius)
+void World::setBallRadius(double radius)
 {
     this->m_ballRadius = radius / PTM_RATIO;
 
@@ -54,7 +54,7 @@ void World::setBallRadius(int radius)
     }
 }
 
-int World::getBallRadius()
+double World::getBallRadius()
 {
     return this->m_ballRadius * PTM_RATIO;
 }
@@ -395,7 +395,7 @@ void World::createNewPhysicPointInWorld(const cv::Point2f point){
     b2Body *body = m_world->CreateBody(&bodyDef);
 
     b2CircleShape circle;
-    circle.m_radius = this->m_ballRadius;
+    circle.m_radius = 5.0 / PTM_RATIO;
 
     b2FixtureDef shapeDef;
     shapeDef.shape = &circle;
