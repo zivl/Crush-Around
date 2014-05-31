@@ -21,9 +21,5 @@ cv::Point2f CVUtils::transformPoint(const cv::Point2f point, const cv::Mat homoM
 }
 
 void CVUtils::transformPoints(const std::vector<cv::Point2f> points, std::vector<cv::Point2f>* targetPoints, const cv::Mat homography) {
-    std::vector<cv::Point2f> ttt;
-
     cv::perspectiveTransform(points, (*targetPoints), homography);
-
-    //ttt.swap((*targetPoints));
 }

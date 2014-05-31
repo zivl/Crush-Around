@@ -85,7 +85,7 @@ VideoTracking::GameType VideoTracking::getGameType()
 {
     return this->m_gameType;
 }
-//! Processes a frame and returns output image
+// Processes a frame and returns output image
 bool VideoTracking::processFrame(const cv::Mat& inputFrame, cv::Mat& outputFrame)
 {  
      // copy the input to output frame
@@ -104,7 +104,7 @@ bool VideoTracking::processFrame(const cv::Mat& inputFrame, cv::Mat& outputFrame
     {        
         std::vector<cv::Point2f> scenePaddleLocations;
         
-        CVUtils::transformPoints(this->m_paddlePositions, &scenePaddleLocations, this->m_refFrame2CurrentHomography);
+        CVUtils::transformPoints(this->m_paddlePositions, &scenePaddleLocations, this->m_refFrame2CurrentHomography.inv());
     
         this->getWorld()->updatePaddlesLocations(scenePaddleLocations);
     }

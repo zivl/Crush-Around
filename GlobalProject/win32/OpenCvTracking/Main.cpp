@@ -48,24 +48,25 @@ int main( int argc, char** argv )
 {
     /*test();
     return 1;*/
-
-    try
+    while(true)
     {
-        destroyAroundMeGame();
+        try
+        {
+            destroyAroundMeGame();
+        }
+        catch (cv::Exception& ex)
+        {
+            std::cout << ex.msg << std::endl;
+        }
+        catch (std::exception& stdEx)
+        {
+            std::cout << stdEx.what() << std::endl;
+        }
+        catch (...)
+        {
+            std::cerr << "Caught unknown exception" << std::endl;
+        }
     }
-    catch (cv::Exception& ex)
-    {
-        std::cout << ex.msg << std::endl;
-    }
-    catch (std::exception& stdEx)
-    {
-        std::cout << stdEx.what() << std::endl;
-    }
-    catch (...)
-    {
-        std::cerr << "Caught unknown exception" << std::endl;
-    }
-
     // some tests functions
     //return simpleTrack();
     //triangulation();
@@ -73,14 +74,11 @@ int main( int argc, char** argv )
     //clipping();
     //simplify();
 
-   /* cout << "Click a key to finish" << endl;
-    getchar();*/
+    cout << "Click a key to finish" << endl;
+    getchar();
 
     return 0;
 }
-
-
-
 
 int destroyAroundMeGame()
 {
@@ -100,9 +98,9 @@ int destroyAroundMeGame()
     }
 
     VideoTracking *track = new VideoTracking();
-    track->getWorld()->setDebugDrawEnabled(false);
+    //track->getWorld()->setDebugDrawEnabled(true);
     track->setFeatureType(VideoTracking::FeatureType::ORB);
-    //track->setRestrictBallInScene(false);
+    track->setRestrictBallInScene(false);
     //track->setGameType(VideoTracking::GameType::BARRIERS);
 
     bool isValid = true;
@@ -149,7 +147,7 @@ int destroyAroundMeGame()
 
                 const Point* ppt[1] = { pnts };
                 int npt[] = { contours[i].size() };
-                fillPoly(contoursFrame, ppt, npt, 1, Scalar(120, 250, 50));
+                fillPoly(contoursFrame, ppt, npt, 1, Scalar(65, 255, 120, 255));
 
                 delete[] pnts;
             }
@@ -192,19 +190,10 @@ int destroyAroundMeGame()
 
                 isValid = track->processFrame(frame, frame);
 
-                /*putText(frame, "Game Over!!!", cvPoint(30,30), FONT_HERSHEY_COMPLEX, 1.8, cvScalar(200,200,250), 1, CV_AA);
-
-                if (!isValid)
-                {
-                    putText(frame, "Game Over!!!", cvPoint(30,30), FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(200,200,250), 1, CV_AA);
-                }*/
-
                 imshow("output", frame);
 
                 if (track->getWorld()->isAllObjectsDestroyed())
                 {
-                    //putText(frame, "You won!!!", cvPoint(30,30), FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(200,200,250), 1, CV_AA);
-                    imshow("output", frame);
                     break;
                 }                
             }

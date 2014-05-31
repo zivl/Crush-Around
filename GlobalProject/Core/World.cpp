@@ -208,9 +208,10 @@ void World::updatePaddlesLocations(std::vector<cv::Point2f> points)
     {
         // Create edges around the entire screen
         b2BodyDef paddleBodyDef;
+        //paddleBodyDef.type = b2_kinematicBody; 
         paddleBodyDef.position.Set(0,0);
-
-        this->m_paddlesBody = m_world->CreateBody(&paddleBodyDef);        
+        
+        this->m_paddlesBody = m_world->CreateBody(&paddleBodyDef);
     }
     else
     {
@@ -229,17 +230,19 @@ void World::updatePaddlesLocations(std::vector<cv::Point2f> points)
     b2EdgeShape paddleEdgde;
     b2FixtureDef paddleShape;
     paddleShape.shape = &paddleEdgde;
+       
+    //std::cout << points[0] << " - " << points[1] << std::endl;
 
-    std::cout << points[0] << " - " << points[1] << std::endl;
-        /*points[0].x << "," << points[0].y << " " << points[1].x << "," << points[1].y << " " <<
-                 points[2].x << "," << points[2].y << "-" << points[3].x << "," << points[3].y << " " <<
-                 points[4].x << "," << points[4].y << "-" << points[5].x << "," << points[5].y << " " <<
-                 points[6].x << "," << points[6].y << "-" << points[7].x << "," << points[7].y << " " <<std::endl;*/
-
-    for (size_t p = 0; p < points.size(); p+=2) {
-        paddleEdgde.Set(b2Vec2(points[p].x / PTM_RATIO, points[p].y / PTM_RATIO), b2Vec2(points[p + 1].x / PTM_RATIO, points[p + 1].y / PTM_RATIO));
+    for (size_t p = 0; p < points.size(); p+=2)
+    {
+        b2Vec2 from(points[p].x / PTM_RATIO, points[p].y / PTM_RATIO);
+        b2Vec2 to(points[p + 1].x / PTM_RATIO, points[p + 1].y / PTM_RATIO);
+        paddleEdgde.Set(from, to);
         this->m_paddlesBody->CreateFixture(&paddleShape);        
     }
+
+    //std::cout << paddleEdgde.m_vertex1.x << "," << paddleEdgde.m_vertex1.y << " - " << 
+    //             paddleEdgde.m_vertex2.x << "," << paddleEdgde.m_vertex2.y << std::endl;
 }
 
 void World::update(cv::Mat &homography)
@@ -249,7 +252,7 @@ void World::update(cv::Mat &homography)
     //check contacts
     std::vector<MyContact>::iterator pos;
     std::map<b2Body*, ClipperLib::Paths*> newBodyMap;
-    std::vector<b2Body*> removeList;
+    std::vector<b2Body*> removeBarrierList;
 
     for(pos = this->m_contactListener->m_contacts.begin();
         pos != this->m_contactListener->m_contacts.end();
@@ -313,7 +316,7 @@ void World::update(cv::Mat &homography)
                     {
                         cv::Point* points = new cv::Point[destroyedParts[i].size()];
 
-                        for (int j = 0; j < destroyedParts[i].size(); j++)
+                        for (size_t j = 0; j < destroyedParts[i].size(); j++)
                         {
                             points[j].x = (int)destroyedParts[i][j].X;
                             points[j].y = (int)destroyedParts[i][j].Y;
@@ -326,7 +329,8 @@ void World::update(cv::Mat &homography)
             }
             else if (objectFixture->GetType() == b2Shape::e_circle)
             {
-                removeList.push_back(objectBody);
+                // this is a barrier - add it to the remove list
+                removeBarrierList.push_back(objectBody);
             }
         }
     }
@@ -374,15 +378,15 @@ void World::update(cv::Mat &homography)
         }
     }
 
-    for (size_t i = 0; i < removeList.size(); i++){
-        cv::Point2f* p = (cv::Point2f*)removeList[i]->GetUserData();
+    for (size_t i = 0; i < removeBarrierList.size(); i++){
+        cv::Point2f* p = (cv::Point2f*)removeBarrierList[i]->GetUserData();
 
         std::vector<cv::Point2f*>::iterator position = std::find(m_guardLocations.begin(), m_guardLocations.end(), p);
         if (position != m_guardLocations.end()){ // == vector.end() means the element was not found
             m_guardLocations.erase(position);
         }
 
-        removeList[i]->GetWorld()->DestroyBody(removeList[i]);
+        removeBarrierList[i]->GetWorld()->DestroyBody(removeBarrierList[i]);
     }
 }
 
