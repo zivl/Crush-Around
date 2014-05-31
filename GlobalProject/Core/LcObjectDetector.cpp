@@ -64,7 +64,7 @@ std::vector<std::vector<cv::Point> > LcObjectDetector::getObjectContours(const c
                         
         // this means squares (todo: remove?)
         if (approx.size() == 4 &&
-            fabs(cv::contourArea(cv::Mat(approx))) > 1000 &&
+            fabs(cv::contourArea(cv::Mat(approx))) > 500 &&
             cv::isContourConvex(cv::Mat(approx)) )
         {
             objectContours.push_back(std::vector<cv::Point>(approx));
@@ -72,8 +72,8 @@ std::vector<std::vector<cv::Point> > LcObjectDetector::getObjectContours(const c
             // convert to clipper format
             polygons.push_back(convertToClipperFormat(approx));
         }
-        else if (approx.size() < 30 &&
-                fabs(cv::contourArea(cv::Mat(approx))) > 1000)
+        else if (approx.size() < 40 &&
+                fabs(cv::contourArea(cv::Mat(approx))) > 500)
         {
             // non complex polygons
             objectContours.push_back(std::vector<cv::Point>(approx));
@@ -85,7 +85,7 @@ std::vector<std::vector<cv::Point> > LcObjectDetector::getObjectContours(const c
         {
             // simplify the shape to it's convex hull
             convexHull(contours[i], approx); 
-            if (fabs(cv::contourArea(cv::Mat(approx))) > 1000){
+            if (fabs(cv::contourArea(cv::Mat(approx))) > 500){
                 // limit the size
                 objectContours.push_back(std::vector<cv::Point>(approx));
                 // convert to clipper format
