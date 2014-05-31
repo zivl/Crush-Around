@@ -8,10 +8,12 @@ VideoTracking::VideoTracking()
 //nfeatures=500, scaleFactor=1.2f, nlevels=8, edgeThreshold=31, firstLevel=0, WTA_K=2, scoreType=ORB::HARRIS_SCORE, patchSize=31
 , m_orbFeatureEngine(500, 1.2f, 8, 31, 0, 2, cv::ORB::HARRIS_SCORE, 31)
 // TODO: adjust parameters for object where applicable
+#if !defined ANDROID
 , m_surfDetector()
 , m_surfExtractor()
 , m_surfMatcher()
 , m_siftEngine()
+#endif
 {
     this->m_ballRadius = 15;
 
@@ -151,6 +153,7 @@ void VideoTracking::setReferenceFrame(const cv::Mat& reference)
     // detect key points and generate descriptors for the reference frame
     switch (m_featureTypeForDetection)
     {
+#if !defined ANDROID
         case FeatureType::SIFT:
             m_siftEngine(m_refFrame, cv::Mat(), m_refKeypoints, m_refDescriptors);
             break;
@@ -160,6 +163,7 @@ void VideoTracking::setReferenceFrame(const cv::Mat& reference)
             // extract features corresponding to the key points
             m_surfExtractor.compute(m_refFrame, m_refKeypoints, m_refDescriptors);
             break;
+#endif
         case FeatureType::ORB:
             m_orbFeatureEngine(m_refFrame, cv::Mat(), m_refKeypoints, m_refDescriptors);
             break;
@@ -234,6 +238,7 @@ void VideoTracking::calculateHomography(const cv::Mat& inputFrame)
 
     switch (m_featureTypeForDetection)
     {
+#if !defined ANDROID
         case FeatureType::SIFT:
             m_siftEngine(m_nextImg, cv::Mat(), m_nextKeypoints, m_nextDescriptors);
             break;
@@ -243,6 +248,7 @@ void VideoTracking::calculateHomography(const cv::Mat& inputFrame)
             // extract features corresponding to the key points
             m_surfExtractor.compute(m_nextImg, m_nextKeypoints, m_nextDescriptors);
             break;
+#endif
         case FeatureType::ORB:
             m_orbFeatureEngine(m_nextImg, cv::Mat(), m_nextKeypoints, m_nextDescriptors);
             break;
@@ -261,9 +267,12 @@ void VideoTracking::calculateHomography(const cv::Mat& inputFrame)
             case FeatureType::ORB:
                 m_matcher->match(m_refDescriptors, m_nextDescriptors, matches);
                 break;
+#if !defined ANDROID
             case FeatureType::SIFT:
             case FeatureType::SURF:
                 m_surfMatcher.match(m_refDescriptors, m_nextDescriptors, matches);
+#endif
+
             default:
                 break;
         }
