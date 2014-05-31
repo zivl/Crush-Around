@@ -50,6 +50,7 @@ int main( int argc, char** argv )
     return 1;*/
     while(true)
     {
+        cout << "Tomer";
         try
         {
             destroyAroundMeGame();
