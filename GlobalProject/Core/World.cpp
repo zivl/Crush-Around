@@ -13,6 +13,7 @@
 World::World(int ballRadius) : 
     m_objectBodies()
 {
+    this->setBallRadius(ballRadius);
     dt = 1.0f/60.0f;
     
     // define world with gravity
@@ -49,7 +50,7 @@ void World::setBallRadius(int radius)
 
     if (this->m_ballFixture)
     {
-        ((b2CircleShape*)this->m_ballFixture->GetShape())->m_radius = radius / PTM_RATIO;
+        ((b2CircleShape*)this->m_ballFixture->GetShape())->m_radius = this->m_ballRadius;
     }
 }
 
@@ -136,7 +137,7 @@ void World::initializeWorldOnFirstFrame(const cv::Mat& reference, const bool res
     // Create ball body and shape
     b2BodyDef ballBodyDef;
     ballBodyDef.type = b2_dynamicBody;
-    ballBodyDef.position.Set(30 / PTM_RATIO, 30 / PTM_RATIO);
+    ballBodyDef.position.Set(100 / PTM_RATIO, 100 / PTM_RATIO);
     m_ballBody = m_world->CreateBody(&ballBodyDef);
 
     b2CircleShape circle;
@@ -228,10 +229,14 @@ void World::updatePaddlesLocations(std::vector<cv::Point2f> points)
     b2FixtureDef paddleShape;
     paddleShape.shape = &paddleEdgde;
 
+    std::cout << points[0].x << "," << points[0].y << "-" << points[1].x << "," << points[0].y << " " <<
+                 points[2].x << "," << points[2].y << "-" << points[3].x << "," << points[3].y << " " <<
+                 points[4].x << "," << points[4].y << "-" << points[5].x << "," << points[5].y << " " <<
+                 points[6].x << "," << points[6].y << "-" << points[7].x << "," << points[7].y << " " <<std::endl;
+
     for (size_t p = 0; p < points.size(); p+=2) {
         paddleEdgde.Set(b2Vec2(points[p].x / PTM_RATIO, points[p].y / PTM_RATIO), b2Vec2(points[p + 1].x / PTM_RATIO, points[p + 1].y / PTM_RATIO));
-        this->m_paddlesBody->CreateFixture(&paddleShape);
-        std::cout << "p" << p << ":(" << points[p].x << "," << points[p].y << "),(" << points[p+1].x << "," << points[p+1].y << ")" << std::endl;
+        this->m_paddlesBody->CreateFixture(&paddleShape);        
     }
 }
 
