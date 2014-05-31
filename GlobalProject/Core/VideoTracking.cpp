@@ -385,7 +385,7 @@ void VideoTracking::transformScene(cv::Mat& outputFrame)
 
     cv::circle(transformedScene,
         cv::Point2f(ballPosition.x * PTM_RATIO, ballPosition.y * PTM_RATIO),
-        26, cv::Scalar(255, 0, 0, 255), -1);
+        this->m_ballRadius, cv::Scalar(255, 0, 0, 255), -1);
 
 #if defined _MSC_VER && OUTPUT_STEPS
     cv::imshow("mask", mask_image);
