@@ -137,6 +137,9 @@ private:
     // last homography to smooth homographies and mitigate vibrations between them
     cv::Mat m_lastHomography;
 
+	// draw homography stabilization helper
+	bool m_homographyHelper = false;
+
     // inpainted scene used to fill over "destroyed" parts of the image
     cv::Mat m_inpaintedScene;
 

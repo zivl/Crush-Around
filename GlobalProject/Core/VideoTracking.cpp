@@ -150,14 +150,16 @@ void VideoTracking::setReferenceFrame(const cv::Mat& reference)
     m_scene.create(reference.rows, reference.cols, CV_8UC4);
     m_scene = cv::Scalar(0, 0, 0, 255);
 
-    // draw a square in the center
-    rectangle(m_scene, cvPoint(reference.cols/2 - SCENE_OFFSET, reference.rows/2 + 10), cvPoint(reference.cols/2 + SCENE_OFFSET, reference.rows /2 - 10), cv::Scalar(0, 255, 255), -1);
+	if(this->m_homographyHelper){
+		// draw a square in the center
+		rectangle(m_scene, cvPoint(reference.cols/2 - SCENE_OFFSET, reference.rows/2 + 10), cvPoint(reference.cols/2 + SCENE_OFFSET, reference.rows /2 - 10), cv::Scalar(0, 255, 255), -1);
 
-    // draw a border SCENE_OFFSET pixels into the image
-    line(m_scene, cvPoint(SCENE_OFFSET, SCENE_OFFSET), cvPoint(SCENE_OFFSET, reference.rows - SCENE_OFFSET), GREEN_COLOR, 2);
-    line(m_scene, cvPoint(SCENE_OFFSET, reference.rows - SCENE_OFFSET), cvPoint(reference.cols - SCENE_OFFSET, reference.rows - SCENE_OFFSET), GREEN_COLOR, 2);
-    line(m_scene, cvPoint(reference.cols - SCENE_OFFSET, reference.rows - SCENE_OFFSET), cvPoint(reference.cols - SCENE_OFFSET, SCENE_OFFSET), GREEN_COLOR, 2);
-    line(m_scene, cvPoint(reference.cols - SCENE_OFFSET, SCENE_OFFSET), cvPoint(SCENE_OFFSET, SCENE_OFFSET), GREEN_COLOR, 2);
+		// draw a border SCENE_OFFSET pixels into the image
+		line(m_scene, cvPoint(SCENE_OFFSET, SCENE_OFFSET), cvPoint(SCENE_OFFSET, reference.rows - SCENE_OFFSET), GREEN_COLOR, 2);
+		line(m_scene, cvPoint(SCENE_OFFSET, reference.rows - SCENE_OFFSET), cvPoint(reference.cols - SCENE_OFFSET, reference.rows - SCENE_OFFSET), GREEN_COLOR, 2);
+		line(m_scene, cvPoint(reference.cols - SCENE_OFFSET, reference.rows - SCENE_OFFSET), cvPoint(reference.cols - SCENE_OFFSET, SCENE_OFFSET), GREEN_COLOR, 2);
+		line(m_scene, cvPoint(reference.cols - SCENE_OFFSET, SCENE_OFFSET), cvPoint(SCENE_OFFSET, SCENE_OFFSET), GREEN_COLOR, 2);
+	}
 
     this->createPaddles(reference);
 

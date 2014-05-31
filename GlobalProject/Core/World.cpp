@@ -125,7 +125,7 @@ void World::initializeWorldOnFirstFrame(const cv::Mat& reference, const bool res
 
     b2FixtureDef ballShapeDef;
     ballShapeDef.shape = &circle;
-    ballShapeDef.density = 2.5f;
+    ballShapeDef.density = 4.5f;
     ballShapeDef.friction = 0.0f;
     ballShapeDef.restitution = 1.0f;
     m_ballFixture = m_ballBody->CreateFixture(&ballShapeDef);
