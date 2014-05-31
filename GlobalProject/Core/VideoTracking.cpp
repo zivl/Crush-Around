@@ -1,7 +1,6 @@
 
 
 #include <iostream>
-#include <Box2D/Collision/Shapes/b2Shape.h>  // for shape types (can remove layter probably)
 #include "VideoTracking.hpp"
 
 VideoTracking::VideoTracking()
@@ -65,7 +64,6 @@ bool VideoTracking::processFrame(const cv::Mat& inputFrame, cv::Mat& outputFrame
         this->notifyObjectsDestryedObservers();
     }
 
-
     inputFrame.copyTo(outputFrame);
     cv::Mat tempInputFrame;
     cv::cvtColor(inputFrame, tempInputFrame, CV_BGRA2BGR);
@@ -88,7 +86,8 @@ bool VideoTracking::processFrame(const cv::Mat& inputFrame, cv::Mat& outputFrame
             break;
     }
     
-    calcHomographyAndTransformScene(outputFrame);
+    calculateHomography(outputFrame);
+    transformScene(outputFrame);
 
     if (this->m_2DWorld->isDebugDrawEnabled()){
         // add the debug drawing
@@ -156,7 +155,7 @@ void VideoTracking::smoothHomography(){
 // find matching (corresponding) features (using open CV built in matcher)
 // calculate the homograpgy (using open CV built in function that uses RANSAC)
 // then transform the scene and add it to the output frame
-void VideoTracking::calcHomographyAndTransformScene(cv::Mat& outputFrame)
+void VideoTracking::calculateHomography(cv::Mat& outputFrame)
 {
     // transform the sence using descriptors, correspondance and homography
     if (m_refKeypoints.size() > 3)
@@ -220,76 +219,87 @@ void VideoTracking::calcHomographyAndTransformScene(cv::Mat& outputFrame)
         {
             // finally, find the homography
             this->m_refFrame2CurrentHomography = findHomography(refPoints, newPoints, CV_RANSAC);
+            
             if(!this->m_lastHomography.empty()){
                 smoothHomography();
             }
+
             this->m_refFrame2CurrentHomography.copyTo(this->m_lastHomography);
-
-            b2Vec2 ballPosition = this->m_2DWorld->getBallBody()->GetPosition();
-            if(!this->isRestrictBallInScene()){
-
-                cv::Point2f pointToCheck = CVUtils::transformPoint(cv::Point2f(ballPosition.x * PTM_RATIO, ballPosition.y * PTM_RATIO), this->m_refFrame2CurrentHomography);
-
-                if(!isPointInScene(pointToCheck, outputFrame.cols, outputFrame.rows)){
-                    this->notifyBallInSceneObservers();
-                    return;
-                }
-            }
-
-            // wrap/transform the scene
-            cv::Mat transformedScene(m_scene.size(), m_scene.type());
-            m_scene.copyTo(transformedScene);
-            std::vector<cv::Point2f*> guardLocations = this->m_2DWorld->getGuardLocations();
-            for (int i = 0; i < (int)guardLocations.size(); i++)
-            {
-                cv::circle(transformedScene, *guardLocations[i], 5, cv::Scalar(0, 0, 255, 255), -1);
-            }
-
-            cv::Mat mask_image(outputFrame.size(), CV_8U, BLACK_COLOR);
-            std::vector<cv::Point*> destroyedPolygons = this->m_2DWorld->getDestroyedPolygons();
-            std::vector<int> destroyedPolygonsPointCount = this->m_2DWorld->getDestroyedPolygonsPointCount();
-            for (int i = 0; i < destroyedPolygons.size(); i++)
-            {
-                const cv::Point* ppt[1] = { destroyedPolygons[i] };
-                int npt[] = { destroyedPolygonsPointCount[i] };
-                fillPoly(mask_image, ppt, npt, 1, WHITE_COLOR);
-            }
-
-            // now that the mask is prepared, copy the points from the inpainted to the scene
-            m_inpaintedScene.copyTo(transformedScene, mask_image);
-
-
-            cv::circle(transformedScene,
-                       cv::Point2f(ballPosition.x * PTM_RATIO, ballPosition.y * PTM_RATIO),
-                       26, cv::Scalar(255, 0, 0, 255), -1);
-#if defined _MSC_VER && OUTPUT_STEPS
-            cv::imshow("mask", mask_image);
-            cv::imshow("scene", transformedScene);
-            cv::imshow("transformed", transformedScene);
-#endif
-
-            warpPerspective(transformedScene, transformedScene, this->m_refFrame2CurrentHomography, outputFrame.size(), CV_INTER_NN);
-
-#if defined _MSC_VER && OUTPUT_STEPS
-            cv::imshow("transformed", transformedScene);
-#endif
-
-            // create a 1-channel mask with black background and white where the is an object
-            // (ball, destroyed points, barriers)
-            int channels = transformedScene.channels();
-            mask_image = cv::Scalar(0);
-            for(int i = 0; i < transformedScene.rows; i++){
-                for(int j = 0; j < transformedScene.cols; j++){
-                    int index = channels * (transformedScene.cols * i + j);
-                    if(transformedScene.data[index] > 0 || transformedScene.data[index + 1] > 0 || transformedScene.data[index + 2] > 0){
-                        mask_image.data[i * mask_image.cols + j] = 255;
-                    }
-                }
-            }
-
-            transformedScene.copyTo(outputFrame, mask_image);
         }
     }
+}
+
+// Transform the current known scene according to homography and merge it to output frame
+void VideoTracking::transformScene(cv::Mat& outputFrame)
+{
+    if (m_refFrame2CurrentHomography.empty())
+    {
+        return;
+    }
+
+    b2Vec2 ballPosition = this->m_2DWorld->getBallBody()->GetPosition();
+    if(!this->isRestrictBallInScene()){
+
+        cv::Point2f pointToCheck = CVUtils::transformPoint(cv::Point2f(ballPosition.x * PTM_RATIO, ballPosition.y * PTM_RATIO), this->m_refFrame2CurrentHomography);
+
+        if(!isPointInScene(pointToCheck, outputFrame.cols, outputFrame.rows)){
+            this->notifyBallInSceneObservers();
+            return;
+        }
+    }
+
+    // wrap/transform the scene
+    cv::Mat transformedScene(m_scene.size(), m_scene.type());
+    m_scene.copyTo(transformedScene);
+    std::vector<cv::Point2f*> guardLocations = this->m_2DWorld->getGuardLocations();
+    for (int i = 0; i < (int)guardLocations.size(); i++)
+    {
+        cv::circle(transformedScene, *guardLocations[i], 5, cv::Scalar(0, 0, 255, 255), -1);
+    }
+
+    cv::Mat mask_image(outputFrame.size(), CV_8U, BLACK_COLOR);
+    std::vector<cv::Point*> destroyedPolygons = this->m_2DWorld->getDestroyedPolygons();
+    std::vector<int> destroyedPolygonsPointCount = this->m_2DWorld->getDestroyedPolygonsPointCount();
+    for (int i = 0; i < destroyedPolygons.size(); i++)
+    {
+        const cv::Point* ppt[1] = { destroyedPolygons[i] };
+        int npt[] = { destroyedPolygonsPointCount[i] };
+        fillPoly(mask_image, ppt, npt, 1, WHITE_COLOR);
+    }
+
+    // now that the mask is prepared, copy the points from the inpainted to the scene
+    m_inpaintedScene.copyTo(transformedScene, mask_image);
+
+    cv::circle(transformedScene,
+        cv::Point2f(ballPosition.x * PTM_RATIO, ballPosition.y * PTM_RATIO),
+        26, cv::Scalar(255, 0, 0, 255), -1);
+
+#if defined _MSC_VER && OUTPUT_STEPS
+    cv::imshow("mask", mask_image);
+    cv::imshow("scene", transformedScene);
+    cv::imshow("transformed", transformedScene);
+#endif
+
+    warpPerspective(transformedScene, transformedScene, this->m_refFrame2CurrentHomography, outputFrame.size(), CV_INTER_NN);
+
+#if defined _MSC_VER && OUTPUT_STEPS
+    cv::imshow("transformed", transformedScene);
+#endif
+
+    // create a 1-channel mask with black background and white where the is an object
+    // (ball, destroyed points, barriers)
+    int channels = transformedScene.channels();
+    mask_image = cv::Scalar(0);
+    for(int i = 0; i < transformedScene.rows; i++){
+        for(int j = 0; j < transformedScene.cols; j++){
+            int index = channels * (transformedScene.cols * i + j);
+            if(transformedScene.data[index] > 0 || transformedScene.data[index + 1] > 0 || transformedScene.data[index + 2] > 0){
+                mask_image.data[i * mask_image.cols + j] = 255;
+            }
+        }
+    }
+
+    transformedScene.copyTo(outputFrame, mask_image);
 }
 
 void VideoTracking::onPanGestureEnded(std::vector<cv::Point> touchPoints){
@@ -333,7 +343,7 @@ void VideoTracking::delegateBallHitObserver(std::function<void(float x, float y)
 
 void VideoTracking::attachObjectsDestryedObserver(std::function<void()> func)
 {
-    objectsDestroyedObserversList.push_back(func);
+    m_objectsDestroyedObserversList.push_back(func);
 }
 
 void VideoTracking::detachObjectsDestryedObserver(std::function<void ()> func)
@@ -343,7 +353,7 @@ void VideoTracking::detachObjectsDestryedObserver(std::function<void ()> func)
 
 void VideoTracking::notifyObjectsDestryedObservers()
 {
-    for(std::vector<std::function<void()>>::const_iterator iter = objectsDestroyedObserversList.begin(); iter != objectsDestroyedObserversList.end(); ++iter)
+    for(std::vector<std::function<void()>>::const_iterator iter = m_objectsDestroyedObserversList.begin(); iter != m_objectsDestroyedObserversList.end(); ++iter)
     {
         if(*iter != 0)
         {
@@ -354,7 +364,7 @@ void VideoTracking::notifyObjectsDestryedObservers()
 
 void VideoTracking::attachBallInSceneObserver(std::function<void ()> func)
 {
-    ballInSceneObserversList.push_back(func);
+    m_ballInSceneObserversList.push_back(func);
 }
 
 void VideoTracking::detachBallInSceneObserver(std::function<void ()> func)
@@ -364,7 +374,7 @@ void VideoTracking::detachBallInSceneObserver(std::function<void ()> func)
 
 void VideoTracking::notifyBallInSceneObservers()
 {
-    for(std::vector<std::function<void()>>::const_iterator iter = ballInSceneObserversList.begin(); iter != ballInSceneObserversList.end(); ++iter)
+    for(std::vector<std::function<void()>>::const_iterator iter = m_ballInSceneObserversList.begin(); iter != m_ballInSceneObserversList.end(); ++iter)
     {
         if(*iter != 0)
         {

@@ -18,6 +18,8 @@
 #include "Observers/IObjectsDestryedObserver.h"
 #include "CVUtils.h"
 
+#include "Core/Globals.h"
+
 class VideoTracking : IBallInSceneObserver, IObjectsDestryedObserver
 {
 public:
@@ -65,9 +67,8 @@ public:
 
 private:
 
-    std::vector<std::function<void()>> objectsDestroyedObserversList;
-
-    std::vector<std::function<void()>> ballInSceneObserversList;    
+    std::vector<std::function<void()>> m_objectsDestroyedObserversList;
+    std::vector<std::function<void()>> m_ballInSceneObserversList;    
 
     cv::Mat m_nextImg;
     cv::Mat m_mask;
@@ -77,16 +78,16 @@ private:
 
     FeatureType m_featureTypeForDetection;
 
+    // ORB based feature detection classes
     cv::ORB                 m_orbFeatureEngine;
     cv::BFMatcher           m_orbMatcher;
     cv::FlannBasedMatcher * m_matcher;
 
+    // SIFT/SURF object detection classes
     cv::SurfFeatureDetector m_surfDetector;
     cv::SurfDescriptorExtractor m_surfExtractor;
     cv::FlannBasedMatcher m_surfMatcher;
-
     cv::SIFT m_siftEngine;
-
 
     // the original (first) frame.
     cv::Mat m_refFrame;
@@ -98,10 +99,14 @@ private:
     // the actual scene corresponding to original frame
     cv::Mat m_scene;
 
-    // Calculate homography for reference and new features,
+    // Calculate homography for reference and new features,    
+    void calculateHomography(cv::Mat& outputFrame);
+
     // transform scene and add to output frame
-    void calcHomographyAndTransformScene(cv::Mat& outputFrame);
-	void smoothHomography();
+    void transformScene(cv::Mat& outputFrame);
+
+    // smooth the homography
+    void smoothHomography();
 
     // the physical world simulation
     World *m_2DWorld;
@@ -109,8 +114,8 @@ private:
     // homograph from reference frame to current (last captured) frame
     cv::Mat m_refFrame2CurrentHomography;
 
-	// last homography to smooth homographies and mitigate vibrations between them
-	cv::Mat m_lastHomography;
+    // last homography to smooth homographies and mitigate vibrations between them
+    cv::Mat m_lastHomography;
 
     // inpainted scene used to fill over "destroyed" parts of the image
     cv::Mat m_inpaintedScene;
