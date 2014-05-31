@@ -54,7 +54,7 @@ public class Tutorial2Activity extends Activity implements CvCameraViewListener2
                     // Load native library after(!) OpenCV initialization
                     System.loadLibrary("gnustl_shared");
                     //System.loadLibrary("box2d");
-                    System.loadLibrary("mixed_sample");
+                    System.loadLibrary("crush_around");
 
                     mOpenCvCameraView.setMaxFrameSize(352, 288);
                     mOpenCvCameraView.enableView();
