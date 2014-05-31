@@ -159,9 +159,18 @@ void VideoTracking::setReferenceFrame(const cv::Mat& reference)
     line(m_scene, cvPoint(reference.cols - SCENE_OFFSET, reference.rows - SCENE_OFFSET), cvPoint(reference.cols - SCENE_OFFSET, SCENE_OFFSET), GREEN_COLOR, 2);
     line(m_scene, cvPoint(reference.cols - SCENE_OFFSET, SCENE_OFFSET), cvPoint(SCENE_OFFSET, SCENE_OFFSET), GREEN_COLOR, 2);
 
+    this->createPaddles(reference);
+
+    this->m_2DWorld->initializeWorldOnFirstFrame(reference, this->isRestrictBallInScene());
+}
+
+void VideoTracking::createPaddles(const cv::Mat& reference)
+{
     // calculate the paddles positions
     int width = reference.cols;
     int height = reference.rows;
+
+    // TODO: take the width/height of paddles from settings/outside
     int lenX = width * 3 / 20; //0.15
     int lenY = height * 3 / 20; //0.15;
     int centerX = width / 2;
@@ -182,8 +191,6 @@ void VideoTracking::setReferenceFrame(const cv::Mat& reference)
     // top paddle
     this->m_paddlePositions.push_back(cv::Point(centerX - lenX, height - 4));
     this->m_paddlePositions.push_back(cv::Point(centerX + lenX, height - 4));
-
-    this->m_2DWorld->initializeWorldOnFirstFrame(reference, this->isRestrictBallInScene());
 }
 
 bool isPointInScene (cv::Point2f point, int width, int height){
@@ -388,8 +395,11 @@ void VideoTracking::transformScene(cv::Mat& outputFrame)
 }
 
 void VideoTracking::onPanGestureEnded(std::vector<cv::Point> touchPoints){
-    for (std::vector<cv::Point>::iterator it = touchPoints.begin() ; it != touchPoints.end(); ++it){
-        this->onMouse(CV_EVENT_LBUTTONDOWN, it->x, it->y, NULL, NULL);
+    if (this->getGameType & GameType::BARRIERS)
+    {
+        for (std::vector<cv::Point>::iterator it = touchPoints.begin() ; it != touchPoints.end(); ++it){
+            this->onMouse(CV_EVENT_LBUTTONDOWN, it->x, it->y, NULL, NULL);
+        }
     }
 }
 
@@ -400,10 +410,12 @@ void VideoTracking::onMouse( int event, int x, int y, int, void* )
         return;
     }
 
-    cv::Point2f targetPoint = CVUtils::transformPoint(cv::Point2f(x, y), this->m_refFrame2CurrentHomography.inv());
+    if (this->getGameType & GameType::BARRIERS)
+    {
+        cv::Point2f targetPoint = CVUtils::transformPoint(cv::Point2f(x, y), this->m_refFrame2CurrentHomography.inv());
 
-    this->m_2DWorld->createNewPhysicPointInWorld(targetPoint);
-    
+        this->m_2DWorld->createNewPhysicPointInWorld(targetPoint);
+    }
 }
 
 // Static callback for allowing mouse events registration in Open CV window.

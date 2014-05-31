@@ -20,6 +20,7 @@
 
 #include "Core/Globals.h"
 
+// bitwise template operators for int based enums etc
 template<class T> inline T operator~ (T a) { return (T)~(int)a; }
 template<class T> inline T operator| (T a, T b) { return (T)((int)a | (int)b); }
 template<class T> inline T operator& (T a, T b) { return (T)((int)a & (int)b); }
@@ -120,6 +121,9 @@ private:
     // check if ball is in scene considering the ball position (in "physical world") and homography
     // if not, notifies that ball left sence (to observers) and return false if not 
     bool checkBallInScene(int width, int height);
+
+    // create paddles based on the image size
+    void createPaddles(const cv::Mat& reference);
 
     // smooth the homography
     void smoothHomography();

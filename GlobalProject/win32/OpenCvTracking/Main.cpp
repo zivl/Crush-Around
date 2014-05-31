@@ -103,7 +103,7 @@ int destroyAroundMeGame()
     track->getWorld()->setDebugDrawEnabled(false);
     track->setFeatureType(VideoTracking::FeatureType::ORB);
     //track->setRestrictBallInScene(false);
-    track->setGameType(VideoTracking::GameType::BARRIERS);
+    //track->setGameType(VideoTracking::GameType::BARRIERS);
 
     bool isValid = true;
     //track->attachBallInSceneObserver(std::function<void>([]() { cout << "tomer" << endl; }));
