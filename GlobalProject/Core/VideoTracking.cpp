@@ -262,7 +262,7 @@ void VideoTracking::calcHomographyAndTransformScene(cv::Mat& outputFrame)
             cv::circle(transformedScene,
                        cv::Point2f(ballPosition.x * PTM_RATIO, ballPosition.y * PTM_RATIO),
                        26, cv::Scalar(255, 0, 0, 255), -1);
-#if defined  _MSC_VER
+#if defined _MSC_VER && OUTPUT_STEPS
             cv::imshow("mask", mask_image);
             cv::imshow("scene", transformedScene);
             cv::imshow("transformed", transformedScene);
@@ -270,7 +270,7 @@ void VideoTracking::calcHomographyAndTransformScene(cv::Mat& outputFrame)
 
             warpPerspective(transformedScene, transformedScene, this->m_refFrame2CurrentHomography, outputFrame.size(), CV_INTER_NN);
 
-#if defined  _MSC_VER
+#if defined _MSC_VER && OUTPUT_STEPS
             cv::imshow("transformed", transformedScene);
 #endif
 

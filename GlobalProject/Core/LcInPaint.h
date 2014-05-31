@@ -10,6 +10,10 @@
 
 #include "clipper.hpp"
 
+#if defined _MSC_VER 
+#include "Core/Globals.h"
+#endif
+
 class LcInPaint {
 private:
 	std::vector<std::vector<cv::Point> > contours;
