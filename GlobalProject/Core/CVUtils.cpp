@@ -9,7 +9,7 @@
 #include "CVUtils.h"
 
 
-cv::Point2f CVUtils::transformPoint(const cv::Point2f point, const cv::Mat homoMat){
+cv::Point2f CVUtils::transformPoint(const cv::Point2f point, const cv::Mat homoMat) {
 
 	std::vector<cv::Point2f> sourcePoints;
     sourcePoints.push_back(point);
@@ -17,6 +17,13 @@ cv::Point2f CVUtils::transformPoint(const cv::Point2f point, const cv::Mat homoM
     std::vector<cv::Point2f> targetPoints;
 
     cv::perspectiveTransform(sourcePoints, targetPoints, homoMat);
-    return cv::Point2f(targetPoints[0]);
-	
+    return cv::Point2f(targetPoints[0]);	
+}
+
+void CVUtils::transformPoints(const std::vector<cv::Point2f> points, std::vector<cv::Point2f>* targetPoints, const cv::Mat homography) {
+    std::vector<cv::Point2f> ttt;
+
+    cv::perspectiveTransform(points, (*targetPoints), homography);
+
+    //ttt.swap((*targetPoints));
 }

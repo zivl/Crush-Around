@@ -14,7 +14,8 @@
 class CVUtils {
 
 public:
-	static cv::Point2f transformPoint(const cv::Point2f point, const cv::Mat homoMat);
+    static cv::Point2f transformPoint(const cv::Point2f point, const cv::Mat homoMat);
+    static void transformPoints(const std::vector<cv::Point2f> points, std::vector<cv::Point2f>* targetPoints, const cv::Mat homography);
 };
 
 #endif /* defined(__DestroyAroundMe__CVUtils__) */
