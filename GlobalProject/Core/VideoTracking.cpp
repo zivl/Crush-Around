@@ -13,19 +13,38 @@ VideoTracking::VideoTracking()
 , m_surfMatcher()
 , m_siftEngine()
 {
+    this->m_ballRadius = 15;
+
     // Instantiate a matcher for descriptor based correlation of features.
     this->m_matcher = new cv::FlannBasedMatcher(new cv::flann::LshIndexParams(5, 24, 2));
-    this->m_2DWorld = new World();
+    this->m_2DWorld = new World(this->m_ballRadius);
     this->m_featureTypeForDetection = FeatureType::ORB;
     this->m_useGoodPointsOnly = false;  // indicates that should only use "good points" (3 time the min distnace) for homography calculation.
 
     this->setGameType(GameType::BARRIERS | GameType::PADDLES);  // default use barriers
+
+    this->m_homographyHelper = false;
 }
 
 VideoTracking::~VideoTracking()
 {
     delete this->m_matcher;
     delete this->m_2DWorld;
+}
+
+void VideoTracking::setBallRadius(int radius)
+{
+    this->m_ballRadius = radius;
+
+    if (this->m_2DWorld)
+    {
+        this->m_2DWorld->setBallRadius(radius);
+    }
+}
+
+int VideoTracking::getBallRadius()
+{
+    return this->m_ballRadius;
 }
 
 // convert a Mat to grayscale taking into account number of channels
@@ -59,12 +78,12 @@ void VideoTracking::setFeatureType(FeatureType feat_type)
 
 void VideoTracking::setGameType(GameType gameType)
 {
-    this->m_GameType = gameType;
+    this->m_gameType = gameType;
 }
 
 VideoTracking::GameType VideoTracking::getGameType()
 {
-    return this->m_GameType;
+    return this->m_gameType;
 }
 //! Processes a frame and returns output image
 bool VideoTracking::processFrame(const cv::Mat& inputFrame, cv::Mat& outputFrame)

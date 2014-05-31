@@ -8,8 +8,11 @@
 
 #include "World.h"
 
-World::World() : m_objectBodies(){
+#include <iostream>
 
+World::World(int ballRadius) : 
+    m_objectBodies()
+{
     dt = 1.0f/60.0f;
     
     // define world with gravity
@@ -38,6 +41,21 @@ World::~World(){
     m_guardLocations.clear();
     m_destroyedPolygons.clear();
     m_destroyedPolygonsPointCount.clear();
+}
+
+void World::setBallRadius(int radius)
+{
+    this->m_ballRadius = radius / PTM_RATIO;
+
+    if (this->m_ballFixture)
+    {
+        ((b2CircleShape*)this->m_ballFixture->GetShape())->m_radius = radius / PTM_RATIO;
+    }
+}
+
+int World::getBallRadius()
+{
+    return this->m_ballRadius * PTM_RATIO;
 }
 
 void World::setDebugDrawEnabled(bool enabled){
@@ -83,7 +101,8 @@ std::vector<int> World::getDestroyedPolygonsPointCount(){
 void World::initializeWorldOnFirstFrame(const cv::Mat& reference, const bool restrictBallToScene){
     // following is box2d world/ball initialization
 
-    if(restrictBallToScene) {
+    if(restrictBallToScene) 
+    {
         // Create edges around the entire screen
         b2BodyDef groundBodyDef;
         groundBodyDef.position.Set(0,0);
@@ -117,11 +136,11 @@ void World::initializeWorldOnFirstFrame(const cv::Mat& reference, const bool res
     // Create ball body and shape
     b2BodyDef ballBodyDef;
     ballBodyDef.type = b2_dynamicBody;
-    ballBodyDef.position.Set(100 / PTM_RATIO, 100 / PTM_RATIO);
+    ballBodyDef.position.Set(30 / PTM_RATIO, 30 / PTM_RATIO);
     m_ballBody = m_world->CreateBody(&ballBodyDef);
 
     b2CircleShape circle;
-    circle.m_radius = 15.0 / PTM_RATIO;
+    circle.m_radius = this->m_ballRadius;
 
     b2FixtureDef ballShapeDef;
     ballShapeDef.shape = &circle;
@@ -212,6 +231,7 @@ void World::updatePaddlesLocations(std::vector<cv::Point2f> points)
     for (size_t p = 0; p < points.size(); p+=2) {
         paddleEdgde.Set(b2Vec2(points[p].x / PTM_RATIO, points[p].y / PTM_RATIO), b2Vec2(points[p + 1].x / PTM_RATIO, points[p + 1].y / PTM_RATIO));
         this->m_paddlesBody->CreateFixture(&paddleShape);
+        std::cout << "p" << p << ":(" << points[p].x << "," << points[p].y << "),(" << points[p+1].x << "," << points[p+1].y << ")" << std::endl;
     }
 }
 
@@ -282,7 +302,7 @@ void World::update(cv::Mat &homography)
                     clipper.Execute(ClipperLib::ctIntersection, destroyedParts, ClipperLib::pftEvenOdd, ClipperLib::pftEvenOdd);
 
                     // paint the required areas to be coppied
-                    for (int i = 0; i < destroyedParts.size(); i++)
+                    for (size_t i = 0; i < destroyedParts.size(); i++)
                     {
                         cv::Point* points = new cv::Point[destroyedParts[i].size()];
 
@@ -327,14 +347,14 @@ void World::update(cv::Mat &homography)
         }
         else
         {
-            for (int i = 0; i < newPolygons->size(); i++)
+            for (size_t i = 0; i < newPolygons->size(); i++)
             {
                 b2EdgeShape objectEdgeShape;
                 b2FixtureDef objectShapeDef;
                 objectShapeDef.shape = &objectEdgeShape;
 
                 ClipperLib::Path polygon = newPolygons->at(i);
-                int j;
+                size_t j;
                 for (j = 0; j < polygon.size() - 1; j++)
                 {
                     objectEdgeShape.Set(b2Vec2(polygon[j].X / PTM_RATIO, polygon[j].Y / PTM_RATIO), b2Vec2(polygon[j+1].X / PTM_RATIO, polygon[j+1].Y / PTM_RATIO));
@@ -347,7 +367,7 @@ void World::update(cv::Mat &homography)
         }
     }
 
-    for (int i = 0; i < removeList.size(); i++){
+    for (size_t i = 0; i < removeList.size(); i++){
         cv::Point2f* p = (cv::Point2f*)removeList[i]->GetUserData();
 
         std::vector<cv::Point2f*>::iterator position = std::find(m_guardLocations.begin(), m_guardLocations.end(), p);

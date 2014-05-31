@@ -20,7 +20,7 @@
 class World : IBallHitObserver {
 
 public:
-    World();
+    World(int ballRadius);
     ~World();
 
     void initializeWorldOnFirstFrame(const cv::Mat& reference, const bool restrictBallToScene);
@@ -35,6 +35,9 @@ public:
     bool isDebugDrawEnabled();
 
     void updatePaddlesLocations(std::vector<cv::Point2f> points);
+
+    void setBallRadius(int radius);
+    int getBallRadius();
 
     OpenCvDebugDraw * getDebugDraw();
 
@@ -54,6 +57,8 @@ public:
     virtual void notifyBallHitObservers(float x, float y);
     
 private:
+
+    int m_ballRadius;
 
     float dt;
     

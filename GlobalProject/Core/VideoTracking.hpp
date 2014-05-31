@@ -45,6 +45,9 @@ public:
     // set the feature type to use for detection
     void setFeatureType(FeatureType feat_type);
 
+    void setBallRadius(int radius);
+    int getBallRadius();
+
     World* getWorld();
 
     //! Processes a frame and returns output image
@@ -79,6 +82,8 @@ public:
     void setGameType(GameType gameType);
     GameType getGameType();
 private:
+
+    int m_ballRadius;
 
     std::vector<std::function<void()>> m_objectsDestroyedObserversList;
     std::vector<std::function<void()>> m_ballInSceneObserversList;    
@@ -137,8 +142,8 @@ private:
     // last homography to smooth homographies and mitigate vibrations between them
     cv::Mat m_lastHomography;
 
-	// draw homography stabilization helper
-	bool m_homographyHelper = false;
+    // draw homography stabilization helper
+    bool m_homographyHelper;
 
     // inpainted scene used to fill over "destroyed" parts of the image
     cv::Mat m_inpaintedScene;
@@ -150,7 +155,7 @@ private:
     bool m_useGoodPointsOnly;
 
     // type of game - barriers or paddles
-    GameType m_GameType;
+    GameType m_gameType;
 
     // position of the paddles (relative to the screen/frame
     std::vector<cv::Point2f> m_paddlePositions;
