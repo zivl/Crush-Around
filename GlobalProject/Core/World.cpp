@@ -137,7 +137,7 @@ void World::initializeWorldOnFirstFrame(const cv::Mat& reference, const bool res
     // Create ball body and shape
     b2BodyDef ballBodyDef;
     ballBodyDef.type = b2_dynamicBody;
-    ballBodyDef.position.Set(100 / PTM_RATIO, 100 / PTM_RATIO);
+    ballBodyDef.position.Set(30 / PTM_RATIO, 30 / PTM_RATIO);
     m_ballBody = m_world->CreateBody(&ballBodyDef);
 
     b2CircleShape circle;
@@ -150,7 +150,7 @@ void World::initializeWorldOnFirstFrame(const cv::Mat& reference, const bool res
     ballShapeDef.restitution = 1.0f;
     m_ballFixture = m_ballBody->CreateFixture(&ballShapeDef);
 
-    m_ballBody->ApplyLinearImpulse(b2Vec2(100, 100), m_ballBody->GetPosition(), true);
+    m_ballBody->ApplyLinearImpulse(b2Vec2(30, 30), m_ballBody->GetPosition(), true);
 }
 
 // Set the objects (defined by contour points) to be models in the world and scene.
@@ -214,7 +214,8 @@ void World::updatePaddlesLocations(std::vector<cv::Point2f> points)
     }
     else
     {
-		if(this->m_paddlesBody->GetFixtureList()){
+		if(this->m_paddlesBody->GetFixtureList())
+        {
 			for (b2Fixture* f = this->m_paddlesBody->GetFixtureList(); f; )
 			{
 				b2Fixture* fixtureToDestroy = f;
@@ -229,10 +230,11 @@ void World::updatePaddlesLocations(std::vector<cv::Point2f> points)
     b2FixtureDef paddleShape;
     paddleShape.shape = &paddleEdgde;
 
-    std::cout << points[0].x << "," << points[0].y << "-" << points[1].x << "," << points[0].y << " " <<
+    std::cout << points[0] << " - " << points[1] << std::endl;
+        /*points[0].x << "," << points[0].y << " " << points[1].x << "," << points[1].y << " " <<
                  points[2].x << "," << points[2].y << "-" << points[3].x << "," << points[3].y << " " <<
                  points[4].x << "," << points[4].y << "-" << points[5].x << "," << points[5].y << " " <<
-                 points[6].x << "," << points[6].y << "-" << points[7].x << "," << points[7].y << " " <<std::endl;
+                 points[6].x << "," << points[6].y << "-" << points[7].x << "," << points[7].y << " " <<std::endl;*/
 
     for (size_t p = 0; p < points.size(); p+=2) {
         paddleEdgde.Set(b2Vec2(points[p].x / PTM_RATIO, points[p].y / PTM_RATIO), b2Vec2(points[p + 1].x / PTM_RATIO, points[p + 1].y / PTM_RATIO));
@@ -393,7 +395,7 @@ void World::createNewPhysicPointInWorld(const cv::Point2f point){
     b2Body *body = m_world->CreateBody(&bodyDef);
 
     b2CircleShape circle;
-    circle.m_radius = 5.0/PTM_RATIO;
+    circle.m_radius = this->m_ballRadius;
 
     b2FixtureDef shapeDef;
     shapeDef.shape = &circle;
