@@ -36,14 +36,14 @@ extern "C"
 			if (doInit == 1) {
 				__android_log_write(ANDROID_LOG_ERROR, "Tomer", "Initializing");
 				tracker.setReferenceFrame(mRgb);
-				tracker.setObjectsToBeModeled(contours);
+				tracker.getWorld()->setObjectsToBeModeled(contours);
 				tracker.prepareInPaintedScene(mRgb, contours);
 				initialize = true;
 				__android_log_write(ANDROID_LOG_ERROR, "Tomer", "Now initialized");
 			} else {
 				__android_log_write(ANDROID_LOG_ERROR, "Tomer", "Object detection");
 				LcObjectDetector detect;
-				detect.setObjectSimplification(true);
+				//detect.setObjectSimplification(true);
 				contours = detect.getObjectContours(mRgb);
 
 				// draw each contour on the image

@@ -10,11 +10,16 @@ import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewListener2;
 
 import android.app.Activity;
+//import android.content.DialogInterface;
+//import android.content.DialogInterface.OnClickListener;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.WindowManager;
+import android.widget.Button;
 
 public class Tutorial2Activity extends Activity implements CvCameraViewListener2 {
     private static final String    TAG = "OCVSample::Activity";   
@@ -25,6 +30,10 @@ public class Tutorial2Activity extends Activity implements CvCameraViewListener2
     private Mat                    mGray;
     
     private boolean                m_initialized;
+    
+    Button button1;
+    
+    private boolean   m_doInit;
     /*
     private MenuItem               mItemPreviewRGBA;
     private MenuItem               mItemPreviewGray;
@@ -44,7 +53,7 @@ public class Tutorial2Activity extends Activity implements CvCameraViewListener2
 
                     // Load native library after(!) OpenCV initialization
                     System.loadLibrary("gnustl_shared");
-                    System.loadLibrary("box2d");
+                    //System.loadLibrary("box2d");
                     System.loadLibrary("mixed_sample");
 
                     mOpenCvCameraView.setMaxFrameSize(352, 288);
@@ -60,6 +69,7 @@ public class Tutorial2Activity extends Activity implements CvCameraViewListener2
 
     public Tutorial2Activity() {
         Log.i(TAG, "Instantiated new " + this.getClass());
+        m_doInit = false;
     }
 
     /** Called when the activity is first created. */
@@ -73,7 +83,22 @@ public class Tutorial2Activity extends Activity implements CvCameraViewListener2
 
         mOpenCvCameraView = (CameraBridgeViewBase) findViewById(R.id.tutorial2_activity_surface_view);
         mOpenCvCameraView.setCvCameraViewListener(this);
+        
+        button1 = (Button)findViewById(R.id.button1);
+        
+        button1.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				Log.e("Tomer", "doint on click");
+				m_doInit = true;
+			}
+		});
+        
     }
+    
+   
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -127,7 +152,8 @@ public class Tutorial2Activity extends Activity implements CvCameraViewListener2
         mRgba = inputFrame.rgba();
         mGray = inputFrame.gray();
         if (!m_initialized) {
-        	FindFeatures(mGray.getNativeObjAddr(), mRgba.getNativeObjAddr());
+        	Log.e("Tomer", "In java doInit: " + m_doInit);
+        	FindFeatures(mGray.getNativeObjAddr(), mRgba.getNativeObjAddr(), m_doInit ? 1:0);
         }
 
         return mRgba;
@@ -138,5 +164,5 @@ public class Tutorial2Activity extends Activity implements CvCameraViewListener2
         return true;
     }
 
-    public native void FindFeatures(long matAddrGr, long matAddrRgba);
+    public native void FindFeatures(long matAddrGr, long matAddrRgba, int doInit);
 }
