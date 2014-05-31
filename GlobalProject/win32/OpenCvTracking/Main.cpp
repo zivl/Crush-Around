@@ -40,48 +40,6 @@ int clipping();
 int simplify();
 int triangulation();
 
-int test()
-{
-    cv::Mat s1(240, 240, CV_8UC3);
-    s1 = cv::Scalar(255);
-
-    imshow("s1", s1);
-
-    cv:Mat s2(240, 240, CV_8UC3);
-    s2 = cv::Scalar(0, 0, 255);
-
-    imshow("s2", s2);
-
-    cv::Mat mask(240, 240, CV_8UC1);
-    mask = 0;
-
-    cv::Point points[4];
-    points[0] = cv::Point(90, 90);
-    points[1] = cv::Point(150, 90);
-    points[2] = cv::Point(150, 150);
-    points[3] = cv::Point(90, 150);
-
-    const cv::Point* ppt[1] = { points };
-    int npt[] = { 4 };
-    fillPoly(mask, ppt, npt, 1, cv::Scalar(255));
-
-    imshow("mask", mask);
-
-    s2.copyTo(s1, mask);
-
-    imshow("copyTo", s1);
-    
-    cv::Mat s3(240, 240, CV_8UC3);
-    s3 = cv::Scalar(255);
-
-    s3 += s2;
-
-    imshow("+=", s3);
-
-    waitKey();
-
-    return 0;
-}
 /**
 * @function main
 * @brief Main function
@@ -115,6 +73,9 @@ int main( int argc, char** argv )
     //clipping();
     //simplify();
 
+   /* cout << "Click a key to finish" << endl;
+    getchar();*/
+
     return 0;
 }
 
@@ -138,12 +99,14 @@ int destroyAroundMeGame()
         cap >> testFrame;
     }
 
-    //namedWindow("output", 1);
-    //namedWindow("input", 2);
-
     VideoTracking *track = new VideoTracking();
     track->getWorld()->setDebugDrawEnabled(false);
     track->setFeatureType(VideoTracking::FeatureType::ORB);
+    //track->setRestrictBallInScene(false);
+    track->setGameType(VideoTracking::GameType::BARRIERS);
+
+    bool isValid = true;
+    //track->attachBallInSceneObserver(std::function<void>([]() { cout << "tomer" << endl; }));
 
     setMouseCallback("output", VideoTracking::mouseCallback, track);
 
@@ -157,7 +120,7 @@ int destroyAroundMeGame()
     bool isFirst = false;
 
     // here starts the game loop
-    for(;;)
+    while(isValid)
     {        
         Mat frame;
         cap >> frame; // get a new frame from camera
@@ -179,7 +142,7 @@ int destroyAroundMeGame()
             for( size_t i = 0; i < contours.size(); i++ )
             {          
                 Point* pnts = new Point[contours[i].size()];
-                for (int j = 0; j < contours[i].size(); j++)
+                for (size_t j = 0; j < contours[i].size(); j++)
                 {
                     pnts[j] = contours[i][j];
                 }
@@ -219,9 +182,6 @@ int destroyAroundMeGame()
                 {
                     std::cout << ex.msg << std::endl;
                 }
-
-                //imshow("inpainted", track->m_inpaintedScene);
-                //waitKey();
             }
         }
         else
@@ -230,9 +190,23 @@ int destroyAroundMeGame()
             {
                 Mat image_copy;
 
-                track->processFrame(frame, frame);
+                isValid = track->processFrame(frame, frame);
+
+                /*putText(frame, "Game Over!!!", cvPoint(30,30), FONT_HERSHEY_COMPLEX, 1.8, cvScalar(200,200,250), 1, CV_AA);
+
+                if (!isValid)
+                {
+                    putText(frame, "Game Over!!!", cvPoint(30,30), FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(200,200,250), 1, CV_AA);
+                }*/
 
                 imshow("output", frame);
+
+                if (track->getWorld()->isAllObjectsDestroyed())
+                {
+                    //putText(frame, "You won!!!", cvPoint(30,30), FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(200,200,250), 1, CV_AA);
+                    imshow("output", frame);
+                    break;
+                }                
             }
             catch (Exception ex)
             {
@@ -249,6 +223,16 @@ int destroyAroundMeGame()
         }   
         */ 
         if(waitKey(5) >= 0) break;
+    }
+
+    if (!isValid)
+    {
+        
+        cout << "Game Over!!!" << endl;
+    }
+    else
+    {
+        cout << "You won!!!" << endl;
     }
 
     return 1;
@@ -325,9 +309,9 @@ int simplify()
 
     paths.push_back(makeCircle(ClipperLib::IntPoint(180, 120), 50, 12));
 
-    for (int i = 0; i < paths.size(); i++)
+    for (size_t i = 0; i < paths.size(); i++)
     {
-        for (int j = 0; j < paths[i].size() - 1; j++)
+        for (size_t j = 0; j < paths[i].size() - 1; j++)
         {
             line(input, UnitsConvertor::ClipperPointToCvPoint(paths[i][j]), UnitsConvertor::ClipperPointToCvPoint(paths[i][j + 1]), cv::Scalar(0));
         }
@@ -341,9 +325,9 @@ int simplify()
     cout << simple.size() << " after simplyfication" << endl;
 
     input = Scalar(255);
-    for (int i = 0; i < simple.size(); i++)
+    for (size_t i = 0; i < simple.size(); i++)
     {
-        for (int j = 0; j < simple[i].size() - 1; j++)
+        for (size_t j = 0; j < simple[i].size() - 1; j++)
         {
             line(input, UnitsConvertor::ClipperPointToCvPoint(simple[i][j]), UnitsConvertor::ClipperPointToCvPoint(simple[i][j + 1]), cv::Scalar(0));
         }
@@ -428,9 +412,9 @@ int clipping()
     if(clipper.Execute(ClipperLib::ctIntersection, solution, ClipperLib::pftEvenOdd, ClipperLib::pftEvenOdd))
     {
         // draw the solution(s)
-        for (int i = 0; i < solution.size(); i++)
+        for (size_t i = 0; i < solution.size(); i++)
         {
-            for (int j = 0; j < solution[i].size() - 1; j++)
+            for (size_t j = 0; j < solution[i].size() - 1; j++)
             {
                 line(frame, cv::Point(solution[i][j].X, solution[i][j].Y), cv::Point(solution[i][j + 1].X, solution[i][j + 1].Y), orange, 1);
             }
@@ -441,7 +425,9 @@ int clipping()
 
     imshow("output", frame);
 
-    key = waitKey();      
+    key = waitKey();
+
+    return 1;
 }
 
 int inPaint()
@@ -485,7 +471,7 @@ int inPaint()
         for( size_t i = 0; i < contours.size(); i++ )
         {          
             Point* pnts = new Point[contours[i].size()]; //(Point*)malloc(sizeof(Point) * contours[i].size());
-            for (int j = 0; j < contours[i].size(); j++)
+            for (size_t j = 0; j < contours[i].size(); j++)
             {
                 pnts[j] = contours[i][j];
             }
@@ -517,6 +503,8 @@ int inPaint()
     imshow("results", output);
     
     waitKey();
+
+    return 1;
 }
 
 int triangulation()

@@ -19,6 +19,7 @@ VideoTracking::VideoTracking()
     this->m_featureTypeForDetection = FeatureType::ORB;
     this->m_useGoodPointsOnly = false;  // indicates that should only use "good points" (3 time the min distnace) for homography calculation.
 
+    this->setGameType(GameType::BARRIERS | GameType::PADDLES);  // default use barriers
 }
 
 VideoTracking::~VideoTracking()
@@ -27,6 +28,7 @@ VideoTracking::~VideoTracking()
     delete this->m_2DWorld;
 }
 
+// convert a Mat to grayscale taking into account number of channels
 void VideoTracking::getGray(const cv::Mat& input, cv::Mat& gray)
 {
     const int numChannes = input.channels();
@@ -55,23 +57,56 @@ void VideoTracking::setFeatureType(FeatureType feat_type)
     this->m_featureTypeForDetection = feat_type;
 }
 
+void VideoTracking::setGameType(GameType gameType)
+{
+    this->m_GameType = gameType;
+}
+
+VideoTracking::GameType VideoTracking::getGameType()
+{
+    return this->m_GameType;
+}
 //! Processes a frame and returns output image
 bool VideoTracking::processFrame(const cv::Mat& inputFrame, cv::Mat& outputFrame)
-{   
+{  
+     // copy the input to output frame
+    inputFrame.copyTo(outputFrame);
+    
+    // calculate the homography
+    calculateHomography(inputFrame);
+
+    if (!checkBallInScene(inputFrame.cols, inputFrame.rows))
+    {
+        return false;
+    }
+
+    // update the paddles if enabled
+    if (this->getGameType() & GameType::PADDLES)
+    {        
+        std::vector<cv::Point2f> scenePaddleLocations;
+        
+        CVUtils::transformPoints(this->m_paddlePositions, &scenePaddleLocations, this->m_refFrame2CurrentHomography);
+    
+        this->getWorld()->updatePaddlesLocations(scenePaddleLocations);
+    }
+
     this->m_2DWorld->update(m_refFrame2CurrentHomography);
 
     if(this->m_2DWorld->isAllObjectsDestroyed()){
         this->notifyObjectsDestryedObservers();
     }
-
-    // copy the input to output frame
-    inputFrame.copyTo(outputFrame);
-    
-    // calculate the homography
-    calculateHomography(inputFrame);
     
     // transform the scene
     transformScene(outputFrame);
+
+    // draw paddles
+    if (this->getGameType() & GameType::PADDLES)
+    {
+        for (size_t p = 0; p < this->m_paddlePositions.size(); p += 2) 
+        {
+            cv::line(outputFrame, this->m_paddlePositions[p], this->m_paddlePositions[p + 1], cv::Scalar(0, 0, 255, 255), 2);
+        }
+    }
 
     // debug drawing
     if (this->m_2DWorld->isDebugDrawEnabled()){
@@ -124,8 +159,31 @@ void VideoTracking::setReferenceFrame(const cv::Mat& reference)
     line(m_scene, cvPoint(reference.cols - SCENE_OFFSET, reference.rows - SCENE_OFFSET), cvPoint(reference.cols - SCENE_OFFSET, SCENE_OFFSET), GREEN_COLOR, 2);
     line(m_scene, cvPoint(reference.cols - SCENE_OFFSET, SCENE_OFFSET), cvPoint(SCENE_OFFSET, SCENE_OFFSET), GREEN_COLOR, 2);
 
-    this->m_2DWorld->initializeWorldOnFirstFrame(reference, this->isRestrictBallInScene());
+    // calculate the paddles positions
+    int width = reference.cols;
+    int height = reference.rows;
+    int lenX = width * 3 / 20; //0.15
+    int lenY = height * 3 / 20; //0.15;
+    int centerX = width / 2;
+    int centerY = height / 2;
 
+    // left paddle
+    this->m_paddlePositions.push_back(cv::Point(4, centerY - lenY));
+    this->m_paddlePositions.push_back(cv::Point(4, centerY + lenY));
+
+    // right paddle
+    this->m_paddlePositions.push_back(cv::Point(width - 4, centerY - lenY));
+    this->m_paddlePositions.push_back(cv::Point(width - 4, centerY + lenY));
+
+    // bottom paddle
+    this->m_paddlePositions.push_back(cv::Point(centerX - lenX, 4));
+    this->m_paddlePositions.push_back(cv::Point(centerX + lenX, 4));
+
+    // top paddle
+    this->m_paddlePositions.push_back(cv::Point(centerX - lenX, height - 4));
+    this->m_paddlePositions.push_back(cv::Point(centerX + lenX, height - 4));
+
+    this->m_2DWorld->initializeWorldOnFirstFrame(reference, this->isRestrictBallInScene());
 }
 
 bool isPointInScene (cv::Point2f point, int width, int height){
@@ -187,7 +245,7 @@ void VideoTracking::calculateHomography(const cv::Mat& inputFrame)
             double max_dist = 0; double min_dist = 100;
 
             // Quick calculation of max and min distances between keypoints
-            for( int i = 0; i < matches.size(); i++ )
+            for( size_t i = 0; i < matches.size(); i++ )
             {
                 double dist = matches[i].distance;
                 if( dist < min_dist ) min_dist = dist;
@@ -200,7 +258,7 @@ void VideoTracking::calculateHomography(const cv::Mat& inputFrame)
             // min dist could be 0 so make it slightly larger if zero
             min_dist = std::max(min_dist, 0.05);
 
-            for( int i = 0; i < matches.size(); i++ )
+            for( size_t i = 0; i < matches.size(); i++ )
             {
                 if( matches[i].distance < 3 * min_dist ) {
                     good_matches.push_back( matches[i]);
@@ -213,7 +271,7 @@ void VideoTracking::calculateHomography(const cv::Mat& inputFrame)
         // Localize the object
         std::vector<cv::Point2f> refPoints, newPoints;
 
-        for( int i = 0; i < matches.size(); i++ )
+        for( size_t i = 0; i < matches.size(); i++ )
         {
             // Get the keypoints from the good matche (reference and new)
             refPoints.push_back(m_refKeypoints[matches[i].queryIdx].pt);
@@ -232,6 +290,28 @@ void VideoTracking::calculateHomography(const cv::Mat& inputFrame)
             this->m_refFrame2CurrentHomography.copyTo(this->m_lastHomography);
         }
     }
+}
+
+bool VideoTracking::checkBallInScene(int width, int height)
+{
+    if(!this->isRestrictBallInScene())
+    {
+        if (m_refFrame2CurrentHomography.empty())
+        {
+            return true;
+        }
+
+        b2Vec2 ballPosition = this->m_2DWorld->getBallBody()->GetPosition();
+
+        cv::Point2f pointToCheck = CVUtils::transformPoint(cv::Point2f(ballPosition.x * PTM_RATIO, ballPosition.y * PTM_RATIO), this->m_refFrame2CurrentHomography);
+
+        if(!isPointInScene(pointToCheck, width, height)){
+            this->notifyBallInSceneObservers();
+            return false;
+        }
+    }
+    
+    return true;
 }
 
 // Transform the current known scene according to homography and merge it to output frame
@@ -265,7 +345,7 @@ void VideoTracking::transformScene(cv::Mat& outputFrame)
     cv::Mat mask_image(outputFrame.size(), CV_8U, BLACK_COLOR);
     std::vector<cv::Point*> destroyedPolygons = this->m_2DWorld->getDestroyedPolygons();
     std::vector<int> destroyedPolygonsPointCount = this->m_2DWorld->getDestroyedPolygonsPointCount();
-    for (int i = 0; i < destroyedPolygons.size(); i++)
+    for (size_t i = 0; i < destroyedPolygons.size(); i++)
     {
         const cv::Point* ppt[1] = { destroyedPolygons[i] };
         int npt[] = { destroyedPolygonsPointCount[i] };

@@ -10,14 +10,15 @@
 
 World::World() : m_objectBodies(){
 
-	dt = 1.0f/60.0f;
-	
-	// define world with gravity
+    dt = 1.0f/60.0f;
+    
+    // define world with gravity
     b2Vec2 gravity = b2Vec2(0.0f, 0.0f);
     this->m_world = new b2World(gravity);
 
     // set and enable debug drawing
     // TODO: make optional
+    this->m_debugDrawEnabled = false;
     this->m_debugDraw = new OpenCvDebugDraw(PTM_RATIO);
 
     m_world->SetDebugDraw(this->m_debugDraw);
@@ -28,62 +29,61 @@ World::World() : m_objectBodies(){
 }
 
 World::~World(){
-	delete m_world;
+    delete m_world;
     m_ballBody = NULL;
     m_world = NULL;
 
     delete m_debugDraw;
     delete m_contactListener;
-	m_guardLocations.clear();
-	m_destroyedPolygons.clear();
+    m_guardLocations.clear();
+    m_destroyedPolygons.clear();
     m_destroyedPolygonsPointCount.clear();
 }
 
 void World::setDebugDrawEnabled(bool enabled){
-	this->m_debugDrawEnabled = enabled;
+    this->m_debugDrawEnabled = enabled;
 }
 
 bool World::isDebugDrawEnabled(){
-	return this->m_debugDrawEnabled;
+    return this->m_debugDrawEnabled;
 }
 
 OpenCvDebugDraw * World::getDebugDraw(){
-	return this->m_debugDraw;
+    return this->m_debugDraw;
 }
 
 b2World * World::getWorld(){
-	return this->m_world;
+    return this->m_world;
 }
 
 std::vector<b2Body *> World::getObjectBodies(){
-	return this->m_objectBodies;
+    return this->m_objectBodies;
 }
 
 b2Body * World::getBallBody(){
-	return this->m_ballBody;
+    return this->m_ballBody;
 }
 
 std::vector<cv::Point2f*> World::getGuardLocations() {
-	return this->m_guardLocations;
+    return this->m_guardLocations;
 }
 
 bool World::isAllObjectsDestroyed(){
-	return this->m_objectBodies.size() == 0;
+    return this->m_objectBodies.size() == 0;
 }
 
 std::vector<cv::Point*> World::getDestroyedPolygons(){
-	return this->m_destroyedPolygons;
+    return this->m_destroyedPolygons;
 }
 
 std::vector<int> World::getDestroyedPolygonsPointCount(){
-	return this->m_destroyedPolygonsPointCount;
+    return this->m_destroyedPolygonsPointCount;
 }
 
 void World::initializeWorldOnFirstFrame(const cv::Mat& reference, const bool restrictBallToScene){
-	// following is box2d world/ball initialization
+    // following is box2d world/ball initialization
 
-    if(restrictBallToScene){
-
+    if(restrictBallToScene) {
         // Create edges around the entire screen
         b2BodyDef groundBodyDef;
         groundBodyDef.position.Set(0,0);
@@ -105,12 +105,12 @@ void World::initializeWorldOnFirstFrame(const cv::Mat& reference, const bool res
 
         // top
         groundEdge.Set(b2Vec2(0, visibleSize.height/PTM_RATIO),
-                       b2Vec2(visibleSize.width/PTM_RATIO, visibleSize.height/PTM_RATIO));
+            b2Vec2(visibleSize.width/PTM_RATIO, visibleSize.height/PTM_RATIO));
         this->m_groundBody->CreateFixture(&boxShapeDef);
 
         // right
         groundEdge.Set(b2Vec2(visibleSize.width/PTM_RATIO, visibleSize.height/PTM_RATIO),
-                       b2Vec2(visibleSize.width/PTM_RATIO, 0));
+            b2Vec2(visibleSize.width/PTM_RATIO, 0));
         this->m_groundBody->CreateFixture(&boxShapeDef);
     }
 
@@ -182,9 +182,40 @@ void World::setObjectsToBeModeled(const std::vector<std::vector<cv::Point>> cont
     }
 }
 
+void World::updatePaddlesLocations(std::vector<cv::Point2f> points)
+{    
+    if (!m_paddlesBody)
+    {
+        // Create edges around the entire screen
+        b2BodyDef paddleBodyDef;
+        paddleBodyDef.position.Set(0,0);
+
+        this->m_paddlesBody = m_world->CreateBody(&paddleBodyDef);        
+    }
+    else
+    {
+        for (b2Fixture* f = this->m_paddlesBody->GetFixtureList(); f; )
+        {
+            b2Fixture* fixtureToDestroy = f;
+            f = f->GetNext();
+            this->m_paddlesBody->DestroyFixture( fixtureToDestroy );
+        }
+    }
+
+    // now add the paddles in their transformed location
+    b2EdgeShape paddleEdgde;
+    b2FixtureDef paddleShape;
+    paddleShape.shape = &paddleEdgde;
+
+    for (size_t p = 0; p < points.size(); p+=2) {
+        paddleEdgde.Set(b2Vec2(points[p].x / PTM_RATIO, points[p].y / PTM_RATIO), b2Vec2(points[p + 1].x / PTM_RATIO, points[p + 1].y / PTM_RATIO));
+        this->m_paddlesBody->CreateFixture(&paddleShape);
+    }
+}
+
 void World::update(cv::Mat &homography)
 {
-	this->m_world->Step(dt, 10, 10);
+    this->m_world->Step(dt, 10, 10);
 
     //check contacts
     std::vector<MyContact>::iterator pos;
@@ -197,8 +228,9 @@ void World::update(cv::Mat &homography)
     {
         MyContact contact = *pos;
 
-        if ((contact.fixtureA == this->m_ballFixture || contact.fixtureB == this->m_ballFixture) &&
-            (contact.fixtureA->GetBody() != m_groundBody && contact.fixtureB->GetBody() != m_groundBody))
+        if ((contact.fixtureA == this->m_ballFixture || contact.fixtureB == this->m_ballFixture) 
+            && (contact.fixtureA->GetBody() != m_groundBody && contact.fixtureB->GetBody() != m_groundBody)
+            && (contact.fixtureA->GetBody() != m_paddlesBody && contact.fixtureB->GetBody() != m_paddlesBody))
         {
             b2Fixture* objectFixture = contact.fixtureA == this->m_ballFixture ? contact.fixtureB : contact.fixtureA;
             b2Body *objectBody = objectFixture->GetBody();
@@ -326,11 +358,11 @@ void World::update(cv::Mat &homography)
 }
 
 void World::createNewPhysicPointInWorld(const cv::Point2f point){
-	// add to the world model
+    // add to the world model
     b2BodyDef bodyDef;
     bodyDef.type = b2_staticBody;
     bodyDef.position.Set(point.x/PTM_RATIO, point.y/PTM_RATIO);
-	//    std::cout << "[" << targetPoints[0].x/PTM_RATIO << "," <<targetPoints[0].y/PTM_RATIO << "]" << std::endl;
+    //    std::cout << "[" << targetPoints[0].x/PTM_RATIO << "," <<targetPoints[0].y/PTM_RATIO << "]" << std::endl;
     b2Body *body = m_world->CreateBody(&bodyDef);
 
     b2CircleShape circle;

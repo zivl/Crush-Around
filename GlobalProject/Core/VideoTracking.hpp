@@ -20,10 +20,20 @@
 
 #include "Core/Globals.h"
 
+template<class T> inline T operator~ (T a) { return (T)~(int)a; }
+template<class T> inline T operator| (T a, T b) { return (T)((int)a | (int)b); }
+template<class T> inline T operator& (T a, T b) { return (T)((int)a & (int)b); }
+template<class T> inline T operator^ (T a, T b) { return (T)((int)a ^ (int)b); }
+template<class T> inline T& operator|= (T& a, T b) { return (T&)((int&)a |= (int)b); }
+template<class T> inline T& operator&= (T& a, T b) { return (T&)((int&)a &= (int)b); }
+template<class T> inline T& operator^= (T& a, T b) { return (T&)((int&)a ^= (int)b); }
+
 class VideoTracking : IBallInSceneObserver, IObjectsDestryedObserver
 {
 public:
     enum FeatureType { ORB, SIFT, SURF };
+
+    enum GameType { BARRIERS = 1, PADDLES = 2 };
 
     VideoTracking();
     ~VideoTracking();
@@ -65,6 +75,8 @@ public:
     virtual void detachBallInSceneObserver(std::function<void()> func);
     virtual void notifyBallInSceneObservers();
 
+    void setGameType(GameType gameType);
+    GameType getGameType();
 private:
 
     std::vector<std::function<void()>> m_objectsDestroyedObserversList;
@@ -105,6 +117,10 @@ private:
     // transform scene and add to output frame
     void transformScene(cv::Mat& outputFrame);
 
+    // check if ball is in scene considering the ball position (in "physical world") and homography
+    // if not, notifies that ball left sence (to observers) and return false if not 
+    bool checkBallInScene(int width, int height);
+
     // smooth the homography
     void smoothHomography();
 
@@ -125,6 +141,12 @@ private:
 
     // flag indicating whether the homography calculation should be based on "good points" only
     bool m_useGoodPointsOnly;
+
+    // type of game - barriers or paddles
+    GameType m_GameType;
+
+    // position of the paddles (relative to the screen/frame
+    std::vector<cv::Point2f> m_paddlePositions;
 };
 
 
