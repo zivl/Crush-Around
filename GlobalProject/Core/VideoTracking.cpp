@@ -395,7 +395,7 @@ void VideoTracking::transformScene(cv::Mat& outputFrame)
 }
 
 void VideoTracking::onPanGestureEnded(std::vector<cv::Point> touchPoints){
-    if (this->getGameType & GameType::BARRIERS)
+    if (this->getGameType() & GameType::BARRIERS)
     {
         for (std::vector<cv::Point>::iterator it = touchPoints.begin() ; it != touchPoints.end(); ++it){
             this->onMouse(CV_EVENT_LBUTTONDOWN, it->x, it->y, NULL, NULL);
@@ -410,7 +410,7 @@ void VideoTracking::onMouse( int event, int x, int y, int, void* )
         return;
     }
 
-    if (this->getGameType & GameType::BARRIERS)
+    if (this->getGameType() & GameType::BARRIERS)
     {
         cv::Point2f targetPoint = CVUtils::transformPoint(cv::Point2f(x, y), this->m_refFrame2CurrentHomography.inv());
 
