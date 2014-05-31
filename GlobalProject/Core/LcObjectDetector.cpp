@@ -23,7 +23,6 @@ std::vector<std::vector<cv::Point> > LcObjectDetector::getObjectContours(const c
     cv::Mat gray;
     cv::cvtColor(image, gray, image.channels() == 3 ? CV_BGR2GRAY : CV_BGRA2GRAY);
 
-
     // perform canny edge detectors with the specified thresholds
     // TODO: move threshold to be class fields with get/set.
     cv::Canny(gray, output, 100, 200);
@@ -32,8 +31,6 @@ std::vector<std::vector<cv::Point> > LcObjectDetector::getObjectContours(const c
     cv::imshow("canny", output);
 #endif
     /*
-
-
     cv::Mat kernel = cv::getStructuringElement(CV_SHAPE_RECT, cv::Size(5, 5));
 
     // do openning
