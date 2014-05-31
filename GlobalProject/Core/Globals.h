@@ -20,5 +20,4 @@ extern bool trackObject;
 #define BLUE_COLOR cv::Scalar(255, 0, 0)
 
 #define OUTPUT_STEPS 0
-
 #endif

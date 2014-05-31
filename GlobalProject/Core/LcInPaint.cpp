@@ -14,11 +14,11 @@ void LcInPaint::inpaint(const Mat input, std::vector<std::vector<cv::Point>> con
     std::vector<std::vector<cv::Point>> offsetContours;
 
     // translate the contours to clipper format 
-    for( size_t i = 0; i < contours.size(); i++ )
+    for(size_t i = 0; i < contours.size(); i++)
     {
         ClipperLib::Paths polygons;
         ClipperLib::Path polygon;
-        for (int j = 0; j < contours[i].size(); j++)
+        for (size_t j = 0; j < contours[i].size(); j++)
         {
             polygon.push_back(ClipperLib::IntPoint(contours[i][j].x, contours[i][j].y));
         }
@@ -33,11 +33,11 @@ void LcInPaint::inpaint(const Mat input, std::vector<std::vector<cv::Point>> con
         clipperOffset.Execute(offsetPolygons, 5);
 
         // now, translate back to open cv format
-        for( size_t i = 0; i < offsetPolygons.size(); i++ )
+        for(size_t i = 0; i < offsetPolygons.size(); i++)
         {
             std::vector<cv::Point> offsetContour;
 
-            for (int j = 0; j < offsetPolygons[i].size(); j++)
+            for (size_t j = 0; j < offsetPolygons[i].size(); j++)
             {
                 offsetContour.push_back(cv::Point((int)offsetPolygons[i][j].X, (int)offsetPolygons[i][j].Y));
             }
@@ -50,7 +50,7 @@ void LcInPaint::inpaint(const Mat input, std::vector<std::vector<cv::Point>> con
     for( size_t i = 0; i < offsetContours.size(); i++ )
     {
         Point* pnts = new Point[offsetContours[i].size()];
-        for (int j = 0; j < offsetContours[i].size(); j++)
+        for (size_t j = 0; j < offsetContours[i].size(); j++)
         {
             pnts[j] = offsetContours[i][j];
         }
