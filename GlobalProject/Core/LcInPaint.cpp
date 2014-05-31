@@ -30,7 +30,7 @@ void LcInPaint::inpaint(const Mat input, std::vector<std::vector<cv::Point>> con
         clipperOffset.AddPaths(polygons, ClipperLib::jtRound, ClipperLib::etClosedPolygon);
 
         ClipperLib::Paths offsetPolygons;
-        clipperOffset.Execute(offsetPolygons, 3);
+        clipperOffset.Execute(offsetPolygons, 5);
 
         // now, translate back to open cv format
         for( size_t i = 0; i < offsetPolygons.size(); i++ )
