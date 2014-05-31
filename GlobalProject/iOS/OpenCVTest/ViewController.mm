@@ -159,7 +159,7 @@ std::vector<std::vector<cv::Point>> getLCDetection(const cv::Mat &image, cv::Mat
 
 		const cv::Point* ppt[1] = { pnts };
 		int npt[] = { (int)contours[i].size() };
-		fillPoly(output, ppt, npt, 1, cv::Scalar(120, 250, 50, 150));
+		fillPoly(output, ppt, npt, 1, cv::Scalar(120, 250, 50, 100));
 		delete pnts;
 	}
 
@@ -171,9 +171,6 @@ std::vector<std::vector<cv::Point>> contours;
 
 - (void)processImage:(Mat&)image;
 {
-	//Mat image_copy;
-	//image.copyTo(image_copy);
-    //cvtColor(image, image_copy, CV_BGRA2BGR);
 	if(imageForSegmentationHasBeenTaken){
 		if(isFirst){
 			isFirst = !isFirst;
@@ -188,18 +185,18 @@ std::vector<std::vector<cv::Point>> contours;
 			track->prepareInPaintedScene(firstImage, contours);
 			[self assignListenersToVideoTracker];
 			track->getWorld()->setDebugDrawEnabled(false);
-			track->setRestrictBallInScene(true);
+			track->setRestrictBallInScene(false);
 			track->setReferenceFrame(firstImage);
 			track->getWorld()->setObjectsToBeModeled(contours);
 		}
 		else {
 			track->processFrame(image, image);
 		}
-		//image = image_copy;
-		//cvtColor(image_copy, image, CV_BGR2BGRA);
 	}
 	else{
-		contours = getLCDetection(image, image);
+		cv::Mat output(image.size(), image.type());
+		contours = getLCDetection(image, output);
+		image += output;
 	}
 }
 
@@ -297,6 +294,9 @@ Mat getWatershedSegmentation(Mat image) {
 
 -(void)onGameOverOKButton {
 	[self.notificationView removeHandlerWithTarget:self withAction:@selector(onGameOverOKButton)];
+	track = NULL;
+	imageForSegmentationHasBeenTaken = NO;
+	isFirst = YES;
 	[self dismissViewControllerAnimated:YES completion:nil];
 }
 

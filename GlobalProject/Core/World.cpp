@@ -194,12 +194,14 @@ void World::updatePaddlesLocations(std::vector<cv::Point2f> points)
     }
     else
     {
-        for (b2Fixture* f = this->m_paddlesBody->GetFixtureList(); f; )
-        {
-            b2Fixture* fixtureToDestroy = f;
-            f = f->GetNext();
-            this->m_paddlesBody->DestroyFixture( fixtureToDestroy );
-        }
+		if(this->m_paddlesBody->GetFixtureList()){
+			for (b2Fixture* f = this->m_paddlesBody->GetFixtureList(); f; )
+			{
+				b2Fixture* fixtureToDestroy = f;
+				f = f->GetNext();
+				this->m_paddlesBody->DestroyFixture( fixtureToDestroy );
+			}
+		}
     }
 
     // now add the paddles in their transformed location
