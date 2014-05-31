@@ -100,7 +100,7 @@ private:
     cv::Mat m_scene;
 
     // Calculate homography for reference and new features,    
-    void calculateHomography(cv::Mat& outputFrame);
+    void calculateHomography(const cv::Mat& inputFrame);
 
     // transform scene and add to output frame
     void transformScene(cv::Mat& outputFrame);

@@ -65,28 +65,9 @@ bool VideoTracking::processFrame(const cv::Mat& inputFrame, cv::Mat& outputFrame
     }
 
     inputFrame.copyTo(outputFrame);
-    cv::Mat tempInputFrame;
-    cv::cvtColor(inputFrame, tempInputFrame, CV_BGRA2BGR);
-
-    getGray(tempInputFrame, m_nextImg);
-
-    switch (m_featureTypeForDetection)
-    {
-        case FeatureType::SIFT:
-            m_siftEngine(m_nextImg, cv::Mat(), m_nextKeypoints, m_nextDescriptors);
-            break;
-        case FeatureType::SURF:
-            // detect key points
-            m_surfDetector.detect(m_nextImg, m_nextKeypoints);
-            // extract features corresponding to the key points
-            m_surfExtractor.compute(m_nextImg, m_nextKeypoints, m_nextDescriptors);
-            break;
-        case FeatureType::ORB:
-            m_orbFeatureEngine(m_nextImg, cv::Mat(), m_nextKeypoints, m_nextDescriptors);
-            break;
-    }
     
-    calculateHomography(outputFrame);
+    calculateHomography(inputFrame);
+
     transformScene(outputFrame);
 
     if (this->m_2DWorld->isDebugDrawEnabled()){
@@ -154,9 +135,29 @@ void VideoTracking::smoothHomography(){
 // calculate homography for keypoint/descriptors based tracking,
 // find matching (corresponding) features (using open CV built in matcher)
 // calculate the homograpgy (using open CV built in function that uses RANSAC)
-// then transform the scene and add it to the output frame
-void VideoTracking::calculateHomography(cv::Mat& outputFrame)
+void VideoTracking::calculateHomography(const cv::Mat& inputFrame)
 {
+    cv::Mat tempInputFrame;
+    cv::cvtColor(inputFrame, tempInputFrame, CV_BGRA2BGR);
+
+    getGray(tempInputFrame, m_nextImg);
+
+    switch (m_featureTypeForDetection)
+    {
+        case FeatureType::SIFT:
+            m_siftEngine(m_nextImg, cv::Mat(), m_nextKeypoints, m_nextDescriptors);
+            break;
+        case FeatureType::SURF:
+            // detect key points
+            m_surfDetector.detect(m_nextImg, m_nextKeypoints);
+            // extract features corresponding to the key points
+            m_surfExtractor.compute(m_nextImg, m_nextKeypoints, m_nextDescriptors);
+            break;
+        case FeatureType::ORB:
+            m_orbFeatureEngine(m_nextImg, cv::Mat(), m_nextKeypoints, m_nextDescriptors);
+            break;
+    }
+
     // transform the sence using descriptors, correspondance and homography
     if (m_refKeypoints.size() > 3)
     {
