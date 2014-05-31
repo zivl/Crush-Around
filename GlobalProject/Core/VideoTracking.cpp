@@ -64,12 +64,16 @@ bool VideoTracking::processFrame(const cv::Mat& inputFrame, cv::Mat& outputFrame
         this->notifyObjectsDestryedObservers();
     }
 
+    // copy the input to output frame
     inputFrame.copyTo(outputFrame);
     
+    // calculate the homography
     calculateHomography(inputFrame);
-
+    
+    // transform the scene
     transformScene(outputFrame);
 
+    // debug drawing
     if (this->m_2DWorld->isDebugDrawEnabled()){
         // add the debug drawing
         this->m_2DWorld->getDebugDraw()->SetScene(outputFrame);
