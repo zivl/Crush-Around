@@ -77,7 +77,9 @@ jni_part.cpp \
 ../../Box2d/Dynamics/b2WorldCallbacks.cpp \
 ../../Box2d/Rope/b2Rope.cpp		   
 				   
-LOCAL_LDLIBS +=  -llog -ldl# -lbox2d
+#LOCAL_LDLIBS +=  -llog -ldl# -lbox2d
+
+LOCAL_SHARED_LIBRARIES = -llog -ldl
 
 #LOCAL_WHOLE_STATIC_LIBRARIES += box2d_static
 

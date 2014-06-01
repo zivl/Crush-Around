@@ -138,7 +138,7 @@ public class Tutorial2Activity extends Activity implements CvCameraViewListener2
     public void onCameraViewStarted(int width, int height) {
         mRgba = new Mat(height, width, CvType.CV_8UC4);
         mIntermediateMat = new Mat(height, width, CvType.CV_8UC4);
-        mGray = new Mat(height, width, CvType.CV_8UC1);
+        //mGray = new Mat(height, width, CvType.CV_8UC1);
     }
 
     public void onCameraViewStopped() {
@@ -150,10 +150,11 @@ public class Tutorial2Activity extends Activity implements CvCameraViewListener2
     public Mat onCameraFrame(CvCameraViewFrame inputFrame) {      
         // input frame has RGBA format
         mRgba = inputFrame.rgba();
-        mGray = inputFrame.gray();
+        //mGray = inputFrame.gray();
+        mRgba.copyTo(mIntermediateMat);
         if (!m_initialized) {
         	Log.e("Tomer", "In java doInit: " + m_doInit);
-        	FindFeatures(mGray.getNativeObjAddr(), mRgba.getNativeObjAddr(), m_doInit ? 1:0);
+        	FindFeatures(mIntermediateMat.getNativeObjAddr(), m_doInit ? 1:0);
         }
 
         return mRgba;
@@ -164,5 +165,5 @@ public class Tutorial2Activity extends Activity implements CvCameraViewListener2
         return true;
     }
 
-    public native void FindFeatures(long matAddrGr, long matAddrRgba, int doInit);
+    public native void FindFeatures(long matAddrRgba, int doInit);
 }
