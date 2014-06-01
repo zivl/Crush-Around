@@ -184,8 +184,8 @@ std::vector<std::vector<cv::Point>> contours;
 			track = new VideoTracking();
 			track->prepareInPaintedScene(firstImage, contours);
 			[self assignListenersToVideoTracker];
-			track->getWorld()->setDebugDrawEnabled(true);
-			track->setRestrictBallInScene(false);
+			track->getWorld()->setDebugDrawEnabled(false);
+			track->setRestrictBallInScene(true);
 			track->setReferenceFrame(firstImage);
 			track->getWorld()->setObjectsToBeModeled(contours);
 		}
