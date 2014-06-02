@@ -6,7 +6,7 @@ Mobile games separates the player from his surrounding and his peers.
 Crouching on top of the mobile device, the player is isolated. 
 
 But it doesn’t have to be that way...
-**Crush Around** lets the user play in its surrounding by augmenting a game later on top of the real world which encourages him to open up to the world. In addition, by playing in the real world, the game is meaningful not only to the player but to other people by sharing the game play epic achievements.
+**Crush Around** lets the user play in its surrounding by augmenting a game layer on top of the real world which encourages him to open up to the world. In addition, by playing in the real world, the game is meaningful not only to the player but to other people by sharing the game play epic achievements.
 
 In **Crush Around** the gamer points the mobile device camera onto the scene.
 
