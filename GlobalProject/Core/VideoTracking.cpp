@@ -21,11 +21,11 @@ VideoTracking::VideoTracking()
     this->m_matcher = new cv::FlannBasedMatcher(new cv::flann::LshIndexParams(5, 24, 2));
     this->m_2DWorld = new World(this->m_ballRadius);
     this->m_featureTypeForDetection = FeatureType::ORB;
-    this->m_useGoodPointsOnly = false;  // indicates that should only use "good points" (3 time the min distnace) for homography calculation.
+    this->m_useGoodPointsOnly = true;  // indicates that should only use "good points" (3 time the min distnace) for homography calculation.
 
     this->setGameType(GameType::BARRIERS | GameType::PADDLES);  // default use barriers
 
-    this->m_homographyHelper = false;
+    this->m_homographyHelper = true;
 }
 
 VideoTracking::~VideoTracking()
@@ -169,6 +169,18 @@ void VideoTracking::setReferenceFrame(const cv::Mat& reference)
             break;
     }
 
+#if defined _MSC_VER && OUTPUT_STEPS
+    cv::Mat keyPointsFrame;
+    reference.copyTo(keyPointsFrame);
+
+    for (size_t i = 0; i < m_refKeypoints.size(); i++)
+    {
+        cv:circle(keyPointsFrame, m_refKeypoints[i].pt, 2, cv::Scalar(200, 100, 255, 255), -1);
+    }
+
+    cv::imshow("ref_keypoints", keyPointsFrame);
+#endif
+
     // create the scene and draw square and borders in it
     m_scene.create(reference.rows, reference.cols, CV_8UC4);
     m_scene = cv::Scalar(0, 0, 0, 255);
@@ -254,6 +266,18 @@ void VideoTracking::calculateHomography(const cv::Mat& inputFrame)
             break;
     }
 
+#if defined _MSC_VER && OUTPUT_STEPS
+    cv::Mat keyPointsFrame;
+    inputFrame.copyTo(keyPointsFrame);
+
+    for (size_t i = 0; i < m_refKeypoints.size(); i++)
+    {
+        cv:circle(keyPointsFrame, m_refKeypoints[i].pt, 2, cv::Scalar(150, 150, 255, 255), -1);
+    }
+
+    cv::imshow("current_keypoints", keyPointsFrame);
+#endif
+
     // transform the sence using descriptors, correspondance and homography
     if (m_refKeypoints.size() > 3)
     {
@@ -314,6 +338,13 @@ void VideoTracking::calculateHomography(const cv::Mat& inputFrame)
             refPoints.push_back(m_refKeypoints[matches[i].queryIdx].pt);
             newPoints.push_back(m_nextKeypoints[matches[i].trainIdx].pt);
         }
+
+#if defined _MSC_VER && OUTPUT_STEPS && 0
+        cv::Mat img_matches;
+        cv::drawMatches(m_refFrame, m_refKeypoints, m_nextImg, m_nextKeypoints, matches, img_matches);
+
+        cv::imshow("matches", img_matches);
+#endif
 
         if (refPoints.size() > 3 && newPoints.size() > 3)
         {

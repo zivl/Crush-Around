@@ -62,6 +62,10 @@ void LcInPaint::inpaint(const Mat input, std::vector<std::vector<cv::Point>> con
         delete[] pnts;
     }
 
+#if defined _MSC_VER && OUTPUT_STEPS
+    cv::imshow("inpaint_mask", mask);
+#endif
+
     // finally, do the inpaint
     //cv::Mat tempInput, tempOutput;
     cv::Mat temp;
