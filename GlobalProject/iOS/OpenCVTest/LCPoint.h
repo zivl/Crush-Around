@@ -5,6 +5,7 @@
 //  Created by Ziv Levy on 5/5/14.
 //  Copyright (c) 2014 Ziv Levy. All rights reserved.
 //
+//  this class is a helper class to convert from cv::Point to CGPoint
 
 #import <Foundation/Foundation.h>
 

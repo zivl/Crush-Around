@@ -5,6 +5,7 @@
 //  Created by Ziv Levy on 5/13/14.
 //  Copyright (c) 2014 Ziv Levy. All rights reserved.
 //
+// this class represents a world scence with physics rules such as gravity and stuff
 
 #ifndef __DestroyAroundMe__World__
 #define __DestroyAroundMe__World__

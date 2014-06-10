@@ -5,6 +5,7 @@
 //  Created by Ziv Levy on 5/8/14.
 //  Copyright (c) 2014 Ziv Levy. All rights reserved.
 //
+// Observer class to raise event when all objects has been destroyed
 
 #ifndef DestroyAroundMe_IObjectsDestryedObserver_h
 #define DestroyAroundMe_IObjectsDestryedObserver_h

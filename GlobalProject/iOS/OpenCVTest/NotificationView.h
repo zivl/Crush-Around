@@ -5,6 +5,7 @@
 //  Created by Ziv Levy on 5/5/14.
 //  Copyright (c) 2014 Ziv Levy. All rights reserved.
 //
+//  this class represents a notification view and logic with dedicated UI design
 
 #import <UIKit/UIKit.h>
 

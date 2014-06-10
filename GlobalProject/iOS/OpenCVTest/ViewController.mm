@@ -8,7 +8,6 @@
 
 #import "ViewController.h"
 #import "VideoTracking.hpp"
-#include "WatershedSegmenter.h"
 #include "LcObjectDetector.h"
 #import "SpriteLayer.h"
 #import "GameConfiguration.h"
@@ -20,6 +19,8 @@
 @end
 
 @implementation ViewController
+
+// getters ans setters
 @synthesize videoCamera;
 @synthesize fontLarge;
 @synthesize fontSmall;
@@ -53,7 +54,7 @@
 	[self updateCountdown];
 }
 
-
+// some private class variables
 BOOL isFirst = YES;
 BOOL imageForSegmentationHasBeenTaken = NO;
 NSTimer *mainGameTimer;
@@ -70,13 +71,15 @@ std::vector<cv::Point> touchPoints;
 	[super viewDidLoad];
 
 	[self loadGameControls];
-//	[self.notificationView showNotificationWithMessage:@"Find an object to blow up :)"];
+    [self.notificationView showNotificationWithMessage:@"Find an object to blow up :)"];
 	[self configureImageCameraAndImageProcessingObjects];
 }
 
 
 
-
+/**
+ * openCV video camera configuration
+ */
 -(void)configureImageCameraAndImageProcessingObjects{
     self.videoCamera = [[CvVideoCamera alloc] initWithParentView:imageView];
 	self.videoCamera.delegate = self;
@@ -89,6 +92,9 @@ std::vector<cv::Point> touchPoints;
 	[self.videoCamera start];
 }
 
+/*
+ * configure finger gestures
+ */
 -(void)configureGestures {
 	UIPanGestureRecognizer *panGestureRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(onFingerPan:)];
 	[imageView addGestureRecognizer:panGestureRecognizer];
@@ -101,6 +107,9 @@ std::vector<cv::Point> touchPoints;
 
 static const CGFloat kCornerRadius = 10.0f;
 
+/*
+ * loading the game controls
+ */
 -(void)loadGameControls {
 	self.fontLarge = [UIFont fontWithName:@"GROBOLD" size:18.0f];
     self.fontSmall = [UIFont fontWithName:@"GROBOLD" size:14.0f];
@@ -141,6 +150,10 @@ static const CGFloat kCornerRadius = 10.0f;
 
 #pragma mark - Protocol CvVideoCameraDelegate
 #ifdef __cplusplus
+
+/*
+ *	find objects in a given image by the algorythm specified in LcObjectDetector
+ */
 std::vector<std::vector<cv::Point>> getLCDetection(const cv::Mat &image, cv::Mat &output){
 	std::vector<std::vector<cv::Point>> contours;
 
@@ -169,6 +182,9 @@ std::vector<std::vector<cv::Point>> getLCDetection(const cv::Mat &image, cv::Mat
 
 std::vector<std::vector<cv::Point>> contours;
 
+/*
+ * the callback function for each frame captured by the video camera
+ */
 - (void)processImage:(Mat&)image;
 {
 	if(imageForSegmentationHasBeenTaken){
@@ -200,6 +216,9 @@ std::vector<std::vector<cv::Point>> contours;
 	}
 }
 
+/*
+ * assigning listeners to video tracker instance
+ */
 -(void) assignListenersToVideoTracker {
 	track->delegateBallHitObserver((^(float x, float y) {
 		LCPoint *point = [[LCPoint alloc] init];
@@ -215,34 +234,35 @@ std::vector<std::vector<cv::Point>> contours;
 	}));
 }
 
-Mat getWatershedSegmentation(Mat image) {
-    //Create watershed segmentation object
-    WatershedSegmenter segmenter;
-    segmenter.createMarkersFromImage(image);
-	Mat wshedMask = segmenter.findSegments(image);
-	Mat mask;
-	segmenter.getSegmentedMask(wshedMask, mask);
-
-    return mask;
-}
-
 #endif
 
+/*
+ * event handler when ball is not in the scene anymore
+ */
 -(void)onBallNotInScene {
 	[self wrapUpAndFinishTheGame:GameEndedDueToBallWentOutOfScene];
 }
 
+/*
+ * event handler when all objects has been destroyed
+ */
 -(void)onAllObjectsHaveBeenDestroyed {
 	[self wrapUpAndFinishTheGame:GameEndedDueToAllObjectsHasBeenDestroyed];
 }
 
+/*
+ * event handler when ball hit an object
+ */
 -(void)ballHitAtPoint:(LCPoint *) point {
 	[self showExplosionAtPoint: [point getCGPoint]];
 	[self setScore:self.score + 12];
 }
 
+/*
+ * calculate the time that is esimated to destroy the objects.
+ */
 -(void)calculateNecessaryTimeForArea:(double)area andNumberOfObjects:(int) numberOfObjects{
-	int time = 60;//area / 10 / numberOfObjects / 2;
+	int time = area / 10 / numberOfObjects / 2;
 	self.timeInSeconds = time;
 }
 
@@ -263,6 +283,9 @@ Mat getWatershedSegmentation(Mat image) {
 	}
 }
 
+/*
+ * this function is being called when the game is over for some reason 
+ */
 -(void)wrapUpAndFinishTheGame:(GameEnded)reason {
 	[mainGameTimer invalidate];
 	[self.videoCamera stop];
@@ -306,6 +329,9 @@ Mat getWatershedSegmentation(Mat image) {
     self.timerTimeLeftLabel.text = [NSString stringWithFormat:@"%02d:%02d", minutes, seconds];
 }
 
+/*
+ * kicks off the game after the player has selected the objects
+ */
 -(IBAction)onBlowItUpButton:(id)sender {
 	if(!imageForSegmentationHasBeenTaken){
 		imageForSegmentationHasBeenTaken = YES;
@@ -329,12 +355,18 @@ Mat getWatershedSegmentation(Mat image) {
 	touchPoints.clear();
 }
 
+/*
+ * event handler when there is a finger tap
+ */
 -(void)onFingerTap:(UITapGestureRecognizer *)recognizer {
 	CGPoint location = [recognizer locationInView:imageView];
 	track->onMouse(1, location.x, location.y, nil, nil);
 	[self reduceScore: 1];
 }
 
+/*
+ * event handler when there is a finger panning
+ */
 -(void)onFingerPan:(UIPanGestureRecognizer *)recognizer {
 	if(recognizer.state == UIGestureRecognizerStateEnded){
 		if(track){
@@ -353,6 +385,9 @@ Mat getWatershedSegmentation(Mat image) {
 	[self setScore: self.score - points];
 }
 
+/*
+ * do the explosion animation at the hit point
+ */
 - (void)showExplosionAtPoint:(CGPoint)point {
     // (1) Create the explosion sprite
     UIImage * explosionImageOrig = [UIImage imageNamed:@"explosion"];

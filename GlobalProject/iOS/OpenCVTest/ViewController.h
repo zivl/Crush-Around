@@ -6,9 +6,7 @@
 //  Copyright (c) 2014 Ziv Levy. All rights reserved.
 //
 
-//
-// Prefix header for all source files of the 'VideoFilters' target in the 'VideoFilters' project
-//
+// this is the main game play view controller.
 
 #import <Availability.h>
 
