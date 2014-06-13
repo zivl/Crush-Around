@@ -100,7 +100,7 @@ int destroyAroundMeGame()
     VideoTracking *track = new VideoTracking();
     //track->getWorld()->setDebugDrawEnabled(true);
     track->setFeatureType(VideoTracking::FeatureType::ORB);
-    track->setRestrictBallInScene(false);
+    track->setRestrictBallInScene(true);
     //track->setGameType(VideoTracking::GameType::BARRIERS);
 
     bool isValid = true;
@@ -137,19 +137,22 @@ int destroyAroundMeGame()
             contours = objDetector.getObjectContours(tempFrame);
           
             // draw each contour
-            for( size_t i = 0; i < contours.size(); i++ )
+            for(size_t  i = 0; i < contours.size(); i++ )
             {          
-                Point* pnts = new Point[contours[i].size()];
-                for (size_t j = 0; j < contours[i].size(); j++)
+                //Point* pnts = new Point[contours[i].size()];
+                size_t j;
+                for (j = 0; j < contours[i].size(); j++)
                 {
-                    pnts[j] = contours[i][j];
+                    //pnts[j] = contours[i][j];
+                    cv::line(contoursFrame, contours[i][j], contours[i][(j + 1) % contours[i].size()], Scalar(65, 255, 120, 255), 2);
                 }
-
+                /*
                 const Point* ppt[1] = { pnts };
                 int npt[] = { contours[i].size() };
                 fillPoly(contoursFrame, ppt, npt, 1, Scalar(65, 255, 120, 255));
 
-                delete[] pnts;
+                delete[] pnts;*/
+                
             }
 
             // show to the user
@@ -187,6 +190,9 @@ int destroyAroundMeGame()
             try
             {
                 Mat image_copy;
+
+                // show to the user
+                imshow("input", frame);
 
                 isValid = track->processFrame(frame, frame);
 

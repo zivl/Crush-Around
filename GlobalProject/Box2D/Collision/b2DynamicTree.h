@@ -21,6 +21,7 @@
 
 #include <Box2D/Collision/b2Collision.h>
 #include <Box2D/Common/b2GrowableStack.h>
+#include <stdlib.h>
 
 #define b2_nullNode (-1)
 

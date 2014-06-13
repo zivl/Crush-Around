@@ -2,7 +2,7 @@ LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
 
-LOCAL_MODULE := box2d_static
+LOCAL_MODULE := box2d
 
 LOCAL_MODULE_FILENAME := libbox2d
 

@@ -15,36 +15,38 @@ std::vector<std::vector<cv::Point> > contours;
 VideoTracking tracker;
 extern "C"
 {
-	JNIEXPORT void JNICALL Java_org_opencv_samples_tutorial2_Tutorial2Activity_FindFeatures(JNIEnv*, jobject, jlong addrGray, jlong addrRgba, jint doInit);
+	JNIEXPORT void JNICALL Java_org_opencv_samples_tutorial2_Tutorial2Activity_FindFeatures(JNIEnv*, jobject, jlong addrRgba, jint doInit);
 
-	JNIEXPORT void JNICALL Java_org_opencv_samples_tutorial2_Tutorial2Activity_FindFeatures(JNIEnv* env, jobject, jlong addrGray, jlong addrRgba, jint doInit)
+	JNIEXPORT void JNICALL Java_org_opencv_samples_tutorial2_Tutorial2Activity_FindFeatures(JNIEnv* env, jobject, jlong addrRgba, jint doInit)
 	{
+		__android_log_print(ANDROID_LOG_DEBUG, "Tomer","Entering JNI");
+
 		if(doInit==1)
 			__android_log_print(ANDROID_LOG_ERROR, "Tomer","doinit: %d", 1);//(ANDROID_LOG_ERROR, "Tomer", "In JNI Call doInit=%d", doInit);
 		else if(doInit == 0)
 			__android_log_print(ANDROID_LOG_ERROR, "Tomer","doinit: %d", 0);
 
-		Mat& mGr  = *(Mat*)addrGray;
+		//Mat& mGr  = *(Mat*)addrGray;
 		Mat& mRgba = *(Mat*)addrRgba;
 
-		Mat mRgb;
+		//Mat mRgb;
 
-		cv::cvtColor(mRgba, mRgb, CV_BGRA2BGR);
+		//cv::cvtColor(mRgba, mRgb, CV_BGRA2BGR);
 		if (!initialize)
 		{
 			__android_log_write(ANDROID_LOG_ERROR, "Tomer", "Not initialized");
 			if (doInit == 1) {
 				__android_log_write(ANDROID_LOG_ERROR, "Tomer", "Initializing");
-				tracker.setReferenceFrame(mRgb);
+				tracker.setReferenceFrame(mRgba);
 				tracker.getWorld()->setObjectsToBeModeled(contours);
-				tracker.prepareInPaintedScene(mRgb, contours);
+				tracker.prepareInPaintedScene(mRgba, contours);
 				initialize = true;
 				__android_log_write(ANDROID_LOG_ERROR, "Tomer", "Now initialized");
 			} else {
 				__android_log_write(ANDROID_LOG_ERROR, "Tomer", "Object detection");
 				LcObjectDetector detect;
 				//detect.setObjectSimplification(true);
-				contours = detect.getObjectContours(mRgb);
+				contours = detect.getObjectContours(mRgba);
 
 				// draw each contour on the image
 				for( int i = 0; i < contours.size(); i++ )
@@ -57,7 +59,7 @@ extern "C"
 
 					const Point* ppt[1] = { pnts };
 					int npt[] = { contours[i].size() };
-					fillPoly(mRgb, ppt, npt, 1, Scalar(120, 250, 50));
+					fillPoly(mRgba, ppt, npt, 1, Scalar(120, 250, 50));
 
 					delete[] pnts;
 				}
@@ -66,10 +68,10 @@ extern "C"
 		else
 		{
 			//__android_log_write(ANDROID_LOG_ERROR, "Tomer", "AR Processing");
-			__android_log_print(ANDROID_LOG_ERROR, "Tomer", "AR Processing MAT (rows:%d, cols:%d)", mRgb.rows, mRgb.cols);
-			tracker.processFrame(mRgb, mRgb);
+			//__android_log_print(ANDROID_LOG_ERROR, "Tomer", "AR Processing MAT (rows:%d, cols:%d)", mRgb.rows, mRgb.cols);
+			tracker.processFrame(mRgba, mRgba);
 		}
 
-		cv::cvtColor(mRgb, mRgba, CV_BGR2BGRA);
+		//cv::cvtColor(mRgb, mRgba, CV_BGR2BGRA);
 	}
 }

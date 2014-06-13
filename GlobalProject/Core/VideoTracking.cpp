@@ -8,10 +8,12 @@ VideoTracking::VideoTracking()
 //nfeatures=500, scaleFactor=1.2f, nlevels=8, edgeThreshold=31, firstLevel=0, WTA_K=2, scoreType=ORB::HARRIS_SCORE, patchSize=31
 , m_orbFeatureEngine(500, 1.2f, 8, 31, 0, 2, cv::ORB::HARRIS_SCORE, 31)
 // TODO: adjust parameters for object where applicable
+#if !defined ANDROID
 , m_surfDetector()
 , m_surfExtractor()
 , m_surfMatcher()
 , m_siftEngine()
+#endif
 {
     this->m_ballRadius = 15;
 
@@ -19,11 +21,11 @@ VideoTracking::VideoTracking()
     this->m_matcher = new cv::FlannBasedMatcher(new cv::flann::LshIndexParams(5, 24, 2));
     this->m_2DWorld = new World(this->m_ballRadius);
     this->m_featureTypeForDetection = FeatureType::ORB;
-    this->m_useGoodPointsOnly = false;  // indicates that should only use "good points" (3 time the min distnace) for homography calculation.
+    this->m_useGoodPointsOnly = true;  // indicates that should only use "good points" (3 time the min distnace) for homography calculation.
 
     this->setGameType(GameType::BARRIERS | GameType::PADDLES);  // default use barriers
 
-    this->m_homographyHelper = false;
+    this->m_homographyHelper = true;
 }
 
 VideoTracking::~VideoTracking()
@@ -151,6 +153,7 @@ void VideoTracking::setReferenceFrame(const cv::Mat& reference)
     // detect key points and generate descriptors for the reference frame
     switch (m_featureTypeForDetection)
     {
+#if !defined ANDROID
         case FeatureType::SIFT:
             m_siftEngine(m_refFrame, cv::Mat(), m_refKeypoints, m_refDescriptors);
             break;
@@ -160,10 +163,23 @@ void VideoTracking::setReferenceFrame(const cv::Mat& reference)
             // extract features corresponding to the key points
             m_surfExtractor.compute(m_refFrame, m_refKeypoints, m_refDescriptors);
             break;
+#endif
         case FeatureType::ORB:
             m_orbFeatureEngine(m_refFrame, cv::Mat(), m_refKeypoints, m_refDescriptors);
             break;
     }
+
+#if defined _MSC_VER && OUTPUT_STEPS
+    cv::Mat keyPointsFrame;
+    reference.copyTo(keyPointsFrame);
+
+    for (size_t i = 0; i < m_refKeypoints.size(); i++)
+    {
+        cv:circle(keyPointsFrame, m_refKeypoints[i].pt, 2, cv::Scalar(200, 100, 255, 255), -1);
+    }
+
+    cv::imshow("ref_keypoints", keyPointsFrame);
+#endif
 
     // create the scene and draw square and borders in it
     m_scene.create(reference.rows, reference.cols, CV_8UC4);
@@ -234,6 +250,7 @@ void VideoTracking::calculateHomography(const cv::Mat& inputFrame)
 
     switch (m_featureTypeForDetection)
     {
+#if !defined ANDROID
         case FeatureType::SIFT:
             m_siftEngine(m_nextImg, cv::Mat(), m_nextKeypoints, m_nextDescriptors);
             break;
@@ -243,10 +260,23 @@ void VideoTracking::calculateHomography(const cv::Mat& inputFrame)
             // extract features corresponding to the key points
             m_surfExtractor.compute(m_nextImg, m_nextKeypoints, m_nextDescriptors);
             break;
+#endif
         case FeatureType::ORB:
             m_orbFeatureEngine(m_nextImg, cv::Mat(), m_nextKeypoints, m_nextDescriptors);
             break;
     }
+
+#if defined _MSC_VER && OUTPUT_STEPS
+    cv::Mat keyPointsFrame;
+    inputFrame.copyTo(keyPointsFrame);
+
+    for (size_t i = 0; i < m_refKeypoints.size(); i++)
+    {
+        cv:circle(keyPointsFrame, m_refKeypoints[i].pt, 2, cv::Scalar(150, 150, 255, 255), -1);
+    }
+
+    cv::imshow("current_keypoints", keyPointsFrame);
+#endif
 
     // transform the sence using descriptors, correspondance and homography
     if (m_refKeypoints.size() > 3)
@@ -261,9 +291,12 @@ void VideoTracking::calculateHomography(const cv::Mat& inputFrame)
             case FeatureType::ORB:
                 m_matcher->match(m_refDescriptors, m_nextDescriptors, matches);
                 break;
+#if !defined ANDROID
             case FeatureType::SIFT:
             case FeatureType::SURF:
                 m_surfMatcher.match(m_refDescriptors, m_nextDescriptors, matches);
+#endif
+
             default:
                 break;
         }
@@ -305,6 +338,13 @@ void VideoTracking::calculateHomography(const cv::Mat& inputFrame)
             refPoints.push_back(m_refKeypoints[matches[i].queryIdx].pt);
             newPoints.push_back(m_nextKeypoints[matches[i].trainIdx].pt);
         }
+
+#if defined _MSC_VER && OUTPUT_STEPS && 0
+        cv::Mat img_matches;
+        cv::drawMatches(m_refFrame, m_refKeypoints, m_nextImg, m_nextKeypoints, matches, img_matches);
+
+        cv::imshow("matches", img_matches);
+#endif
 
         if (refPoints.size() > 3 && newPoints.size() > 3)
         {

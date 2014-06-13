@@ -19,5 +19,5 @@ extern bool trackObject;
 #define GREEN_COLOR cv::Scalar(0, 255, 0)
 #define BLUE_COLOR cv::Scalar(255, 0, 0)
 
-#define OUTPUT_STEPS 0
+#define OUTPUT_STEPS 1
 #endif

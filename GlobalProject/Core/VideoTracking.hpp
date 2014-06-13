@@ -7,8 +7,12 @@
 #include <opencv2/video/tracking.hpp>
 #include <opencv2/calib3d/calib3d.hpp>         //for homography
 #include <opencv2/features2d/features2d.hpp>   //features (orb, brief and corresponding matcher/extractors)
-#include <opencv2/highgui/highgui.hpp>
-#include "opencv2/nonfree/nonfree.hpp"         // SURF detector 
+#include <opencv2/highgui/highgui.hpp>\
+
+#if !defined ANDROID
+#include <opencv2/nonfree/nonfree.hpp>         // SIFT/SURF detector
+#endif
+
 #include <vector>
 #include <functional>
 #include "World.h"
@@ -101,11 +105,13 @@ private:
     cv::BFMatcher           m_orbMatcher;
     cv::FlannBasedMatcher * m_matcher;
 
+#if !defined ANDROID
     // SIFT/SURF object detection classes
     cv::SurfFeatureDetector m_surfDetector;
     cv::SurfDescriptorExtractor m_surfExtractor;
     cv::FlannBasedMatcher m_surfMatcher;
     cv::SIFT m_siftEngine;
+#endif
 
     // the original (first) frame.
     cv::Mat m_refFrame;
