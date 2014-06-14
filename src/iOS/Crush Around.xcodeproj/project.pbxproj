@@ -238,23 +238,23 @@
 		C99B2023190BB14B003F19C1 /* opencv2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = opencv2.framework; sourceTree = "<group>"; };
 		C9D7B7B51925203B0083C690 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		C9D7B7B61925203B0083C690 /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
-		C9F4CABA18C3C1BA0020D812 /* DestroyAroundMe.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DestroyAroundMe.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C9F4CABA18C3C1BA0020D812 /* Crush Around.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Crush Around.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C9F4CABD18C3C1BA0020D812 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		C9F4CABF18C3C1BA0020D812 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		C9F4CAC118C3C1BA0020D812 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
-		C9F4CAC518C3C1BA0020D812 /* DestroyAroundMe-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "DestroyAroundMe-Info.plist"; sourceTree = "<group>"; };
+		C9F4CAC518C3C1BA0020D812 /* Crush Around-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Crush Around-Info.plist"; sourceTree = "<group>"; };
 		C9F4CAC718C3C1BA0020D812 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		C9F4CAC918C3C1BA0020D812 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		C9F4CACB18C3C1BA0020D812 /* DestroyAroundMe-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "DestroyAroundMe-Prefix.pch"; sourceTree = "<group>"; };
+		C9F4CACB18C3C1BA0020D812 /* Crush Around-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Crush Around-Prefix.pch"; sourceTree = "<group>"; };
 		C9F4CACC18C3C1BA0020D812 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		C9F4CACD18C3C1BA0020D812 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		C9F4CAD018C3C1BA0020D812 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		C9F4CAD218C3C1BA0020D812 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
 		C9F4CAD318C3C1BA0020D812 /* ViewController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ViewController.mm; sourceTree = "<group>"; };
 		C9F4CAD518C3C1BA0020D812 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
-		C9F4CADB18C3C1BA0020D812 /* DestroyAroundMeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DestroyAroundMeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		C9F4CADB18C3C1BA0020D812 /* Crush AroundTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Crush AroundTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C9F4CADC18C3C1BA0020D812 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
-		C9F4CAE418C3C1BA0020D812 /* DestroyAroundMeTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "DestroyAroundMeTests-Info.plist"; sourceTree = "<group>"; };
+		C9F4CAE418C3C1BA0020D812 /* Crush AroundTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Crush AroundTests-Info.plist"; sourceTree = "<group>"; };
 		C9F4CAE618C3C1BA0020D812 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		C9F4CAE818C3C1BA0020D812 /* OpenCVTestTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OpenCVTestTests.m; sourceTree = "<group>"; };
 		C9F4CAF418C3DB940020D812 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
@@ -516,8 +516,8 @@
 			children = (
 				C99B1F7D190BB0EC003F19C1 /* Box2D */,
 				C99B1FE2190BB0EC003F19C1 /* Core */,
-				C9F4CAC318C3C1BA0020D812 /* OpenCVTest */,
-				C9F4CAE218C3C1BA0020D812 /* OpenCVTestTests */,
+				C9F4CAC318C3C1BA0020D812 /* CrushAround */,
+				C9F4CAE218C3C1BA0020D812 /* CrushAroundTests */,
 				C9F4CABC18C3C1BA0020D812 /* Frameworks */,
 				C9F4CABB18C3C1BA0020D812 /* Products */,
 			);
@@ -526,8 +526,8 @@
 		C9F4CABB18C3C1BA0020D812 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				C9F4CABA18C3C1BA0020D812 /* DestroyAroundMe.app */,
-				C9F4CADB18C3C1BA0020D812 /* DestroyAroundMeTests.xctest */,
+				C9F4CABA18C3C1BA0020D812 /* Crush Around.app */,
+				C9F4CADB18C3C1BA0020D812 /* Crush AroundTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -556,7 +556,7 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		C9F4CAC318C3C1BA0020D812 /* OpenCVTest */ = {
+		C9F4CAC318C3C1BA0020D812 /* CrushAround */ = {
 			isa = PBXGroup;
 			children = (
 				C95815031917BF3A00552030 /* SpriteLayer.h */,
@@ -577,6 +577,7 @@
 				C92817FC192203BE00C4C523 /* HomeViewController.m */,
 				C92BF5651924D5370048010B /* GameConfiguration.h */,
 			);
+			name = CrushAround;
 			path = OpenCVTest;
 			sourceTree = "<group>";
 		};
@@ -585,27 +586,28 @@
 			children = (
 				C9D7B7B9192520420083C690 /* Images */,
 				C94F006B1913E5C700EBA9C9 /* Fonts */,
-				C9F4CAC518C3C1BA0020D812 /* DestroyAroundMe-Info.plist */,
+				C9F4CAC518C3C1BA0020D812 /* Crush Around-Info.plist */,
 				C9F4CAC618C3C1BA0020D812 /* InfoPlist.strings */,
 				C9F4CAC918C3C1BA0020D812 /* main.m */,
-				C9F4CACB18C3C1BA0020D812 /* DestroyAroundMe-Prefix.pch */,
+				C9F4CACB18C3C1BA0020D812 /* Crush Around-Prefix.pch */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		C9F4CAE218C3C1BA0020D812 /* OpenCVTestTests */ = {
+		C9F4CAE218C3C1BA0020D812 /* CrushAroundTests */ = {
 			isa = PBXGroup;
 			children = (
 				C9F4CAE818C3C1BA0020D812 /* OpenCVTestTests.m */,
 				C9F4CAE318C3C1BA0020D812 /* Supporting Files */,
 			);
+			name = CrushAroundTests;
 			path = OpenCVTestTests;
 			sourceTree = "<group>";
 		};
 		C9F4CAE318C3C1BA0020D812 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				C9F4CAE418C3C1BA0020D812 /* DestroyAroundMeTests-Info.plist */,
+				C9F4CAE418C3C1BA0020D812 /* Crush AroundTests-Info.plist */,
 				C9F4CAE518C3C1BA0020D812 /* InfoPlist.strings */,
 			);
 			name = "Supporting Files";
@@ -614,9 +616,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		C9F4CAB918C3C1BA0020D812 /* DestroyAroundMe */ = {
+		C9F4CAB918C3C1BA0020D812 /* Crush Around */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = C9F4CAEC18C3C1BA0020D812 /* Build configuration list for PBXNativeTarget "DestroyAroundMe" */;
+			buildConfigurationList = C9F4CAEC18C3C1BA0020D812 /* Build configuration list for PBXNativeTarget "Crush Around" */;
 			buildPhases = (
 				C9F4CAB618C3C1BA0020D812 /* Sources */,
 				C9F4CAB718C3C1BA0020D812 /* Frameworks */,
@@ -626,14 +628,14 @@
 			);
 			dependencies = (
 			);
-			name = DestroyAroundMe;
+			name = "Crush Around";
 			productName = OpenCVTest;
-			productReference = C9F4CABA18C3C1BA0020D812 /* DestroyAroundMe.app */;
+			productReference = C9F4CABA18C3C1BA0020D812 /* Crush Around.app */;
 			productType = "com.apple.product-type.application";
 		};
-		C9F4CADA18C3C1BA0020D812 /* DestroyAroundMeTests */ = {
+		C9F4CADA18C3C1BA0020D812 /* Crush AroundTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = C9F4CAEF18C3C1BA0020D812 /* Build configuration list for PBXNativeTarget "DestroyAroundMeTests" */;
+			buildConfigurationList = C9F4CAEF18C3C1BA0020D812 /* Build configuration list for PBXNativeTarget "Crush AroundTests" */;
 			buildPhases = (
 				C9F4CAD718C3C1BA0020D812 /* Sources */,
 				C9F4CAD818C3C1BA0020D812 /* Frameworks */,
@@ -644,9 +646,9 @@
 			dependencies = (
 				C9F4CAE118C3C1BA0020D812 /* PBXTargetDependency */,
 			);
-			name = DestroyAroundMeTests;
+			name = "Crush AroundTests";
 			productName = OpenCVTestTests;
-			productReference = C9F4CADB18C3C1BA0020D812 /* DestroyAroundMeTests.xctest */;
+			productReference = C9F4CADB18C3C1BA0020D812 /* Crush AroundTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
@@ -663,7 +665,7 @@
 					};
 				};
 			};
-			buildConfigurationList = C9F4CAB518C3C1BA0020D812 /* Build configuration list for PBXProject "DestroyAroundMe" */;
+			buildConfigurationList = C9F4CAB518C3C1BA0020D812 /* Build configuration list for PBXProject "Crush Around" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -676,8 +678,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				C9F4CAB918C3C1BA0020D812 /* DestroyAroundMe */,
-				C9F4CADA18C3C1BA0020D812 /* DestroyAroundMeTests */,
+				C9F4CAB918C3C1BA0020D812 /* Crush Around */,
+				C9F4CADA18C3C1BA0020D812 /* Crush AroundTests */,
 			);
 		};
 /* End PBXProject section */
@@ -790,7 +792,7 @@
 /* Begin PBXTargetDependency section */
 		C9F4CAE118C3C1BA0020D812 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = C9F4CAB918C3C1BA0020D812 /* DestroyAroundMe */;
+			target = C9F4CAB918C3C1BA0020D812 /* Crush Around */;
 			targetProxy = C9F4CAE018C3C1BA0020D812 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -905,14 +907,14 @@
 					"$(PROJECT_DIR)",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "OpenCVTest/DestroyAroundMe-Prefix.pch";
+				GCC_PREFIX_HEADER = "OpenCVTest/Crush Around-Prefix.pch";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"/Users/zivl/workspace/OpenCVTest/**",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 				);
-				INFOPLIST_FILE = "OpenCVTest/DestroyAroundMe-Info.plist";
-				PRODUCT_NAME = DestroyAroundMe;
+				INFOPLIST_FILE = "OpenCVTest/Crush Around-Info.plist";
+				PRODUCT_NAME = "Crush Around";
 				USER_HEADER_SEARCH_PATHS = "";
 				WRAPPER_EXTENSION = app;
 			};
@@ -928,14 +930,14 @@
 					"$(PROJECT_DIR)",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "OpenCVTest/DestroyAroundMe-Prefix.pch";
+				GCC_PREFIX_HEADER = "OpenCVTest/Crush Around-Prefix.pch";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"/Users/zivl/workspace/OpenCVTest/**",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 				);
-				INFOPLIST_FILE = "OpenCVTest/DestroyAroundMe-Info.plist";
-				PRODUCT_NAME = DestroyAroundMe;
+				INFOPLIST_FILE = "OpenCVTest/Crush Around-Info.plist";
+				PRODUCT_NAME = "Crush Around";
 				USER_HEADER_SEARCH_PATHS = "";
 				WRAPPER_EXTENSION = app;
 			};
@@ -956,8 +958,8 @@
 					"DEBUG=1",
 					"$(inherited)",
 				);
-				INFOPLIST_FILE = "OpenCVTestTests/DestroyAroundMeTests-Info.plist";
-				PRODUCT_NAME = DestroyAroundMeTests;
+				INFOPLIST_FILE = "OpenCVTestTests/Crush AroundTests-Info.plist";
+				PRODUCT_NAME = "Crush AroundTests";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = xctest;
 			};
@@ -974,8 +976,8 @@
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "OpenCVTest/OpenCVTest-Prefix.pch";
-				INFOPLIST_FILE = "OpenCVTestTests/DestroyAroundMeTests-Info.plist";
-				PRODUCT_NAME = DestroyAroundMeTests;
+				INFOPLIST_FILE = "OpenCVTestTests/Crush AroundTests-Info.plist";
+				PRODUCT_NAME = "Crush AroundTests";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = xctest;
 			};
@@ -984,7 +986,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		C9F4CAB518C3C1BA0020D812 /* Build configuration list for PBXProject "DestroyAroundMe" */ = {
+		C9F4CAB518C3C1BA0020D812 /* Build configuration list for PBXProject "Crush Around" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C9F4CAEA18C3C1BA0020D812 /* Debug */,
@@ -993,7 +995,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		C9F4CAEC18C3C1BA0020D812 /* Build configuration list for PBXNativeTarget "DestroyAroundMe" */ = {
+		C9F4CAEC18C3C1BA0020D812 /* Build configuration list for PBXNativeTarget "Crush Around" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C9F4CAED18C3C1BA0020D812 /* Debug */,
@@ -1002,7 +1004,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		C9F4CAEF18C3C1BA0020D812 /* Build configuration list for PBXNativeTarget "DestroyAroundMeTests" */ = {
+		C9F4CAEF18C3C1BA0020D812 /* Build configuration list for PBXNativeTarget "Crush AroundTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C9F4CAF018C3C1BA0020D812 /* Debug */,
