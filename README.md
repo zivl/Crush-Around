@@ -10,11 +10,11 @@ But it doesn’t have to be that way...
 
 In **Crush Around** the gamer points the mobile device camera onto the scene.
 
-<img src="https://raw.githubusercontent.com/zivl/Destroy-Around-Me/master/Screenshots/select_targets.png" alt="select_targets" width="500"/>
+<img src="https://raw.githubusercontent.com/zivl/Destroy-Around-Me/master/docs/gameplay_detection.png" alt="select_targets" width="500"/>
 
 The game automatically detect objects in the surrounding, transforming the scene into a game level in which the player can interact by bouncing a ball around (similar to classic “Wall Breaker” games).
 
-<img src="https://raw.githubusercontent.com/zivl/Destroy-Around-Me/master/Screenshots/in_play.png" alt="in_play" width="500"/>
+<img src="https://raw.githubusercontent.com/zivl/Destroy-Around-Me/master/docs/gameplay2.PNG" alt="in_play" width="500"/>
 
 The more destruction – the more points (and fun). Several game mechanism ensure that the gamer faces dilemas and tension which makes the experience more rewarding.
 
