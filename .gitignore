@@ -2,33 +2,42 @@
 
 # Package Files #
 *.jar
-!DestroyAroundMe/libs/*.jar
 *.war
 *.ear
 
 # Visual Studio SDF files #
 *.sdf
 *.opensdf
-OpenCVFinal/Debug/
-OpenCVFinal/OpenCVFinal/Debug/
-GlobalProject/win32/Box2d/bin/
-GlobalProject/win32/Box2d/obj/
-GlobalProject/win32/Debug/
-GlobalProject/win32/OpenCvTracking/Debug/
+src/win32/Box2d/bin/
+src/win32/Box2d/obj/
+src/win32/Debug/
+src/win32/OpenCvTracking/Debug/
 *.vcxproj.user
 *.suo
 
+.DS_Store
+
+# Xcode
+*.mode1
+*.mode1v3
+*.mode2v3
+*.perspective
+*.perspectivev3
+*.pbxuser
+*/build/*
+
+*.xcworkspace
+xcuserdata
 *.xcuserstate
 
 *.xcscheme
 
-*.xcuserstate
-
 *.xcbkptlist
-GlobalProject/Poly2Tri/Debug/
-GlobalProject/Poly2Tri/bin/
-GlobalProject/win32/bin/
-GlobalProject/.metadata/
-GlobalProject/tutorial-2-mixedprocessing/bin/
-GlobalProject/tutorial-2-mixedprocessing/obj/
-GlobalProject/a.exe
+
+src/Poly2Tri/Debug/
+src/Poly2Tri/bin/
+src/win32/bin/
+src/.metadata/
+src/Android/bin/
+src/Android/obj/
+src/a.exe
