@@ -19,3 +19,8 @@ The game automatically detect objects in the surrounding, transforming the scene
 The more destruction – the more points (and fun). Several game mechanism ensure that the gamer faces dilemas and tension which makes the experience more rewarding.
 
 The game was developed as part of Game Intelligence course and uses [OpenCV](http://opencv.org) and [Box2D](http://box2d.org) – open source C++ libraries for Computer Vision and physic simulation and is working on multiple platforms such as `iOS`, `Android` and `Win32`.
+
+**Our Goal**
+We would like to invite the global community to contribute their knowledge about *Computer Graphics, Game Design, Animation, UI/UX and everything involved*.
+
+We are just a few more line from submitting this game to Apple/Google App Stores and publish that as an open-source game that being made by the community and belogs to everyone :)
