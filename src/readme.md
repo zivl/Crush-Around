@@ -1,17 +1,3 @@
-Crush Around
-=============
-
-***Image Processing on Mobile Platforms - Final Project***
-
-***Spring 2014, IDC Herzliya***
-
-
-Students
-----------
-Ziv Levy (levy.ziv@post.idc.ac.il)
-
-Tomer Cagan (cagan.tomer@post.idc.ac.il)
-
 
 **Files and folders in project:**
 
